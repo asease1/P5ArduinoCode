@@ -19,6 +19,7 @@
 #define Hold_Delay 8000
 
 #include "Wire.h";
+#include "queue.h";
 
 //Chanel is the current motor input Interupts
 enum Chanels {chanel1, chanel2, chanel3};
