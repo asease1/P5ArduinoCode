@@ -43,28 +43,6 @@ typedef struct Queue {
  * both queue->head and queue->tail will point to it,
  * otherwise the oldtail->next and tail will point to it.
  */
-void push (Queue* queue, int item);
-
-/**
- * Return and remove the first item.
- */
-int pop (Queue* queue);
-
-/**
- * Return but not remove the first item.
- */
-int peek (Queue* queue);
-
-/**
- * Create and initiate a Queue
- */
-Queue createQueue ();
-
-/**
- * Push an item into queue, if this is the first item,
- * both queue->head and queue->tail will point to it,
- * otherwise the oldtail->next and tail will point to it.
- */
 void push (Queue* queue, int item) {
     // Create a new node
     Node* n = (Node*) malloc (sizeof(Node));
