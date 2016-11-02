@@ -8,8 +8,8 @@
 #define zPin1 6
 #define zPin2 7
 //Diraction pins y axis
-#define yPin1 8
-#define yPin2 9
+#define yPin1 9
+#define yPin2 8
 //Chanel Pins
 #define chanelPin3 10
 #define chanelPin2 11
@@ -22,7 +22,7 @@
 #include "queue.h";
 
 //Chanel is the current motor input Interupts
-enum Chanels {chanel1, chanel2, chanel3};
+enum Chanels {motorY, motorX, motorZ, motorRotation};
 enum motorstates {forward, backward, hold};
 
 struct Motor{
@@ -36,6 +36,13 @@ struct Motor{
     volatile int sig2;
 };
 
+struct Instruction{
+  int positions[4];
+  short int count;
+};
+
+
+
 
 
 int targetPos = 0;
@@ -44,6 +51,8 @@ struct Motor motor1;
 struct Motor motor2;
 struct Motor motor3;
 struct Motor *runningMotor;
+
+struct Instruction currentInstruction;
 
 void setup() {
 
@@ -64,13 +73,12 @@ Wire.beginTransmission(0x20);
   pinMode(chanelPin1, OUTPUT);
 
   //Y bricks 4 Deegres 4*10*15=600
-    
+  motor1 = {0, 1050, 0, yPin2, yPin1, hold,0,0};
   //X bricks 10 Deegres 10*10*15-(size platform 30*15)=1050
   motor2 = {0, 1050, 0, xPin2, xPin1, hold,0,0};
   //Z bricks 6 Deegres 6*10*15-(20*15)= 600
   motor3 = {0, 600, 0, zPin1, zPin2, hold, 0,0};
   
-  ChangeChanel(chanel1);
   pinMode(xPin1, OUTPUT);
   pinMode(xPin2, OUTPUT);
   pinMode(yPin1, OUTPUT);
@@ -85,18 +93,33 @@ Wire.beginTransmission(0x20);
 
   Serial.begin(9600);
 
-  MoveTo(1000, runningMotor);
+  currentInstruction = CreateInstruction(0, 200, 300, 265);
+
+  ChangeMotor(motorZ);
+  MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-
+  
 
 
 
   
   Serial.println(runningMotor->pos);
+}
+
+Instruction CreateInstruction(int rotation, int x, int y, int z){
+  Instruction newInstruction;
+  newInstruction.positions[0] = rotation;
+  newInstruction.positions[1] = x;
+  newInstruction.positions[2] = y;
+  newInstruction.positions[3] = z;
+ 
+  newInstruction.count = 3; //Change to 0 when doing rotation :3
+
+  return newInstruction;
 }
 
 //Dukomotion for the diffrent Error_Codes
@@ -149,7 +172,7 @@ void OnInterupts1(){
       }
       break;
   }  
-  InterruptMotorPositionCheck();
+  OnInterrupt();
 }
 
 void OnInterupts2(){
@@ -184,26 +207,54 @@ void OnInterupts2(){
       break;
   }
 
-   InterruptMotorPositionCheck();
+   OnInterrupt();
 }
 
-void InterruptMotorPositionCheck(){
+bool InterruptMotorPositionCheck(){
+    bool halted = false;
+    
     switch(runningMotor->state){
       case forward:
-        if(runningMotor->pos >= targetPos - ERROR_MARGIN){
+        if(runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN){
           ChangeMotorState(hold, runningMotor);
+          halted = true;
         }
         break;
       case backward:
-        if(runningMotor->pos <= targetPos + ERROR_MARGIN){
+        if(runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN){
           ChangeMotorState(hold, runningMotor);
+          halted = true;
         }
         break;
       case hold:
         break;
     }
+
+    return halted;
 }
 
+void OnInterrupt(){
+  if(InterruptMotorPositionCheck()){
+    switch(currentInstruction.count){
+      case 0:
+        currentInstruction.count = 1;
+        ChangeMotor(motorX);
+        break;
+      case 1:
+        currentInstruction.count = 2;
+        ChangeMotor(motorY);
+        break;
+      case 2:
+        currentInstruction.count = 3;
+        ChangeMotor(motorZ);
+        break;
+      case 3:
+        currentInstruction.positions[3] = 0;
+        break;
+    }
+    MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
+  }
+}
 
 void ChangeMotorState(motorstates state, Motor* motor){
   switch(state){
@@ -234,25 +285,26 @@ void ChangeMotorState(motorstates state, Motor* motor){
   }
 }
 
-void ChangeChanel(Chanels newChanel){
-  switch(newChanel){
-    case chanel1:
-      digitalWrite(chanelPin1, LOW);
-      digitalWrite(chanelPin2, LOW);
-      digitalWrite(chanelPin3, LOW);
-      runningMotor = &motor1;
-      break;
-    case chanel2:
+void ChangeMotor(Chanels newMotor){
+  switch(newMotor){
+    case motorX:
       digitalWrite(chanelPin1, HIGH);
       digitalWrite(chanelPin2, LOW);
       digitalWrite(chanelPin3, LOW);
       runningMotor = &motor2;
       break;
-    case chanel3:
+    case motorY:
+      digitalWrite(chanelPin1, LOW);
+      digitalWrite(chanelPin2, LOW);
+      digitalWrite(chanelPin3, LOW);
+      runningMotor = &motor1;
+      break;
+    case motorZ:
       digitalWrite(chanelPin1, LOW);
       digitalWrite(chanelPin2, HIGH);
       digitalWrite(chanelPin3, LOW);
       runningMotor = &motor3;
       break;
+     //Make case for rotation
   }
 }
