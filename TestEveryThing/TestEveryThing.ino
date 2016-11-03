@@ -93,7 +93,7 @@ Wire.beginTransmission(0x20);
 
   Serial.begin(9600);
 
-  currentInstruction = CreateInstruction(0, 200, 300, 265);
+  currentInstruction = CreateInstruction(0, 200, 300, 235);
 
   ChangeMotor(motorZ);
   MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
