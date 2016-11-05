@@ -21,20 +21,9 @@
 #include "Wire.h";
 #include "queue.h";
 
-//Chanel is the current motor input Interupts
-enum Chanels {motorY, motorX, motorZ, motorRotation};
-enum motorstates {forward, backward, hold};
 
-struct Motor{
-    volatile int pos;
-    int maxPos;
-    int minPos;
-    int pin1;
-    int pin2;
-    motorstates state;
-    volatile int sig1;
-    volatile int sig2;
-};
+
+
 
 struct Instruction{
   int positions[4];
