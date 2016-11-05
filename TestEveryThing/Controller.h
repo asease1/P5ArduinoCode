@@ -108,12 +108,12 @@ void ChangeMotorState(MotorStates state, Motor* motor){
       digitalWrite(motor->pin2, HIGH);
       break;
     case hold:
-      if(motor->state == forward)
+     /* if(motor->state == forward)
         ChangeMotorState(backward, motor);
       else if(motor->state == backward)  
         ChangeMotorState(forward, motor);
       //we should find a other way, maybe use PVM and gears so we slow down.
-      delay(Hold_Delay);
+      delay(Hold_Delay);*/
     
       digitalWrite(motor->pin1, LOW);
       digitalWrite(motor->pin2, LOW);
@@ -127,10 +127,13 @@ void ChangeMotorState(MotorStates state, Motor* motor){
 
 //Update the controller targetpos to the new position and start the runningMotor in the dircation of target
 void MoveTo(int pos, Controller control){
-  if(control.runningMotor->pos > (pos + ERROR_MARGIN)){
+  if(pos < 0 || pos > control.runningMotor->maxPos)
+    return;
+  
+  if(control.runningMotor->pos > (pos + ERROR_MARGIN1)){
       ChangeMotorState(backward, control.runningMotor);
   }
-  else if(control.runningMotor->pos < (pos - ERROR_MARGIN)){
+  else if(control.runningMotor->pos < (pos - ERROR_MARGIN1)){
     ChangeMotorState(forward, control.runningMotor);
   }
 

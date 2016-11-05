@@ -8,14 +8,24 @@
 #define zPin1 6
 #define zPin2 7
 //Diraction pins y axis
-#define yPin1 9
+#define yPin1 13
 #define yPin2 8
 //Chanel Pins
 #define chanelPin3 10
 #define chanelPin2 11
 #define chanelPin1 12
+//Gear Pin
+//Pin to the PVM pins(3,5,6,9,10,11)
+#define gearPin 9
 //Margins
-#define ERROR_MARGIN 2
+#define ERROR_MARGIN1 2
+#define ERROR_MARGIN2 20
+#define ERROR_MARGIN3 40
+//gear are the amount of speed the motor should move at from 0-255
+#define gear1 255
+#define gear2 100
+#define gear3 150
+
 #define Hold_Delay 8000
 
 #include "Wire.h";
@@ -171,20 +181,38 @@ void OnInterupts2(){
 }
 
 bool InterruptMotorPositionCheck(){
-    bool halted = false;
+    bool halted = true;
     
     switch(myController.runningMotor->state){
       case forward:
-        if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN){
+        if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN1){
           ChangeMotorState(hold, myController.runningMotor);
-          halted = true;
+          //Reset the speed of the motor
+          analogWrite(gearPin, gear1);
         }
+        else if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN2){
+          analogWrite(gearPin, gear2);
+        }
+        else if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN3){
+          analogWrite(gearPin, gear3);
+        }
+        else 
+          halted = false;
         break;
       case backward:
-        if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN){
+        if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN1){
           ChangeMotorState(hold, myController.runningMotor);
-          halted = true;
+          //Reset the speed of the motor
+          analogWrite(gearPin, gear1);
         }
+        else if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN2){
+          analogWrite(gearPin, gear2);
+        }
+        else if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN3){
+          analogWrite(gearPin, gear3);
+        }
+        else 
+          halted = false;
         break;
       case hold:
         break;
