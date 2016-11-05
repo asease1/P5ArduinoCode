@@ -4,51 +4,55 @@
 
 //Chanel is the current motor input Interupts
 enum Chanels {motorY, motorX, motorZ, motorRotation};
-enum Motorstates {forward, backward, hold};
+enum MotorStates {forward, backward, hold};
 enum BrickType {smallBrick, largeBrick0, largeBrick90};
 
 //All data struct
-struct Motor{
+typedef struct Motor{
     volatile int pos;
     int maxPos;
     int minPos;
     int pin1;
     int pin2;
-    Motorstates state;
+    MotorStates state;
     volatile int sig1;
     volatile int sig2;
 };
 
-struct Controller{
-  int targetPos;
-  Motor motorX;
-  Motor motorY;
-  Motor motorZ;
-  Motor *runningMotor;
-  //if null we dont have any brick picked
-  Brick currentBrick;
-};
 
-struct Position{
+typedef struct Position{
   int x;
   int y;
   int z;
 };
 
-struct Brick{
+typedef struct Brick{
   Position myPos;
   BrickType myType;
 };
 
+typedef struct Controller{
+  int targetPos;
+  Motor motorX;
+  Motor motorY;
+  Motor motorZ;
+  Motor *runningMotor;
+  //if null we dont have any brick picked, and need to be a pointer or we cant use null
+  Brick *currentBrick;
+};
+
+
+
+
 //Counstructers for all the struct
 Controller CreateController(Motor motorX, Motor motorY, Motor motorZ){
   Controller newController;
-  newController.targetPos
+  newController.targetPos;
   newController.motorX = motorX;
   newController.motorY = motorY;
   newController.motorZ = motorZ;
   newController.runningMotor = &motorX;
-  newController.currentBrick = null;
+  newController.currentBrick = NULL;
 
   return newController;
 }
@@ -74,10 +78,11 @@ Brick CreateBrick(Position pos, BrickType brickType){
 
 //Function that create the motor with the values that a dynamic at the start
 Motor CreateMotor(int maxPos, int pin1, int pin2){
+  //maybe move pin setyp in to this function.
   Motor newMotor;
   newMotor.pos = 0;
   newMotor.maxPos = maxPos;
-  newMotor.minPos = minPos;
+  newMotor.minPos = 0;
   newMotor.pin1 = pin1;
   newMotor.pin2 = pin2;
   newMotor.state = hold;
@@ -88,21 +93,9 @@ Motor CreateMotor(int maxPos, int pin1, int pin2){
   return newMotor;
 }
 
-//Update the controller targetpos to the new position and start the runningMotor in the dircation of target
-void MoveTo(int pos, Controller control){
-  if(control.runningMotor->pos > (pos + ERROR_MARGIN)){
-      ChangeMotorState(backward, control.runningMotor);
-  }
-  else if(control.runningMotor->pos < (pos - ERROR_MARGIN)){
-    ChangeMotorState(forward, control.runningMotor);
-  }
-
-  control.targetPos = pos;
-}
-
 //Take a motor and set the pins to the diraction you want it to move and chance the state
 //Have to watch out for that you can run a motor that the channel is not on if this is don't you cannot update its position.
-void ChangeMotorState(motorstates state, Motor* motor){
+void ChangeMotorState(MotorStates state, Motor* motor){
   switch(state){
     case forward:
       motor->state = state;
@@ -131,6 +124,20 @@ void ChangeMotorState(motorstates state, Motor* motor){
       break;
   }
 }
+
+//Update the controller targetpos to the new position and start the runningMotor in the dircation of target
+void MoveTo(int pos, Controller control){
+  if(control.runningMotor->pos > (pos + ERROR_MARGIN)){
+      ChangeMotorState(backward, control.runningMotor);
+  }
+  else if(control.runningMotor->pos < (pos - ERROR_MARGIN)){
+    ChangeMotorState(forward, control.runningMotor);
+  }
+
+  control.targetPos = pos;
+}
+
+
 
 //Switch the runningMotor on the Controller to a new Motor
 void ChangeMotor(Controller myControl, Chanels newMotor){

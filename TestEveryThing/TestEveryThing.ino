@@ -20,6 +20,7 @@
 
 #include "Wire.h";
 #include "queue.h";
+#include "Controller.h";
 
 struct Instruction{
   int positions[4];
@@ -27,6 +28,8 @@ struct Instruction{
 };
 
 struct Instruction currentInstruction;
+
+struct Controller myController;
 
 void setup() {
 
@@ -53,6 +56,12 @@ Wire.beginTransmission(0x20);
   pinMode(zPin1, OUTPUT);
   pinMode(zPin2, OUTPUT);
 
+  Motor motorX = CreateMotor(1005, xPin1, xPin2);
+  Motor motorY = CreateMotor(1005, yPin1, yPin2);
+  Motor motorZ = CreateMotor(1005, zPin1, zPin2);
+
+  myController = CreateController(motorX, motorY, motorZ);
+
   pinMode(interupt1, INPUT_PULLUP);
   pinMode(interupt2, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(interupt1), OnInterupts1, CHANGE);
@@ -69,7 +78,7 @@ void loop() {
 
 
   
-  Serial.println(runningMotor->pos);
+  Serial.println(myController.runningMotor->pos);
 }
 
 Instruction CreateInstruction(int rotation, int x, int y, int z){
@@ -102,24 +111,24 @@ void OnInterupts1(){
   //B0110 Code for the clockwise rotation
   int pinSignal = digitalRead(interupt1);
 
-  if(runningMotor->sig1 == pinSignal)
+  if(myController.runningMotor->sig1 == pinSignal)
     return;
   
-  runningMotor->sig1 = pinSignal;
+  myController.runningMotor->sig1 = pinSignal;
   switch(pinSignal){
     case 0:
-      if(runningMotor->sig2 == 0){
-        runningMotor->pos += -1;
+      if(myController.runningMotor->sig2 == 0){
+        myController.runningMotor->pos += -1;
       }
       else{
-        runningMotor->pos += 1;
+        myController.runningMotor->pos += 1;
       }
     case 1:
-      if(runningMotor->sig2 == 0){
-        runningMotor->pos += 1;
+      if(myController.runningMotor->sig2 == 0){
+        myController.runningMotor->pos += 1;
       }
       else{
-        runningMotor->pos += -1;
+        myController.runningMotor->pos += -1;
       }
       break;
   }  
@@ -138,22 +147,22 @@ void OnInterupts2(){
   //   return;
       
   //Save the change the sig to the new bit
-  runningMotor->sig2 = pinSignal;
+  myController.runningMotor->sig2 = pinSignal;
 
   switch(pinSignal){
     case 0:
-      if(runningMotor->sig1 == 0){
-        runningMotor->pos += 1;
+      if(myController.runningMotor->sig1 == 0){
+        myController.runningMotor->pos += 1;
       }
       else{
-        runningMotor->pos += -1;
+        myController.runningMotor->pos += -1;
       }
     case 1:
-      if(runningMotor->sig1 == 0){
-        runningMotor->pos += -1;
+      if(myController.runningMotor->sig1 == 0){
+        myController.runningMotor->pos += -1;
       }
       else{
-        runningMotor->pos += 1;
+        myController.runningMotor->pos += 1;
       }
       break;
   }
@@ -164,16 +173,16 @@ void OnInterupts2(){
 bool InterruptMotorPositionCheck(){
     bool halted = false;
     
-    switch(runningMotor->state){
+    switch(myController.runningMotor->state){
       case forward:
-        if(runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN){
-          ChangeMotorState(hold, runningMotor);
+        if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN){
+          ChangeMotorState(hold, myController.runningMotor);
           halted = true;
         }
         break;
       case backward:
-        if(runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN){
-          ChangeMotorState(hold, runningMotor);
+        if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN){
+          ChangeMotorState(hold, myController.runningMotor);
           halted = true;
         }
         break;
@@ -189,20 +198,20 @@ void OnInterrupt(){
     switch(currentInstruction.count){
       case 0:
         currentInstruction.count = 1;
-        ChangeMotor(motorX);
+        ChangeMotor(myController, motorX);
         break;
       case 1:
         currentInstruction.count = 2;
-        ChangeMotor(motorY);
+        ChangeMotor(myController, motorY);
         break;
       case 2:
         currentInstruction.count = 3;
-        ChangeMotor(motorZ);
+        ChangeMotor(myController, motorZ);
         break;
       case 3:
         currentInstruction.positions[3] = 0;
         break;
     }
-    MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
+    MoveTo(currentInstruction.positions[currentInstruction.count], myController);
   }
 }
