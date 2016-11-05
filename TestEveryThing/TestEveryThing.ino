@@ -21,25 +21,10 @@
 #include "Wire.h";
 #include "queue.h";
 
-
-
-
-
 struct Instruction{
   int positions[4];
   short int count;
 };
-
-
-
-
-
-int targetPos = 0;
-
-struct Motor motor1;
-struct Motor motor2;
-struct Motor motor3;
-struct Motor *runningMotor;
 
 struct Instruction currentInstruction;
 
@@ -60,13 +45,6 @@ Wire.beginTransmission(0x20);
   pinMode(chanelPin3, OUTPUT);
   pinMode(chanelPin2, OUTPUT);
   pinMode(chanelPin1, OUTPUT);
-
-  //Y bricks 4 Deegres 4*10*15=600
-  motor1 = {0, 1050, 0, yPin2, yPin1, hold,0,0};
-  //X bricks 10 Deegres 10*10*15-(size platform 30*15)=1050
-  motor2 = {0, 1050, 0, xPin2, xPin1, hold,0,0};
-  //Z bricks 6 Deegres 6*10*15-(20*15)= 600
-  motor3 = {0, 600, 0, zPin1, zPin2, hold, 0,0};
   
   pinMode(xPin1, OUTPUT);
   pinMode(xPin2, OUTPUT);
@@ -81,11 +59,6 @@ Wire.beginTransmission(0x20);
   attachInterrupt(digitalPinToInterrupt(interupt2), OnInterupts2, CHANGE);
 
   Serial.begin(9600);
-
-  currentInstruction = CreateInstruction(0, 200, 300, 235);
-
-  ChangeMotor(motorZ);
-  MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
 }
 
 void loop() {
@@ -121,18 +94,7 @@ void ErrorCode(int error_Code){
   Wire.endTransmission();
 }
 
-void MoveTo(int pos, Motor* motor){
-  //Maybe optimize here, save motor state on motor.
 
-  if(motor->pos > (pos + ERROR_MARGIN)){
-      ChangeMotorState(backward, motor);
-  }
-  else if(motor->pos < (pos - ERROR_MARGIN)){
-    ChangeMotorState(forward, motor);
-  }
-
-  targetPos = pos;
-}
 
 void OnInterupts1(){
   //NXT lego motor encoder
@@ -242,58 +204,5 @@ void OnInterrupt(){
         break;
     }
     MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
-  }
-}
-
-void ChangeMotorState(motorstates state, Motor* motor){
-  switch(state){
-    case forward:
-      motor->state = state;
-      digitalWrite(motor->pin1, HIGH);
-      digitalWrite(motor->pin2, LOW);
-      break;
-    case backward:
-      motor->state = state;
-      digitalWrite(motor->pin1, LOW);
-      digitalWrite(motor->pin2, HIGH);
-      break;
-    case hold:
-      if(motor->state == forward)
-        ChangeMotorState(backward, motor);
-      else if(motor->state == backward)  
-        ChangeMotorState(forward, motor);
-      delay(Hold_Delay);
-    
-      digitalWrite(motor->pin1, LOW);
-      digitalWrite(motor->pin2, LOW);
-      motor->state = hold;
-
-      //Debug
-      //MoveTo(motor->pos * -1, runningMotor);
-      break;
-  }
-}
-
-void ChangeMotor(Chanels newMotor){
-  switch(newMotor){
-    case motorX:
-      digitalWrite(chanelPin1, HIGH);
-      digitalWrite(chanelPin2, LOW);
-      digitalWrite(chanelPin3, LOW);
-      runningMotor = &motor2;
-      break;
-    case motorY:
-      digitalWrite(chanelPin1, LOW);
-      digitalWrite(chanelPin2, LOW);
-      digitalWrite(chanelPin3, LOW);
-      runningMotor = &motor1;
-      break;
-    case motorZ:
-      digitalWrite(chanelPin1, LOW);
-      digitalWrite(chanelPin2, HIGH);
-      digitalWrite(chanelPin3, LOW);
-      runningMotor = &motor3;
-      break;
-     //Make case for rotation
   }
 }
