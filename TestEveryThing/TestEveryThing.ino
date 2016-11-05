@@ -181,7 +181,7 @@ void OnInterupts2(){
 }
 
 bool InterruptMotorPositionCheck(){
-    bool halted = true;
+    bool halted = false;
     
     switch(myController.runningMotor->state){
       case forward:
@@ -189,6 +189,7 @@ bool InterruptMotorPositionCheck(){
           ChangeMotorState(hold, myController.runningMotor);
           //Reset the speed of the motor
           analogWrite(gearPin, gear1);
+          halted = true;
         }
         else if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN2){
           analogWrite(gearPin, gear2);
@@ -196,14 +197,13 @@ bool InterruptMotorPositionCheck(){
         else if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN3){
           analogWrite(gearPin, gear3);
         }
-        else 
-          halted = false;
         break;
       case backward:
         if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN1){
           ChangeMotorState(hold, myController.runningMotor);
           //Reset the speed of the motor
           analogWrite(gearPin, gear1);
+          halted = true;
         }
         else if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN2){
           analogWrite(gearPin, gear2);
@@ -211,8 +211,6 @@ bool InterruptMotorPositionCheck(){
         else if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN3){
           analogWrite(gearPin, gear3);
         }
-        else 
-          halted = false;
         break;
       case hold:
         break;
