@@ -42,17 +42,19 @@ struct Instruction{
 };
 
 
-
-
+float timer = 0;
+float delaytimer = 1000;
 
 int targetPos = 0;
+
+Queue instructionQueue;
 
 struct Motor motor1;
 struct Motor motor2;
 struct Motor motor3;
 struct Motor *runningMotor;
 
-struct Instruction currentInstruction;
+struct Instruction *currentInstruction;
 
 void setup() {
 
@@ -90,24 +92,37 @@ Wire.beginTransmission(0x20);
   pinMode(interupt2, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(interupt1), OnInterupts1, CHANGE);
   attachInterrupt(digitalPinToInterrupt(interupt2), OnInterupts2, CHANGE);
-
+  instructionQueue = createQueue();
+  /*push(&instructionQueue, &CreateInstruction(0,0,0,0));
+  push(&instructionQueue, &CreateInstruction(0,0,0,235));*/
   Serial.begin(9600);
-
-  currentInstruction = CreateInstruction(0, 200, 300, 235);
-
-  ChangeMotor(motorZ);
-  MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
+  ChangeMotor(motorX);
+ 
+  
+  currentInstruction = &CreateInstruction(0,200,200,0);
+  MoveTo(currentInstruction->positions[currentInstruction->count], runningMotor);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
   
-
-
-
-  
   Serial.println(runningMotor->pos);
+}
+
+void PickUpBrick(int brickType){
+  if(brickType  == 0){
+    currentInstruction = &CreateInstruction(0, 0, 0, 0);
+    MoveTo(currentInstruction->positions[currentInstruction->count], runningMotor);
+  }
+  else{
+    
+  }
+}
+
+void GrabBrick(){
+  ChangeMotor(motorY);
+  MoveTo(235, runningMotor);
 }
 
 Instruction CreateInstruction(int rotation, int x, int y, int z){
@@ -117,7 +132,7 @@ Instruction CreateInstruction(int rotation, int x, int y, int z){
   newInstruction.positions[2] = y;
   newInstruction.positions[3] = z;
  
-  newInstruction.count = 3; //Change to 0 when doing rotation :3
+  newInstruction.count = 1; //Change to 0 when doing rotation :3
 
   return newInstruction;
 }
@@ -215,13 +230,13 @@ bool InterruptMotorPositionCheck(){
     
     switch(runningMotor->state){
       case forward:
-        if(runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN){
+        if(runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN){
           ChangeMotorState(hold, runningMotor);
           halted = true;
         }
         break;
       case backward:
-        if(runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN){
+        if(runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN){
           ChangeMotorState(hold, runningMotor);
           halted = true;
         }
@@ -234,25 +249,28 @@ bool InterruptMotorPositionCheck(){
 }
 
 void OnInterrupt(){
+  timer  = millis();
   if(InterruptMotorPositionCheck()){
-    switch(currentInstruction.count){
+    switch(currentInstruction->count){
       case 0:
-        currentInstruction.count = 1;
+        currentInstruction->count = 1;
         ChangeMotor(motorX);
         break;
       case 1:
-        currentInstruction.count = 2;
+        currentInstruction->count = 2;
         ChangeMotor(motorY);
         break;
       case 2:
-        currentInstruction.count = 3;
+        currentInstruction->count = 3;
         ChangeMotor(motorZ);
         break;
       case 3:
-        currentInstruction.positions[3] = 0;
+        if(instructionQueue.size > 0){
+          currentInstruction = pop(&instructionQueue);
+        }
         break;
     }
-    MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
+    MoveTo(currentInstruction->positions[currentInstruction->count], runningMotor);
   }
 }
 
