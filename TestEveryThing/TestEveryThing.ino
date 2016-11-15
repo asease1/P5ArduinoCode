@@ -8,7 +8,7 @@
 #define zPin1 6
 #define zPin2 7
 //Diraction pins y axis
-#define yPin1 9
+#define yPin1 13
 #define yPin2 8
 //Chanel Pins
 #define chanelPin3 10
@@ -95,7 +95,7 @@ Wire.beginTransmission(0x20);
 
   currentInstruction = CreateInstruction(0, 200, 300, 235);
 
-  ChangeMotor(motorZ);
+  ChangeMotor(motorX);
   MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
 }
 
@@ -117,7 +117,7 @@ Instruction CreateInstruction(int rotation, int x, int y, int z){
   newInstruction.positions[2] = y;
   newInstruction.positions[3] = z;
  
-  newInstruction.count = 3; //Change to 0 when doing rotation :3
+  newInstruction.count = 1; //Change to 0 when doing rotation :3
 
   return newInstruction;
 }
