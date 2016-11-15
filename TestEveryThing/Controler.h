@@ -1,1 +1,0 @@
-//Control that defines motor and a controler that contains the motor 

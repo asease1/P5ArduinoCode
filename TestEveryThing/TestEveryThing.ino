@@ -8,51 +8,38 @@
 #define zPin1 6
 #define zPin2 7
 //Diraction pins y axis
-#define yPin1 9
+#define yPin1 13
 #define yPin2 8
 //Chanel Pins
 #define chanelPin3 10
 #define chanelPin2 11
 #define chanelPin1 12
+//Gear Pin
+//Pin to the PVM pins(3,5,6,9,10,11)
+#define gearPin 9
 //Margins
-#define ERROR_MARGIN 2
+#define ERROR_MARGIN1 2
+#define ERROR_MARGIN2 20
+#define ERROR_MARGIN3 40
+//gear are the amount of speed the motor should move at from 0-255
+#define gear1 255
+#define gear2 100
+#define gear3 150
+
 #define Hold_Delay 8000
 
 #include "Wire.h";
 #include "queue.h";
-
-//Chanel is the current motor input Interupts
-enum Chanels {motorY, motorX, motorZ, motorRotation};
-enum motorstates {forward, backward, hold};
-
-struct Motor{
-    volatile int pos;
-    int maxPos;
-    int minPos;
-    int pin1;
-    int pin2;
-    motorstates state;
-    volatile int sig1;
-    volatile int sig2;
-};
+#include "Controller.h";
 
 struct Instruction{
   int positions[4];
   short int count;
 };
 
-
-
-
-
-int targetPos = 0;
-
-struct Motor motor1;
-struct Motor motor2;
-struct Motor motor3;
-struct Motor *runningMotor;
-
 struct Instruction currentInstruction;
+
+struct Controller myController;
 
 void setup() {
 
@@ -71,13 +58,6 @@ Wire.beginTransmission(0x20);
   pinMode(chanelPin3, OUTPUT);
   pinMode(chanelPin2, OUTPUT);
   pinMode(chanelPin1, OUTPUT);
-
-  //Y bricks 4 Deegres 4*10*15=600
-  motor1 = {0, 1050, 0, yPin2, yPin1, hold,0,0};
-  //X bricks 10 Deegres 10*10*15-(size platform 30*15)=1050
-  motor2 = {0, 1050, 0, xPin2, xPin1, hold,0,0};
-  //Z bricks 6 Deegres 6*10*15-(20*15)= 600
-  motor3 = {0, 600, 0, zPin1, zPin2, hold, 0,0};
   
   pinMode(xPin1, OUTPUT);
   pinMode(xPin2, OUTPUT);
@@ -86,17 +66,18 @@ Wire.beginTransmission(0x20);
   pinMode(zPin1, OUTPUT);
   pinMode(zPin2, OUTPUT);
 
+  Motor motorX = CreateMotor(1005, xPin1, xPin2);
+  Motor motorY = CreateMotor(1005, yPin1, yPin2);
+  Motor motorZ = CreateMotor(1005, zPin1, zPin2);
+
+  myController = CreateController(motorX, motorY, motorZ);
+
   pinMode(interupt1, INPUT_PULLUP);
   pinMode(interupt2, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(interupt1), OnInterupts1, CHANGE);
   attachInterrupt(digitalPinToInterrupt(interupt2), OnInterupts2, CHANGE);
 
   Serial.begin(9600);
-
-  currentInstruction = CreateInstruction(0, 200, 300, 235);
-
-  ChangeMotor(motorZ);
-  MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
 }
 
 void loop() {
@@ -107,7 +88,7 @@ void loop() {
 
 
   
-  Serial.println(runningMotor->pos);
+  Serial.println(myController.runningMotor->pos);
 }
 
 Instruction CreateInstruction(int rotation, int x, int y, int z){
@@ -132,18 +113,7 @@ void ErrorCode(int error_Code){
   Wire.endTransmission();
 }
 
-void MoveTo(int pos, Motor* motor){
-  //Maybe optimize here, save motor state on motor.
 
-  if(motor->pos > (pos + ERROR_MARGIN)){
-      ChangeMotorState(backward, motor);
-  }
-  else if(motor->pos < (pos - ERROR_MARGIN)){
-    ChangeMotorState(forward, motor);
-  }
-
-  targetPos = pos;
-}
 
 void OnInterupts1(){
   //NXT lego motor encoder
@@ -151,24 +121,24 @@ void OnInterupts1(){
   //B0110 Code for the clockwise rotation
   int pinSignal = digitalRead(interupt1);
 
-  if(runningMotor->sig1 == pinSignal)
+  if(myController.runningMotor->sig1 == pinSignal)
     return;
   
-  runningMotor->sig1 = pinSignal;
+  myController.runningMotor->sig1 = pinSignal;
   switch(pinSignal){
     case 0:
-      if(runningMotor->sig2 == 0){
-        runningMotor->pos += -1;
+      if(myController.runningMotor->sig2 == 0){
+        myController.runningMotor->pos += -1;
       }
       else{
-        runningMotor->pos += 1;
+        myController.runningMotor->pos += 1;
       }
     case 1:
-      if(runningMotor->sig2 == 0){
-        runningMotor->pos += 1;
+      if(myController.runningMotor->sig2 == 0){
+        myController.runningMotor->pos += 1;
       }
       else{
-        runningMotor->pos += -1;
+        myController.runningMotor->pos += -1;
       }
       break;
   }  
@@ -187,22 +157,22 @@ void OnInterupts2(){
   //   return;
       
   //Save the change the sig to the new bit
-  runningMotor->sig2 = pinSignal;
+  myController.runningMotor->sig2 = pinSignal;
 
   switch(pinSignal){
     case 0:
-      if(runningMotor->sig1 == 0){
-        runningMotor->pos += 1;
+      if(myController.runningMotor->sig1 == 0){
+        myController.runningMotor->pos += 1;
       }
       else{
-        runningMotor->pos += -1;
+        myController.runningMotor->pos += -1;
       }
     case 1:
-      if(runningMotor->sig1 == 0){
-        runningMotor->pos += -1;
+      if(myController.runningMotor->sig1 == 0){
+        myController.runningMotor->pos += -1;
       }
       else{
-        runningMotor->pos += 1;
+        myController.runningMotor->pos += 1;
       }
       break;
   }
@@ -213,17 +183,33 @@ void OnInterupts2(){
 bool InterruptMotorPositionCheck(){
     bool halted = false;
     
-    switch(runningMotor->state){
+    switch(myController.runningMotor->state){
       case forward:
-        if(runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN){
-          ChangeMotorState(hold, runningMotor);
+        if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN1){
+          ChangeMotorState(hold, myController.runningMotor);
+          //Reset the speed of the motor
+          analogWrite(gearPin, gear1);
           halted = true;
+        }
+        else if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN2){
+          analogWrite(gearPin, gear2);
+        }
+        else if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN3){
+          analogWrite(gearPin, gear3);
         }
         break;
       case backward:
-        if(runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN){
-          ChangeMotorState(hold, runningMotor);
+        if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN1){
+          ChangeMotorState(hold, myController.runningMotor);
+          //Reset the speed of the motor
+          analogWrite(gearPin, gear1);
           halted = true;
+        }
+        else if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN2){
+          analogWrite(gearPin, gear2);
+        }
+        else if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN3){
+          analogWrite(gearPin, gear3);
         }
         break;
       case hold:
@@ -238,73 +224,20 @@ void OnInterrupt(){
     switch(currentInstruction.count){
       case 0:
         currentInstruction.count = 1;
-        ChangeMotor(motorX);
+        ChangeMotor(myController, motorX);
         break;
       case 1:
         currentInstruction.count = 2;
-        ChangeMotor(motorY);
+        ChangeMotor(myController, motorY);
         break;
       case 2:
         currentInstruction.count = 3;
-        ChangeMotor(motorZ);
+        ChangeMotor(myController, motorZ);
         break;
       case 3:
         currentInstruction.positions[3] = 0;
         break;
     }
-    MoveTo(currentInstruction.positions[currentInstruction.count], runningMotor);
-  }
-}
-
-void ChangeMotorState(motorstates state, Motor* motor){
-  switch(state){
-    case forward:
-      motor->state = state;
-      digitalWrite(motor->pin1, HIGH);
-      digitalWrite(motor->pin2, LOW);
-      break;
-    case backward:
-      motor->state = state;
-      digitalWrite(motor->pin1, LOW);
-      digitalWrite(motor->pin2, HIGH);
-      break;
-    case hold:
-      if(motor->state == forward)
-        ChangeMotorState(backward, motor);
-      else if(motor->state == backward)  
-        ChangeMotorState(forward, motor);
-      delay(Hold_Delay);
-    
-      digitalWrite(motor->pin1, LOW);
-      digitalWrite(motor->pin2, LOW);
-      motor->state = hold;
-
-      //Debug
-      //MoveTo(motor->pos * -1, runningMotor);
-      break;
-  }
-}
-
-void ChangeMotor(Chanels newMotor){
-  switch(newMotor){
-    case motorX:
-      digitalWrite(chanelPin1, HIGH);
-      digitalWrite(chanelPin2, LOW);
-      digitalWrite(chanelPin3, LOW);
-      runningMotor = &motor2;
-      break;
-    case motorY:
-      digitalWrite(chanelPin1, LOW);
-      digitalWrite(chanelPin2, LOW);
-      digitalWrite(chanelPin3, LOW);
-      runningMotor = &motor1;
-      break;
-    case motorZ:
-      digitalWrite(chanelPin1, LOW);
-      digitalWrite(chanelPin2, HIGH);
-      digitalWrite(chanelPin3, LOW);
-      runningMotor = &motor3;
-      break;
-     //Make case for rotation
+    MoveTo(currentInstruction.positions[currentInstruction.count], myController);
   }
 }
