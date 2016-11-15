@@ -1,7 +1,10 @@
 //Control that defines motor and a controler that contains the motors
 //Have function that contains the controller or motor in them
 //Have struct for position/3DVector and a brickData struckt
-
+//Margins
+#define ERROR_MARGIN1 2
+#define ERROR_MARGIN2 20
+#define ERROR_MARGIN3 40
 //Chanel is the current motor input Interupts
 enum Chanels {motorY, motorX, motorZ, motorRotation};
 enum MotorStates {forward, backward, hold};
@@ -99,6 +102,10 @@ void ChangeMotorState(MotorStates state, Motor* motor){
   switch(state){
     case forward:
       motor->state = state;
+      
+      //Serial.println(motor->pin1);
+      //Serial.println(motor->pin2);
+      
       digitalWrite(motor->pin1, HIGH);
       digitalWrite(motor->pin2, LOW);
       break;
@@ -126,42 +133,45 @@ void ChangeMotorState(MotorStates state, Motor* motor){
 }
 
 //Update the controller targetpos to the new position and start the runningMotor in the dircation of target
-void MoveTo(int pos, Controller control){
-  if(pos < 0 || pos > control.runningMotor->maxPos)
+void MoveTo(int pos, Controller *control){
+  if(pos < 0 || pos > control->runningMotor->maxPos)
     return;
+
   
-  if(control.runningMotor->pos > (pos + ERROR_MARGIN1)){
-      ChangeMotorState(backward, control.runningMotor);
+  if(control->runningMotor->pos > (pos + ERROR_MARGIN1)){
+      ChangeMotorState(backward, control->runningMotor);
+      //Serial.println("Back");
   }
-  else if(control.runningMotor->pos < (pos - ERROR_MARGIN1)){
-    ChangeMotorState(forward, control.runningMotor);
+  else if(control->runningMotor->pos < (pos - ERROR_MARGIN1)){
+    ChangeMotorState(forward, control->runningMotor);
+    //Serial.println("Forward");
   }
 
-  control.targetPos = pos;
+  control->targetPos = pos;
 }
 
 
 
 //Switch the runningMotor on the Controller to a new Motor
-void ChangeMotor(Controller myControl, Chanels newMotor){
+void ChangeMotor(Controller *myControl, Chanels newMotor){
   switch(newMotor){
     case motorX:
       digitalWrite(chanelPin1, HIGH);
       digitalWrite(chanelPin2, LOW);
       digitalWrite(chanelPin3, LOW);
-      myControl.runningMotor = &myControl.motorX;
+      myControl->runningMotor = &myControl->motorX;
       break;
     case motorY:
       digitalWrite(chanelPin1, LOW);
       digitalWrite(chanelPin2, LOW);
       digitalWrite(chanelPin3, LOW);
-      myControl.runningMotor = &myControl.motorY;
+      myControl->runningMotor = &myControl->motorY;
       break;
     case motorZ:
       digitalWrite(chanelPin1, LOW);
       digitalWrite(chanelPin2, HIGH);
       digitalWrite(chanelPin3, LOW);
-      myControl.runningMotor = &myControl.motorZ;
+      myControl->runningMotor = &myControl->motorZ;
       break;
     case motorRotation:
       //place code for rotationMotor.

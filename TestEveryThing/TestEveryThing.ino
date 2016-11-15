@@ -2,8 +2,8 @@
 #define interupt1 2
 #define interupt2 3
 //Dircation pins x axis
-#define xPin1 4
-#define xPin2 5
+#define xPin1 5
+#define xPin2 4
 //Dircation pins z axis
 #define zPin1 6
 #define zPin2 7
@@ -17,13 +17,10 @@
 //Gear Pin
 //Pin to the PVM pins(3,5,6,9,10,11)
 #define gearPin 9
-//Margins
-#define ERROR_MARGIN1 2
-#define ERROR_MARGIN2 20
-#define ERROR_MARGIN3 40
+
 //gear are the amount of speed the motor should move at from 0-255
 #define gear1 255
-#define gear2 100
+#define gear2 128
 #define gear3 150
 
 #define Hold_Delay 8000
@@ -38,7 +35,7 @@ struct Instruction{
 };
 
 struct Instruction currentInstruction;
-
+struct Queue queue;
 struct Controller myController;
 
 void setup() {
@@ -65,19 +62,24 @@ Wire.beginTransmission(0x20);
   pinMode(yPin2, OUTPUT);
   pinMode(zPin1, OUTPUT);
   pinMode(zPin2, OUTPUT);
+  pinMode(gearPin, OUTPUT);
 
-  Motor motorX = CreateMotor(1005, xPin1, xPin2);
-  Motor motorY = CreateMotor(1005, yPin1, yPin2);
-  Motor motorZ = CreateMotor(1005, zPin1, zPin2);
+  Motor motorXX = CreateMotor(1005, xPin1, xPin2);
+  Motor motorYY = CreateMotor(1005, yPin1, yPin2);
+  Motor motorZZ = CreateMotor(1005, zPin1, zPin2);
 
-  myController = CreateController(motorX, motorY, motorZ);
-
+  myController = CreateController(motorXX, motorYY, motorZZ);
+  queue = createQueue();
   pinMode(interupt1, INPUT_PULLUP);
   pinMode(interupt2, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(interupt1), OnInterupts1, CHANGE);
   attachInterrupt(digitalPinToInterrupt(interupt2), OnInterupts2, CHANGE);
 
   Serial.begin(9600);
+
+  currentInstruction = CreateInstruction(0,100,100,100);
+  ChangeMotor(&myController, motorX);
+  MoveTo(currentInstruction.positions[currentInstruction.count],&myController);
 }
 
 void loop() {
@@ -88,7 +90,7 @@ void loop() {
 
 
   
-  Serial.println(myController.runningMotor->pos);
+ Serial.println(myController.runningMotor->pos);
 }
 
 Instruction CreateInstruction(int rotation, int x, int y, int z){
@@ -98,7 +100,7 @@ Instruction CreateInstruction(int rotation, int x, int y, int z){
   newInstruction.positions[2] = y;
   newInstruction.positions[3] = z;
  
-  newInstruction.count = 3; //Change to 0 when doing rotation :3
+  newInstruction.count = 1; //Change to 0 when doing rotation :3
 
   return newInstruction;
 }
@@ -153,8 +155,8 @@ void OnInterupts2(){
 
   //Check if the signal is the same as before
   //if it is then we have changed chanel and should not run the interupt
-  //if(runningMotor->sig2 == pinSignal)
-  //   return;
+  if(myController.runningMotor->sig2 == pinSignal)
+     return;
       
   //Save the change the sig to the new bit
   myController.runningMotor->sig2 = pinSignal;
@@ -215,7 +217,8 @@ bool InterruptMotorPositionCheck(){
       case hold:
         break;
     }
-
+    
+      //Serial.println(halted);
     return halted;
 }
 
@@ -224,20 +227,20 @@ void OnInterrupt(){
     switch(currentInstruction.count){
       case 0:
         currentInstruction.count = 1;
-        ChangeMotor(myController, motorX);
+        ChangeMotor(&myController, motorX);
         break;
       case 1:
         currentInstruction.count = 2;
-        ChangeMotor(myController, motorY);
+        ChangeMotor(&myController, motorY);
         break;
       case 2:
         currentInstruction.count = 3;
-        ChangeMotor(myController, motorZ);
+        ChangeMotor(&myController, motorZ);
         break;
       case 3:
         currentInstruction.positions[3] = 0;
         break;
     }
-    MoveTo(currentInstruction.positions[currentInstruction.count], myController);
+    MoveTo(currentInstruction.positions[currentInstruction.count], &myController);
   }
 }
