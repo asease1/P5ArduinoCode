@@ -134,7 +134,7 @@ void ChangeMotorState(MotorStates state, Motor* motor){
 
 //Update the controller targetpos to the new position and start the runningMotor in the dircation of target
 void MoveTo(int pos, Controller *control){
-  if(pos < 0 || pos > control->runningMotor->maxPos)
+  if(pos > control->runningMotor->maxPos)
     return;
 
   

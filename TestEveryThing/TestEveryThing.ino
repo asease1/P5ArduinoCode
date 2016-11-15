@@ -8,8 +8,8 @@
 #define zPin1 6
 #define zPin2 7
 //Diraction pins y axis
-#define yPin1 13
-#define yPin2 8
+#define yPin1 8
+#define yPin2 13
 //Chanel Pins
 #define chanelPin3 10
 #define chanelPin2 11
@@ -62,31 +62,25 @@ Wire.beginTransmission(0x20);
   pinMode(yPin2, OUTPUT);
   pinMode(zPin1, OUTPUT);
   pinMode(zPin2, OUTPUT);
-  pinMode(gearPin, OUTPUT);
 
-  Motor motorXX = CreateMotor(1005, xPin1, xPin2);
-  Motor motorYY = CreateMotor(1005, yPin1, yPin2);
-  Motor motorZZ = CreateMotor(1005, zPin1, zPin2);
-
-  myController = CreateController(motorXX, motorYY, motorZZ);
-  queue = createQueue();
   pinMode(interupt1, INPUT_PULLUP);
   pinMode(interupt2, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(interupt1), OnInterupts1, CHANGE);
   attachInterrupt(digitalPinToInterrupt(interupt2), OnInterupts2, CHANGE);
 
+
   Serial.begin(9600);
 
-  currentInstruction = CreateInstruction(0,100,100,100);
+  myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
+
+  currentInstruction = CreateInstruction(0,-100,100,100);
   ChangeMotor(&myController, motorX);
   MoveTo(currentInstruction.positions[currentInstruction.count],&myController);
+  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
-  
-
 
 
   
