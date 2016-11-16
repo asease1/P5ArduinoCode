@@ -24,6 +24,9 @@
 #define gear3 150
 
 #define Hold_Delay 8000
+#define DELAY_FOR_MOTOR_MOVEMENT 1000
+
+#define MAX_QUEUE_SIZE 32
 
 #include "Wire.h";
 #include "queue.h";
@@ -38,6 +41,9 @@ struct Instruction currentInstruction;
 struct Queue queue;
 struct Controller myController;
 
+int TimeSinceLastInterrupt = 0;
+bool isResat = false;
+
 void setup() {
 
    Wire.begin(); // wake up I2C bus
@@ -46,7 +52,7 @@ void setup() {
  Wire.write(0x00); // IODIRA register
  Wire.write(0x00); // set all of port A to outputs
  Wire.endTransmission();
-Wire.beginTransmission(0x20);
+ Wire.beginTransmission(0x20);
  Wire.write(0x01); // IODIRB register
  Wire.write(0x00); // set all of port B to outputs
  Wire.endTransmission();
@@ -63,6 +69,8 @@ Wire.beginTransmission(0x20);
   pinMode(zPin1, OUTPUT);
   pinMode(zPin2, OUTPUT);
 
+  pinMode(gearPin, OUTPUT);
+
   pinMode(interupt1, INPUT_PULLUP);
   pinMode(interupt2, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(interupt1), OnInterupts1, CHANGE);
@@ -71,20 +79,27 @@ Wire.beginTransmission(0x20);
 
   Serial.begin(9600);
 
+  //queue = CreateQueue();
+  
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
-  currentInstruction = CreateInstruction(0,-100,100,100);
-  ChangeMotor(&myController, motorX);
-  MoveTo(currentInstruction.positions[currentInstruction.count],&myController);
   
+  //push(&queue, &CreateInstruction(0,0,0,0))
+
+  //currentInstruction = ;
+  //ChangeMotor(&myController, motorX);
+  
+  //StartMotor();
+  ResetSystem();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-
+  //if(queue.size < MAX_QUEUE_SIZE)
+    //push(&queue, &GetInstrction());
   
- Serial.println(myController.runningMotor->pos);
+ //Serial.println("Loop: %d" + myController.runningMotor->pos);
 }
 
 Instruction CreateInstruction(int rotation, int x, int y, int z){
@@ -217,7 +232,9 @@ bool InterruptMotorPositionCheck(){
 }
 
 void OnInterrupt(){
-  if(InterruptMotorPositionCheck()){
+  TimeSinceLastInterrupt = millis();
+  
+  if(isResat && InterruptMotorPositionCheck()){
     switch(currentInstruction.count){
       case 0:
         currentInstruction.count = 1;
@@ -233,8 +250,49 @@ void OnInterrupt(){
         break;
       case 3:
         currentInstruction.positions[3] = 0;
+        NextInstruction();
         break;
     }
-    MoveTo(currentInstruction.positions[currentInstruction.count], &myController);
+    StartMotor();
   }
 }
+
+void StartMotor(){
+  while(!MoveTo(currentInstruction.positions[currentInstruction.count],&myController)){
+      if(++currentInstruction.count == 4)
+        NextInstruction();
+    }
+}
+
+void NextInstruction(){
+  free(&currentInstruction);
+  //currentInstruction = *pop(&queue);
+}
+
+void ResetSystem(){
+  ResetMotor(motorZ);
+  ResetMotor(motorY);
+  ResetMotor(motorX); 
+}
+
+void ResetMotor(Chanels motor){
+  ChangeMotor(&myController, motor);
+  ChangeMotorState(backward, myController.runningMotor);
+  while(IsCurrentMotorMoving()){
+    Serial.println(myController.runningMotor->pin1);
+  }
+  ChangeMotorState(hold, myController.runningMotor);
+  myController.runningMotor->pos = 0;
+}
+
+bool IsCurrentMotorMoving(){
+  
+  if(myController.runningMotor->state != hold && millis() < TimeSinceLastInterrupt + DELAY_FOR_MOTOR_MOVEMENT){
+    return true;
+  }
+  else{
+    //Serial.println(myController.runningMotor->pos);
+    return false;
+  }
+}
+

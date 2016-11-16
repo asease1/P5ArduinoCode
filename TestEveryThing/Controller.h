@@ -133,9 +133,9 @@ void ChangeMotorState(MotorStates state, Motor* motor){
 }
 
 //Update the controller targetpos to the new position and start the runningMotor in the dircation of target
-void MoveTo(int pos, Controller *control){
+bool MoveTo(int pos, Controller *control){
   if(pos > control->runningMotor->maxPos)
-    return;
+    return false;
 
   
   if(control->runningMotor->pos > (pos + ERROR_MARGIN1)){
@@ -146,13 +146,16 @@ void MoveTo(int pos, Controller *control){
     ChangeMotorState(forward, control->runningMotor);
     //Serial.println("Forward");
   }
+  else
+    return false;
 
   control->targetPos = pos;
+  return true;
 }
 
 
 
-//Switch the runningMotor on the Controller to a new Motor
+//Swi'tch the runningMotor on the Controller to a new Motor
 void ChangeMotor(Controller *myControl, Chanels newMotor){
   switch(newMotor){
     case motorX:
