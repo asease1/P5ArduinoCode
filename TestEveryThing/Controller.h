@@ -4,7 +4,7 @@
 //Margins
 #define ERROR_MARGIN1 2
 #define ERROR_MARGIN2 20
-#define ERROR_MARGIN3 40
+#define ERROR_MARGIN3 400
 //Chanel is the current motor input Interupts
 enum Chanels {motorY, motorX, motorZ, motorRotation};
 enum MotorStates {forward, backward, hold};
