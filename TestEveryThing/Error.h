@@ -5,7 +5,7 @@
 #define ERR_EMPTY_INPUT 2 //empty input stream
 #define ERR_BAD_INPUT 3 //Input is nonsensical/wrong
 
-void InitalizeComms() {
+void InitializeErrorComms() {
 	Wire.begin(); // wake up I2C bus
 				  // set I/O pins to outputs
 	Wire.beginTransmission(0x20);
