@@ -20,17 +20,17 @@
 
 //gear are the amount of speed the motor should move at from 0-255
 #define gear1 255
-#define gear2 150
-#define gear3 150
+#define gear2 255
+#define gear3 255
 
 #define Hold_Delay 8000
 #define DELAY_FOR_MOTOR_MOVEMENT 1000
 
 #define MAX_QUEUE_SIZE 32
 
-#include "Wire.h"
-#include "queue.h"
-#include "Controller.h"
+#include "Wire.h";
+#include "queue.h";
+#include "Controller.h";
 
 struct Instruction{
   int positions[4];
@@ -44,7 +44,6 @@ struct Controller myController;
 int TimeSinceLastInterrupt = 0;
 bool isResat = false;
 bool queueIsEmpty = true;
-bool changeMotorReady = false;
 
 void setup() {
   InitializeErrorComms();
@@ -76,15 +75,14 @@ void setup() {
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
   
-  push(&queue, &CreateInstruction(0,100,0,0));
-  push(&queue, &CreateInstruction(0 ,200,0,0));
-  push(&queue, &CreateInstruction(0,300,0,0));
-  push(&queue, &CreateInstruction(0,0,0,0));
+  push(&queue, &CreateInstruction(0,100,100,50));
+  push(&queue, &CreateInstruction(0,200,200,0));
+  push(&queue, &CreateInstruction(0,0,0,50));
   NextInstruction();
   
   //StartMotor();
   ResetSystem();
-  delay(500);
+  
   StartMotor();
 }
 
@@ -93,35 +91,8 @@ void loop() {
 
   /*if(queue.size < MAX_QUEUE_SIZE)
     push(&queue, &GetInstrction());*/
-
-    if(changeMotorReady &&  !IsCurrentMotorMoving()){
-      switch(currentInstruction->count){
-      case 0:
-        currentInstruction->count = 1;
-        ChangeMotor(&myController, motorX);
-        break;
-      case 1:
-        currentInstruction->count = 2;
-        ChangeMotor(&myController, motorZ);
-        break;
-      case 2:
-        currentInstruction->count = 3;
-        ChangeMotor(&myController, motorY);
-        break;
-      case 3:
-        NextInstruction();
-        
-        break;
-        
-      }
-      
-      if(!queueIsEmpty){
-        delay(500);
-        StartMotor();
-      }
-    }
   
- Serial.println(myController.runningMotor->pos);
+ //Serial.println("Loop: %d" + myController.runningMotor->pos);
 }
 
 Instruction CreateInstruction(int rotation, int x, int y, int z){
@@ -250,9 +221,26 @@ void OnInterrupt(){
   TimeSinceLastInterrupt = millis();
   
   if(isResat && InterruptMotorPositionCheck()){
- 
-        changeMotorReady = true;
-
+    switch(currentInstruction->count){
+      case 0:
+        currentInstruction->count = 1;
+        ChangeMotor(&myController, motorX);
+        break;
+      case 1:
+        currentInstruction->count = 2;
+        ChangeMotor(&myController, motorZ);
+        break;
+      case 2:
+        currentInstruction->count = 3;
+        ChangeMotor(&myController, motorY);
+        break;
+      case 3:
+        NextInstruction();
+        
+        break;
+    }
+    if(!queueIsEmpty)
+      StartMotor();
   }
 }
 
