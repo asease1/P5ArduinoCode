@@ -1,7 +1,7 @@
 /*Defined values. Remember they're used in an array, so -1 for actual values!*/
-#define MaxX = 26;
-#define MaxY = 3;
-#define MaxZ = 15;
+#define MaxX 26
+#define MaxY 3
+#define MaxZ 15
 
 /*Contains a single position in 3d space*/
 typedef struct position{
@@ -10,13 +10,22 @@ typedef struct position{
   char z;
 };
 
+position CreatePosition(char x, char y, char z){
+  position newPosition;
+  newPosition.x;
+  newPosition.y;
+  newPosition.z;
+
+  return newPosition;
+}
+
 /*Contains a three-dimensional array of chars and te position of the brick pickup site*/
 typedef struct Blueprint{
   char pos[MaxX][MaxY][MaxZ];
   position pickup;
 };
 
-struct Blupeprint createBlueprint{
+struct Blueprint createBlueprint(){
   struct Blueprint temp;
   struct position ps;
   char a, b, c;

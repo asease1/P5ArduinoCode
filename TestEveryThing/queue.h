@@ -11,7 +11,7 @@
   
 /*
  * The Node struct,
- * contains item and the pointer that point to next node.
+ * contains item and the pointer that point to next Node.
  */
 typedef struct Node {
     void* item;
@@ -20,19 +20,19 @@ typedef struct Node {
 
 /**
  * The Queue struct, contains the pointers that
- * point to first node and last node, the size of the Queue,
+ * point to first Node and last Node, the size of the Queue,
  * and the function pointers.
  */
 typedef struct Queue {
     Node* head;
     Node* tail;
-    int sizeOfElement;
+    int sizeOfNode;
     void (*push) (struct Queue*, void*); // add item to tail
     // get item from head and remove it from queue
     void* (*pop) (struct Queue*);
     // get item from head but keep it in queue
     void* (*peek) (struct Queue*);
-    // display all element in queue
+    // display all Node in queue
     void (*display) (struct Queue*);
     // size of this queue
     int size;
@@ -44,12 +44,12 @@ typedef struct Queue {
  * otherwise the oldtail->next and tail will point to it.
  */
 void push (Queue* queue, void* item) {
-    // Create a new node
+    // Create a new Node
     Node* n = (Node*) malloc (sizeof(Node));
-    n->item = malloc(queue->sizeOfElement);
+    n->item = malloc(queue->sizeOfNode);
     n->next = NULL;
 
-    memcpy(n->item, item, queue->sizeOfElement);
+    memcpy(n->item, item, queue->sizeOfNode);
 
     if (queue->head == NULL) { // no head
         queue->head = n;
@@ -67,7 +67,7 @@ void* pop (Queue* queue) {
     // get the first item
     Node* head = queue->head;
     void* item = head->item;
-    // move head pointer to next node, decrease size
+    // move head pointer to next Node, decrease size
     queue->head = head->next;
     queue->size--;
     // free the memory of original head
@@ -87,7 +87,7 @@ void* peek (Queue* queue) {
 /**
  * Create and initiate a Queue
  */
-Queue CreateQueue (int sizeOfElement) {
+Queue CreateQueue (int sizeOfNode) {
     Queue queue;
     queue.size = 0;
     queue.head = NULL;
@@ -95,6 +95,6 @@ Queue CreateQueue (int sizeOfElement) {
     queue.push = &push;
     queue.pop = &pop;
     queue.peek = &peek;
-    queue.sizeOfElement = sizeOfElement;
+    queue.sizeOfNode = sizeOfNode;
     return queue;
 }

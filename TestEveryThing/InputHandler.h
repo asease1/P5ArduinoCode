@@ -1,5 +1,6 @@
 #include "queue.h";
 #include "Model.h";
+#include "Error.h";
 
 struct Wall{
   char value[5];
@@ -18,7 +19,7 @@ struct Wall createWall(){
 
 /*Reads an input stream from the USB port. Divides the input into wall structs, enqueues these structs and returns a pointer to the queue*/
 int readInput(){
-  Queue Walls = createQueue();
+  Queue Walls = CreateQueue(sizeof(Wall*));
   /*loop runs while there is input waiting to be processed*/
   while(Serial.available() > 0){
     struct Wall wallTemp = createWall();
@@ -30,36 +31,9 @@ int readInput(){
   return &Walls;
 }
 
-/*Takes a pointer to queue containing Wall structs, converts these into a Blueprint struct and returns a pointer to said Blueprint struct*/
-struct Blueprint convertToBlueprint(int WallQueuePointer){
-  int tempWall;
-  struct Blueprint tempBlueprint = createBlueprint();
-  while(peek(WallQueuePointer) != NULL){
-    tempWall = pop(WallQueuePointer);
-    if(tempWall->value[4] > 0 && tempWall->value[4] < MaxY //Checks wall height for 0 < h <= max height
-      && tempWall->value[0] >= 0 && tempWall->value[0] > MaxX // Check if value is within model bounds
-      && tempWall->value[1] >= 0 && tempWall->value[1] > MaxZ // Same
-      && tempWall->value[2] >= 0 && tempWall->value[2] > MaxX //You get the idea
-      && tempWall->value[3] >= 0 && tempWall->value[3] > MaxZ){ //not even gonna try
-      if(tempWall->value[0] == tempWall->value[2]   // Checks if start X == end X (prevents diagonal walls)
-      && tempWall->value[1] =! tempWall->value[3]){ // Checks if wall is not 0 long
-        tempBlueprint = makeBlueprint(tempBlueprint, tempWall, 0);
-      }
-      if(tempWall->value[1] == tempWall->value[3]   // Checks if start y == end y (prevents diagonal walls)
-      && tempWall->value[0] =! tempWall->value[2]){ // Checks if wall is not 0 long
-        tempBlueprint = makeBlueprint(tempBlueprint, tempWall, 1);
-      }
-      else
-        ErrorCode(ERROR_WALL);
-    }
-    else
-      ErrorCode(ERROR_WALL);
-  }
-  return tempBlueprint;
-}
 
 //Insert values according to the Wall it has been given
-Blueprint makeBlueprint(blueprint BP, wall* W, int D){
+Blueprint makeBlueprint(Blueprint BP, Wall* W, int D){
   int startval, endval;
   if(D){
     if(W->value[0] < W->value[2]){
@@ -70,10 +44,10 @@ Blueprint makeBlueprint(blueprint BP, wall* W, int D){
       startval = W->value[2];
       endval = W->value[0];
     }
-    endH = W->value[4];
-    zval = W->value[1];
+    int endH = W->value[4];
+    int zval = W->value[1];
     for(startval; startval <= endval; startval++){
-      for(startH = 0; startH > endH; startH++)
+      for(int startH = 0; startH > endH; startH++)
       BP.pos[startval][startH][zval] = 1;
     }
   }
@@ -87,11 +61,40 @@ Blueprint makeBlueprint(blueprint BP, wall* W, int D){
       startval = W->value[3];
       endval = W->value[1];
     }
-    endH = W->value[4];
-    xval = W->value[0];
+    int endH = W->value[4];
+    int xval = W->value[0];
     for(startval; startval <= endval; startval++){
-      for(startH = 0; startH > endH; startH++)
+      for(int startH = 0; startH > endH; startH++)
       BP.pos[xval][startH][startval] = 1;
     }
   }
 }
+
+/*Takes a pointer to queue containing Wall structs, converts these into a Blueprint struct and returns a pointer to said Blueprint struct*/
+struct Blueprint convertToBlueprint(int WallQueuePointer){
+  Wall* tempWall;
+  struct Blueprint tempBlueprint = createBlueprint();
+  while(peek(WallQueuePointer) != NULL){
+    tempWall = pop(WallQueuePointer);
+    if(tempWall->value[4] > 0 && tempWall->value[4] < MaxY //Checks wall height for 0 < h <= max height
+      && tempWall->value[0] >= 0 && tempWall->value[0] > MaxX // Check if value is within model bounds
+      && tempWall->value[1] >= 0 && tempWall->value[1] > MaxZ // Same
+      && tempWall->value[2] >= 0 && tempWall->value[2] > MaxX //You get the idea
+      && tempWall->value[3] >= 0 && tempWall->value[3] > MaxZ){ //not even gonna try
+      if(tempWall->value[0] == tempWall->value[2]   // Checks if start X == end X (prevents diagonal walls)
+      && tempWall->value[1] != tempWall->value[3]){ // Checks if wall is not 0 long
+        tempBlueprint = makeBlueprint(tempBlueprint, tempWall, 0);
+      }
+      if(tempWall->value[1] == tempWall->value[3]   // Checks if start y == end y (prevents diagonal walls)
+      && tempWall->value[0] != tempWall->value[2]){ // Checks if wall is not 0 long
+        tempBlueprint = makeBlueprint(tempBlueprint, tempWall, 1);
+      }
+      else
+        ErrorCode(ERR_WALL);
+    }
+    else
+      ErrorCode(ERR_WALL);
+  }
+  return tempBlueprint;
+}
+

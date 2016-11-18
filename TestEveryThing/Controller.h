@@ -5,6 +5,7 @@
 #define ERROR_MARGIN1 2
 #define ERROR_MARGIN2 20
 #define ERROR_MARGIN3 40
+
 //Chanel is the current motor input Interupts
 enum Chanels {motorY, motorX, motorZ, motorRotation};
 enum MotorStates {forward, backward, hold};
@@ -22,18 +23,6 @@ typedef struct Motor{
     volatile int sig2;
 };
 
-
-typedef struct Position{
-  int x;
-  int y;
-  int z;
-};
-
-typedef struct Brick{
-  Position myPos;
-  BrickType myType;
-};
-
 typedef struct Controller{
   int targetPos;
   Motor motorX;
@@ -41,10 +30,8 @@ typedef struct Controller{
   Motor motorZ;
   Motor *runningMotor;
   //if null we dont have any brick picked, and need to be a pointer or we cant use null
-  Brick *currentBrick;
+  //Brick *currentBrick;                                                                              /*RECOMMENT ME BACK IN WHEN BRICKS ARE IMPLEMENTED*/
 };
-
-
 
 
 //Counstructers for all the struct
@@ -55,27 +42,9 @@ Controller CreateController(Motor motorX, Motor motorY, Motor motorZ){
   newController.motorY = motorY;
   newController.motorZ = motorZ;
   newController.runningMotor = &motorX;
-  newController.currentBrick = NULL;
+  //newController.currentBrick = NULL;                                                              /*RECOMMENT ME BACK IN WHEN BRICKS ARE IMPLEMENTED*/
 
   return newController;
-}
-
-
-Position CreatePosition(int x, int y, int z){
-  Position newPosition;
-  newPosition.x;
-  newPosition.y;
-  newPosition.z;
-
-  return newPosition;
-}
-
-Brick CreateBrick(Position pos, BrickType brickType){
-  Brick newBrick;
-  newBrick.myPos = pos;
-  newBrick.myType = brickType;
-
-  return newBrick;
 }
 
 
