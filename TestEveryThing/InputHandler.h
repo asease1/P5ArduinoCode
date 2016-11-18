@@ -50,12 +50,12 @@ struct Blueprint convertToBlueprint(int WallQueuePointer){
         tempBlueprint = makeBlueprint(tempBlueprint, tempWall, 1);
       }
       else
-        ErrorCode(WALL_ERROR);
+        ErrorCode(ERROR_WALL);
     }
     else
-      ErrorCode(WALL_ERROR);
+      ErrorCode(ERROR_WALL);
   }
-  return &tempBlueprint;
+  return tempBlueprint;
 }
 
 //Insert values according to the Wall it has been given
