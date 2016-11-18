@@ -166,13 +166,13 @@ void ChangeMotor(Controller *myControl, Chanels newMotor){
       break;
     case motorY:
       digitalWrite(chanelPin1, LOW);
-      digitalWrite(chanelPin2, LOW);
+      digitalWrite(chanelPin2, HIGH);
       digitalWrite(chanelPin3, LOW);
       myControl->runningMotor = &myControl->motorY;
       break;
     case motorZ:
       digitalWrite(chanelPin1, LOW);
-      digitalWrite(chanelPin2, HIGH);
+      digitalWrite(chanelPin2, LOW);
       digitalWrite(chanelPin3, LOW);
       myControl->runningMotor = &myControl->motorZ;
       break;
