@@ -1,4 +1,4 @@
-q//Interrupts pin 2-3
+//Interrupts pin 2-3
 #define interupt1 2
 #define interupt2 3
 //Dircation pins x axis
