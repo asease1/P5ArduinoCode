@@ -20,17 +20,19 @@
 
 //gear are the amount of speed the motor should move at from 0-255
 #define gear1 255
-#define gear2 255
-#define gear3 255
+#define gear2 128
+#define gear3 150
 
 #define Hold_Delay 8000
 #define DELAY_FOR_MOTOR_MOVEMENT 1000
 
 #define MAX_QUEUE_SIZE 32
 
-#include "Wire.h";
-#include "queue.h";
-#include "Controller.h";
+#include "Wire.h"
+#include "queue.h"
+#include "Controller.h"
+//#include "InputHandler.h"
+#include "Model.h"
 
 struct Instruction{
   int positions[4];
@@ -237,7 +239,7 @@ bool InterruptMotorPositionCheck(){
 void OnInterrupt(){
   TimeSinceLastInterrupt = millis();
   
-  if(isResat && InterruptMotorPositionCheck()){
+  if(isResat && InterruptMotorPositionCheck() && IsCurrentMotorMoving()){
     switch(currentInstruction->count){
       case 0:
         currentInstruction->count = 1;

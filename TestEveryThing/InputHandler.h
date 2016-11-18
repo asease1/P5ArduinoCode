@@ -1,4 +1,3 @@
-#include "queue.h";
 #include "Model.h";
 #include "Error.h";
 
@@ -71,7 +70,7 @@ Blueprint makeBlueprint(Blueprint BP, Wall* W, int D){
 }
 
 /*Takes a pointer to queue containing Wall structs, converts these into a Blueprint struct and returns a pointer to said Blueprint struct*/
-struct Blueprint convertToBlueprint(int WallQueuePointer){
+  Blueprint convertToBlueprint(int WallQueuePointer){
   Wall* tempWall;
   struct Blueprint tempBlueprint = createBlueprint();
   while(peek(WallQueuePointer) != NULL){
