@@ -2,14 +2,14 @@
 #define interupt1 2
 #define interupt2 3
 //Dircation pins x axis
-#define xPin1 4
-#define xPin2 5
+#define xPin1 5
+#define xPin2 4
 //Dircation pins z axis
 #define zPin1 6
 #define zPin2 7
 //Diraction pins y axis
-#define yPin1 13
-#define yPin2 8
+#define yPin1 8
+#define yPin2 13
 //Chanel Pins
 #define chanelPin3 10
 #define chanelPin2 11
@@ -17,30 +17,36 @@
 //Gear Pin
 //Pin to the PVM pins(3,5,6,9,10,11)
 #define gearPin 9
-//Margins
-#define ERROR_MARGIN1 2
-#define ERROR_MARGIN2 20
-#define ERROR_MARGIN3 40
+
 //gear are the amount of speed the motor should move at from 0-255
 #define gear1 255
-#define gear2 100
+#define gear2 128
 #define gear3 150
 
 #define Hold_Delay 8000
+#define DELAY_FOR_MOTOR_MOVEMENT 1000
+
+#define MAX_QUEUE_SIZE 32
 
 #include "Wire.h";
+#include "queue.h";
 #include "Controller.h";
-#include "InputHandler.h";
+#include "Error.h";
+
 struct Instruction{
   int positions[4];
   short int count;
 };
 
 struct Instruction currentInstruction;
-
+struct Queue queue;
 struct Controller myController;
 
+int TimeSinceLastInterrupt = 0;
+bool isResat = false;
+
 void setup() {
+  InitializeErrorComms();
  
   // define pin mode for chanels
   pinMode(chanelPin3, OUTPUT);
@@ -54,29 +60,37 @@ void setup() {
   pinMode(zPin1, OUTPUT);
   pinMode(zPin2, OUTPUT);
 
-  Motor motorX = CreateMotor(1005, xPin1, xPin2);
-  Motor motorY = CreateMotor(1005, yPin1, yPin2);
-  Motor motorZ = CreateMotor(1005, zPin1, zPin2);
-
-  myController = CreateController(motorX, motorY, motorZ);
+  pinMode(gearPin, OUTPUT);
 
   pinMode(interupt1, INPUT_PULLUP);
   pinMode(interupt2, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(interupt1), OnInterupts1, CHANGE);
   attachInterrupt(digitalPinToInterrupt(interupt2), OnInterupts2, CHANGE);
 
+
   Serial.begin(9600);
+
+  //queue = CreateQueue();
+  
+  myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
+
+  
+  //push(&queue, &CreateInstruction(0,0,0,0))
+
+  //currentInstruction = ;
+  //ChangeMotor(&myController, motorX);
+  
+  //StartMotor();
+  ResetSystem();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
+  //if(queue.size < MAX_QUEUE_SIZE)
+    //push(&queue, &GetInstrction());
   
-
-
-
-  
-  Serial.println(myController.runningMotor->pos);
+ //Serial.println("Loop: %d" + myController.runningMotor->pos);
 }
 
 Instruction CreateInstruction(int rotation, int x, int y, int z){
@@ -86,10 +100,13 @@ Instruction CreateInstruction(int rotation, int x, int y, int z){
   newInstruction.positions[2] = y;
   newInstruction.positions[3] = z;
  
-  newInstruction.count = 3; //Change to 0 when doing rotation :3
+  newInstruction.count = 1; //Change to 0 when doing rotation :3
 
   return newInstruction;
 }
+
+//Dukomotion for the diffrent Error_Codes
+//
 
 
 
@@ -131,8 +148,8 @@ void OnInterupts2(){
 
   //Check if the signal is the same as before
   //if it is then we have changed chanel and should not run the interupt
-  //if(runningMotor->sig2 == pinSignal)
-  //   return;
+  if(myController.runningMotor->sig2 == pinSignal)
+     return;
       
   //Save the change the sig to the new bit
   myController.runningMotor->sig2 = pinSignal;
@@ -193,12 +210,15 @@ bool InterruptMotorPositionCheck(){
       case hold:
         break;
     }
-
+    
+      //Serial.println(halted);
     return halted;
 }
 
 void OnInterrupt(){
-  if(InterruptMotorPositionCheck()){
+  TimeSinceLastInterrupt = millis();
+  
+  if(isResat && InterruptMotorPositionCheck()){
     switch(currentInstruction.count){
       case 0:
         currentInstruction.count = 1;
@@ -214,8 +234,49 @@ void OnInterrupt(){
         break;
       case 3:
         currentInstruction.positions[3] = 0;
+        NextInstruction();
         break;
     }
-    MoveTo(currentInstruction.positions[currentInstruction.count], &myController);
+    StartMotor();
   }
 }
+
+void StartMotor(){
+  while(!MoveTo(currentInstruction.positions[currentInstruction.count],&myController)){
+      if(++currentInstruction.count == 4)
+        NextInstruction();
+    }
+}
+
+void NextInstruction(){
+  free(&currentInstruction);
+  //currentInstruction = *pop(&queue);
+}
+
+void ResetSystem(){
+  ResetMotor(motorZ);
+  ResetMotor(motorY);
+  ResetMotor(motorX); 
+}
+
+void ResetMotor(Chanels motor){
+  ChangeMotor(&myController, motor);
+  ChangeMotorState(backward, myController.runningMotor);
+  while(IsCurrentMotorMoving()){
+    Serial.println(myController.runningMotor->pin1);
+  }
+  ChangeMotorState(hold, myController.runningMotor);
+  myController.runningMotor->pos = 0;
+}
+
+bool IsCurrentMotorMoving(){
+  
+  if(myController.runningMotor->state != hold && millis() < TimeSinceLastInterrupt + DELAY_FOR_MOTOR_MOVEMENT){
+    return true;
+  }
+  else{
+    //Serial.println(myController.runningMotor->pos);
+    return false;
+  }
+}
+
