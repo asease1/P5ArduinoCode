@@ -4,12 +4,12 @@
 //Dircation pins x axis
 #define xPin1 5
 #define xPin2 4
-//Dircation pins z axis
-#define zPin1 6
-#define zPin2 7
-//Diraction pins y axis
-#define yPin1 8
-#define yPin2 13
+//Dircation pins y axis
+#define yPin1 6
+#define yPin2 7
+//Diraction pins z axis
+#define zPin1 8
+#define zPin2 13
 //Chanel Pins
 #define chanelPin3 10
 #define chanelPin2 11
@@ -37,7 +37,7 @@ struct Instruction{
   short int count;
 };
 
-struct Instruction currentInstruction;
+struct Instruction* currentInstruction;
 struct Queue queue;
 struct Controller myController;
 
@@ -46,7 +46,17 @@ bool isResat = false;
 bool queueIsEmpty = true;
 
 void setup() {
-  InitializeErrorComms();
+
+   Wire.begin(); // wake up I2C bus
+// set I/O pins to outputs
+ Wire.beginTransmission(0x20);
+ Wire.write(0x00); // IODIRA register
+ Wire.write(0x00); // set all of port A to outputs
+ Wire.endTransmission();
+ Wire.beginTransmission(0x20);
+ Wire.write(0x01); // IODIRB register
+ Wire.write(0x00); // set all of port B to outputs
+ Wire.endTransmission();
  
   // define pin mode for chanels
   pinMode(chanelPin3, OUTPUT);
@@ -70,7 +80,7 @@ void setup() {
 
   Serial.begin(9600);
 
-  //queue = CreateQueue();
+  queue = CreateQueue(sizeof(Instruction));
   
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
@@ -80,14 +90,14 @@ void setup() {
   push(&queue, &CreateInstruction(0,0,0,50));
   NextInstruction();
   
-  //StartMotor();
+  
   ResetSystem();
   
   StartMotor();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  //put your main code here, to run repeatedly:
 
   /*if(queue.size < MAX_QUEUE_SIZE)
     push(&queue, &GetInstrction());*/
@@ -109,6 +119,13 @@ Instruction CreateInstruction(int rotation, int x, int y, int z){
 
 //Dukomotion for the diffrent Error_Codes
 //
+void ErrorCode(int error_Code){
+  Wire.beginTransmission(0x20); //Ip of the chip we want to talk to
+  Wire.write(0x12); // choice the side of the chip
+  //side A 0x13 and B 0x13 
+  Wire.write(error_Code); //turn on the pin with a number from 0-255
+  Wire.endTransmission();
+}
 
 
 
@@ -182,30 +199,30 @@ bool InterruptMotorPositionCheck(){
     
     switch(myController.runningMotor->state){
       case forward:
-        if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN1){
+        if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN1){
           ChangeMotorState(hold, myController.runningMotor);
           //Reset the speed of the motor
           analogWrite(gearPin, gear1);
           halted = true;
         }
-        else if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN2){
+        else if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN2){
           analogWrite(gearPin, gear2);
         }
-        else if(myController.runningMotor->pos >= currentInstruction.positions[currentInstruction.count] - ERROR_MARGIN3){
+        else if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN3){
           analogWrite(gearPin, gear3);
         }
         break;
       case backward:
-        if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN1){
+        if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN1){
           ChangeMotorState(hold, myController.runningMotor);
           //Reset the speed of the motor
           analogWrite(gearPin, gear1);
           halted = true;
         }
-        else if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN2){
+        else if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN2){
           analogWrite(gearPin, gear2);
         }
-        else if(myController.runningMotor->pos <= currentInstruction.positions[currentInstruction.count] + ERROR_MARGIN3){
+        else if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN3){
           analogWrite(gearPin, gear3);
         }
         break;
@@ -245,28 +262,46 @@ void OnInterrupt(){
 }
 
 void StartMotor(){
-  while(!MoveTo(currentInstruction.positions[currentInstruction.count],&myController)){
-      if(++currentInstruction.count == 4)
+  while(!MoveTo(currentInstruction->positions[currentInstruction->count],&myController)){
+      if(++currentInstruction->count == 4)
         NextInstruction();
+      //Serial.println(currentInstruction->count);
     }
 }
 
 void NextInstruction(){
-  free(&currentInstruction);
-  //currentInstruction = *pop(&queue);
+  ChangeMotor(&myController, motorX);
+  free(currentInstruction);
+
+  Serial.println(queue.size);
+  if(queue.size == 0)
+    queueIsEmpty = true;
+  else
+    queueIsEmpty = false;
+  
+  currentInstruction = pop(&queue);
+  
+  
+  Serial.println((int)currentInstruction);
+  Serial.println(currentInstruction->positions[1]);
 }
 
 void ResetSystem(){
-  ResetMotor(motorZ);
+  analogWrite(gearPin, 200);
   ResetMotor(motorY);
+  digitalWrite(gearPin, HIGH);
+  ResetMotor(motorZ);
+  analogWrite(gearPin, 200);
   ResetMotor(motorX); 
+  isResat = true;
 }
 
 void ResetMotor(Chanels motor){
   ChangeMotor(&myController, motor);
   ChangeMotorState(backward, myController.runningMotor);
+  TimeSinceLastInterrupt = millis();
   while(IsCurrentMotorMoving()){
-    Serial.println(myController.runningMotor->pin1);
+    //Serial.println(myController.runningMotor->pos);
   }
   ChangeMotorState(hold, myController.runningMotor);
   myController.runningMotor->pos = 0;
