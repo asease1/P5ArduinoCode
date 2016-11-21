@@ -29,9 +29,8 @@
 #define MAX_QUEUE_SIZE 32
 
 #include "Wire.h";
-#include "queue.h";
 #include "Controller.h";
-#include "Error.h";
+#include "InputHandler.h";
 
 struct Instruction{
   int positions[4];

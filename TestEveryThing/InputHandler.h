@@ -2,21 +2,6 @@
 #include "Model.h";
 #include "Error.h";
 
-struct Wall{
-  char value[5];
-};
-
-/*creates a new instance of the wall struct*/
-struct Wall createWall(){
-  struct Wall tempWall;
-  tempWall.value[0] = '0'; // Wall starting x
-  tempWall.value[1] = '0'; // Wall starting z
-  tempWall.value[2] = '0'; // Wall stopping x
-  tempWall.value[3] = '0'; // Wall stopping z
-  tempWall.value[4] = '0'; // Wall height
-  return tempWall;
-}
-
 /*Reads an input stream from the USB port. Divides the input into wall structs, enqueues these structs and returns a pointer to the queue*/
 int readInput(){
   Queue Walls = CreateQueue(sizeof(Wall*));
