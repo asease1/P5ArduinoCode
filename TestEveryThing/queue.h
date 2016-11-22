@@ -72,7 +72,6 @@ void* pop (Queue* queue) {
     queue->size--;
     // free the memory of original head
     free(head);
-    Serial.println((int)item);
     return item;
 }
 
@@ -97,4 +96,5 @@ Queue CreateQueue (int sizeOfElement) {
     queue.peek = &peek;
     queue.sizeOfElement = sizeOfElement;
     return queue;
+
 }
