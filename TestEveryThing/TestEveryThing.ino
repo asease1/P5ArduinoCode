@@ -39,9 +39,13 @@ struct Instruction{
   short int count;
 };
 
-struct Instruction* currentInstruction;
+Instruction* currentInstruction;
 struct Queue queue;
 struct Controller myController;
+
+int* BlueprintCounter = 0;
+Blueprint bluePrint;
+
 
 int TimeSinceLastInterrupt = 0;
 bool isResat = false;
@@ -86,23 +90,25 @@ void setup() {
   
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
-  
-  push(&queue, &CreateInstruction(0,500,100,50));
+  bluePrint = createBlueprint();
+ /* push(&queue, &CreateInstruction(0,500,100,50));
   push(&queue, &CreateInstruction(0,200,200,0));
   push(&queue, &CreateInstruction(0,0,0,0));
-  NextInstruction();
+  NextInstruction();*/
   
   
-  ResetSystem();
-  
+  ResetSystem();  
   StartMotor();
+
 }
 
 void loop() {
   //put your main code here, to run repeatedly:
 
-  /*if(queue.size < MAX_QUEUE_SIZE)
-    push(&queue, &GetInstrction());*/
+  if(queue.size < MAX_QUEUE_SIZE)
+    push(&queue, &GetInstruction(bluePrint, BlueprintCounter));
+
+
  delay(1000);
  Serial.println(myController.motorZ.pos);
 }
@@ -256,7 +262,6 @@ void StartMotor(){
   while(!MoveTo(currentInstruction->positions[currentInstruction->count],&myController)){
       if(++currentInstruction->count == 4)
         NextInstruction();
-      //Serial.println(currentInstruction->count);
     }
 }
 

@@ -3,6 +3,8 @@
 #define MaxY 3 
 #define MaxZ 15 
  
+
+
 /*Contains a single position in 3d space*/ 
 typedef struct position{ 
   char x; 
@@ -57,4 +59,16 @@ struct Wall createWall(){
   tempWall.value[3] = '0'; // Wall stopping z
   tempWall.value[4] = '0'; // Wall height
   return tempWall;
+}
+
+void * createInstruction() {
+
+}
+
+
+Instruction GetInstruction(Blueprint bp, int * bpCounter) {
+	Instruction inst;
+
+
+	return inst;
 }
