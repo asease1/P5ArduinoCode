@@ -32,15 +32,6 @@
 #include "Controller.h"
 #include "InputHandler.h"
 
-enum InstructionType {normal, pickUp, place};
-
-struct Instruction{
-  InstructionType type;
-  int positions[2];
-  short int count;
-  BrickType brick;
-};
-
 struct Instruction* currentInstruction;
 struct Instruction* savedInstruction;
 struct Queue queue;
@@ -100,18 +91,21 @@ void setup() {
   
   ResetSystem();
   
-  StartMotor();
+  //StartMotor();
+  isPosReached = true;
 }
 
 void loop() {
   //put your main code here, to run repeatedly:
 
   if(isPosReached && !IsCurrentMotorMoving()){
+    isPosReached = false;
     switch(currentInstruction->count){
       case 0:
         if(currentInstruction->type == normal){
           savedInstruction = currentInstruction;
-          currentInstruction = PickUpBrick();
+          currentInstruction = PickUpBrick(smallBrick);
+        Serial.println(111112);  
           break;
         }
         
@@ -119,10 +113,11 @@ void loop() {
         ChangeMotor(&myController, motorZ);
         break;
       case 1:
+        Serial.println(222222);
         if(currentInstruction->type == pickUp){
-          GrabBrick();
+          GrabBrick(&myController);
           free(currentInstruction);
-          currentInstruction = savedInstrction;
+          currentInstruction = savedInstruction;
           currentInstruction->type = place;
           break;
         }
@@ -135,23 +130,13 @@ void loop() {
       StartMotor();
     }
     
-    isPosReached = false;
+    
   }
     
   /*if(queue.size < MAX_QUEUE_SIZE)
     push(&queue, &GetInstrction());*/
  delay(10);
  //Serial.println(myController.runningMotor->pos);
-}
-
-Instruction CreateInstruction(int x, int z, BrickType brick){
-  Instruction newInstruction;
-  newInstruction.positions[0] = ConvertToGearDegrees(x);
-  newInstruction.positions[1] = ConvertToGearDegrees(z);
-  newInstruction.brick = brick;
-  newInstruction.count = 0;
-  newInstruction.InstructionType = normal;
-  return newInstruction;
 }
 
 
@@ -271,9 +256,18 @@ void OnInterrupt(){
 void StartMotor(){
   while(!MoveTo(currentInstruction->positions[currentInstruction->count],&myController)){
       Serial.println(-9000);
+      
       if(++currentInstruction->count == 2){
-        NextInstruction();
-        
+        //Maybe remove this
+        /*if(currentInstruction->type != pickUp){
+          NextInstruction();
+        }
+        //to here
+        else{*/
+           currentInstruction->count = 1;
+           isPosReached = true;
+           return;
+        //}
       }
       else{
         switch(currentInstruction->count){

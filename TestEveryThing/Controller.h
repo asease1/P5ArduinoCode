@@ -16,6 +16,7 @@
 enum Chanels {motorY, motorX, motorZ, motorRotation};
 enum MotorStates {forward, backward, hold};
 enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
+#include "Model.h"
 
 //All data struct
 typedef struct Motor{
@@ -158,14 +159,9 @@ void ChangeMotor(Controller *myControl, Chanels newMotor){
   }
 }
 
-int ConvertToGearDegrees(int BrickCord){
-  //return 100;
-  Serial.println(((15.0/0.32)*0.8*(float)BrickCord));
-  return (int)((15.0/0.32)*0.8*(float)BrickCord);
-}
 
 Instruction* PickUpBrick(BrickType brick){
-  Instruction* pickUpInstruction = malloc(sizeof(instruction));
+  Instruction* pickUpInstruction = malloc(sizeof(Instruction));
   Instruction tempInstruction;
 
   switch(brick){
@@ -173,20 +169,25 @@ Instruction* PickUpBrick(BrickType brick){
       tempInstruction = CreateInstruction(ConvertToGearDegrees(SMALL_BRICK_DEPO_X),ConvertToGearDegrees(SMALL_BRICK_DEPO_Z), none);
       break;
     case largeBrick0:
-      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_0_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_0_DEPO_Z), none)
+      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_0_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_0_DEPO_Z), none);
       break;
     case largeBrick90:
-      tempInstruction = CreateInstruction((ConvertToGearDegrees(LARGE_BRICK_90_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_90_DEPO_Z), none)
+      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_90_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_90_DEPO_Z), none);
       break;
   }
 
   tempInstruction.type = pickUp; 
   
-  memcpy(pickUpInstruction, &tempInstruction, sizeof(instruction));
+  memcpy(pickUpInstruction, &tempInstruction, sizeof(Instruction));
+  Serial.println(pickUpInstruction->positions[0]);
   return pickUpInstruction;
 }
 
-void GrabBrick(){
-  
+void GrabBrick(Controller *myController){
+  ChangeMotorState(forward, &myController->motorY);
+  delay(1000);
+  ChangeMotorState(backward, &myController->motorY);
+  delay(1000);
+  ChangeMotorState(hold, &myController->motorY);
 }
 

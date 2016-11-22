@@ -18,6 +18,33 @@ Position CreatePosition(char x, char y, char z){
  
   return newPosition; 
 } 
+
+enum InstructionType {normal, pickUp, place};
+
+struct Instruction{
+  InstructionType type;
+  int positions[2];
+  short int count;
+  BrickType brick;
+};
+
+
+int ConvertToGearDegrees(int BrickCord){
+  //return 100;
+  Serial.println(((15.0/0.32)*0.8*(float)BrickCord));
+  return (int)((15.0/0.32)*0.8*(float)BrickCord);
+}
+
+Instruction CreateInstruction(int x, int z, BrickType brick){
+  Instruction newInstruction;
+  newInstruction.positions[0] = ConvertToGearDegrees(x);
+  newInstruction.positions[1] = ConvertToGearDegrees(z);
+  newInstruction.brick = brick;
+  newInstruction.count = 0;
+  newInstruction.type = normal;
+  return newInstruction;
+}
+
  
 /*Contains a three-dimensional array of chars and te position of the brick pickup site*/ 
 typedef struct Blueprint{ 
@@ -44,34 +71,14 @@ Blueprint* createBlueprint(){
   return temp; 
 }
 
-  struct Wall{
-  char value[5];
-};
 
-/*creates a new instance of the wall struct*/
-struct Wall createWall(){
-  struct Wall tempWall;
-  tempWall.value[0] = '0'; // Wall starting x
-  tempWall.value[1] = '0'; // Wall starting z
-  tempWall.value[2] = '0'; // Wall stopping x
-  tempWall.value[3] = '0'; // Wall stopping z
-  tempWall.value[4] = '0'; // Wall height
-  return tempWall;
-<<<<<<< HEAD
-}
-=======
-}
-
-void * createInstruction() {
-
-}
 
 enum brickState
 {
 	empty, notPlaced, placed
 };
 
-Instruction GetInstruction(Blueprint bp, position * bpProgress) {
+Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
 Instruction inst;
 
 	for (int i = bpProgress->x; i < MaxX; i+=2)
@@ -136,4 +143,5 @@ Instruction inst;
 
 	return inst;
 }
->>>>>>> blueprint-to-instruction
+
+
