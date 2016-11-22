@@ -65,19 +65,105 @@ void * createInstruction() {
 
 }
 
+enum brickState
+{
+	empty, notPlaced, placed
+};
 
 Instruction GetInstruction(Blueprint bp, position * bpProgress) {
-	Instruction inst;
-	for (int i = bpProgress->x; i < MaxX; i++)
-	{
-		for (int i = bpProgress->y; i < MaxY; i++)
-		{
-			for (int i = bpProgress->z; i < MaxZ; i++)
-			{
+Instruction inst;
 
+	for (int i = bpProgress->x; i < MaxX; i+=2)
+	{
+		for (int j = bpProgress->z; j < MaxY; j+=2)
+		{
+			for (int k = bpProgress->y; k < MaxZ; k++)
+			{
+				switch (bp.pos[i][j][k])
+				{
+					case notPlaced:
+						switch (bp.pos[i + 2][j][k])
+						{
+							case notPlaced:
+								bp.pos[i][j][k] = placed;
+								bp.pos[i + 2][j][k] = placed;
+								//Place big brick)
+							break;
+							case placed: case empty:
+								switch (bp.pos[i - 2][j][k])
+								{
+									case notPlaced:
+										bp.pos[i][j][k] = placed;
+										bp.pos[i - 2][j][k] = placed;
+										//Place big brick)
+									break;
+									case placed: case empty:
+										switch (bp.pos[i][j+2][k])
+										{
+										case notPlaced:
+											bp.pos[i][j][k] = placed;
+											bp.pos[i][j+2][k] = placed;
+											//Place big brick)
+											break;
+										case placed: case empty:
+											switch (bp.pos[i][j-2][k])
+											{
+											case notPlaced:
+												bp.pos[i][j][k] = placed;
+												bp.pos[i][j-2][k] = placed;
+												//Place big brick)
+												break;
+											case placed: case empty:
+										default:
+										break;
+										}
+									default:
+									break;
+									}
+							default:
+							break;
+							}
+						default:
+						break;
+						}
+				default:
+				break;
+				}
+				
+				
+				
+				/*
+				
+				if (bp.pos[i][j][k] == '1' && bp.pos[i][j][k].notPlaced == '1')
+				{
+					if (bp.pos[i+2][j][k] == '1' && bp.pos[i+2][j][k].notPlaced == '1')
+					{
+						bp.pos[i][j][k].notPlaced = '0';
+						bp.pos[i+2][j][k].notPlaced = '0';
+						//Place big brick
+					}
+					else if (bp.pos[i - 2][j][k] == '1' && bp.pos[i - 2][j][k].notPlaced == '1')
+					{
+						bp.pos[i][j][k].notPlaced = '0';
+						bp.pos[i - 2][j][k].notPlaced = '0';
+						//Place big brick
+					}
+					else if (bp.pos[i][j+2][k] == '1' && bp.pos[i][j+2][k].notPlaced == '1')
+					{
+						bp.pos[i][j][k].notPlaced = '0';
+						bp.pos[i][j+2][k].notPlaced = '0';
+						//Place big brick
+					}
+					else if (bp.pos[i][j-2][k] == '1' && bp.pos[i][j-2][k].notPlaced == '1')
+					{
+						bp.pos[i][j][k].notPlaced = '0';
+						bp.pos[i][j + 2][k].notPlaced = '0';
+						//Place big brick
+					}
+					*/
+				}
 			}
 		}
 	}
-
 	return inst;
 }
