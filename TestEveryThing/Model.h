@@ -57,4 +57,83 @@ struct Wall createWall(){
   tempWall.value[3] = '0'; // Wall stopping z
   tempWall.value[4] = '0'; // Wall height
   return tempWall;
+<<<<<<< HEAD
 }
+=======
+}
+
+void * createInstruction() {
+
+}
+
+enum brickState
+{
+	empty, notPlaced, placed
+};
+
+Instruction GetInstruction(Blueprint bp, position * bpProgress) {
+Instruction inst;
+
+	for (int i = bpProgress->x; i < MaxX; i+=2)
+	{
+		for (int j = bpProgress->z; j < MaxY; j+=2)
+		{
+			for (int k = bpProgress->y; k < MaxZ; k++)
+			{
+				switch (bp.pos[i][j][k])
+				{
+					case notPlaced:
+						switch (bp.pos[i + 2][j][k])
+						{
+							case notPlaced:
+								bp.pos[i][j][k] = placed;
+								bp.pos[i + 2][j][k] = placed;
+								//Place big brick)
+							break;
+							case placed: case empty:
+								switch (bp.pos[i - 2][j][k])
+								{
+									case notPlaced:
+										bp.pos[i][j][k] = placed;
+										bp.pos[i - 2][j][k] = placed;
+										//Place big brick)
+									break;
+									case placed: case empty:
+										switch (bp.pos[i][j+2][k])
+										{
+										case notPlaced:
+											bp.pos[i][j][k] = placed;
+											bp.pos[i][j+2][k] = placed;
+											//Place big brick)
+											break;
+										case placed: case empty:
+											switch (bp.pos[i][j-2][k])
+											{
+												case notPlaced:
+													bp.pos[i][j][k] = placed;
+													bp.pos[i][j-2][k] = placed;
+													//Place big brick)
+													break;
+												case placed: case empty:
+												default:
+												break;
+											}
+											default:
+											break;
+										}
+									default:
+									break;
+								}
+							default:
+							break;
+						}
+					default:
+					break;
+				}
+			}
+		}
+	}
+
+	return inst;
+}
+>>>>>>> blueprint-to-instruction
