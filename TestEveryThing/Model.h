@@ -25,22 +25,22 @@ typedef struct Blueprint{
   position pickup; 
 }; 
  
-struct Blueprint createBlueprint(){ 
-  struct Blueprint temp; 
+Blueprint* createBlueprint(){ 
+  struct Blueprint* temp = malloc(sizeof(Blueprint)); 
   struct position ps; 
   char a, b, c; 
   /*initializing all values in the array to 0*/ 
   for(a = 0; a < MaxX; a++){ 
     for(b = 0; b < MaxY; b++){ 
       for(c = 0; c < MaxZ; c++){ 
-        temp.pos[a][b][c] = 0; 
+        temp->pos[a][b][c] = 0; 
         } 
       } 
     } 
   /*initializing pickup site position to (0, 0, 0)*/ 
-  temp.pickup.x = 0; 
-  temp.pickup.y = 0; 
-  temp.pickup.z = 0; 
+  temp->pickup.x = 0; 
+  temp->pickup.y = 0; 
+  temp->pickup.z = 0; 
   return temp; 
   }
 

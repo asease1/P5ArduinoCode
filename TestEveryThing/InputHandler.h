@@ -58,7 +58,7 @@ Blueprint makeBlueprint(Blueprint* BP, Wall* W, int D){
 /*Takes a pointer to queue containing Wall structs, converts these into a Blueprint struct and returns a pointer to said Blueprint struct*/
 Blueprint* convertToBlueprint(int WallQueuePointer){
   Wall* tempWall;
-  struct Blueprint tempBlueprint = createBlueprint();
+  struct Blueprint* tempBlueprint = createBlueprint();
   while(peek(WallQueuePointer) != NULL){
     tempWall = pop(WallQueuePointer);
     if(tempWall->value[4] > 0 && tempWall->value[4] < MaxY //Checks wall height for 0 < h <= max height
@@ -68,11 +68,11 @@ Blueprint* convertToBlueprint(int WallQueuePointer){
       && tempWall->value[3] >= 0 && tempWall->value[3] > MaxZ){ //not even gonna try
       if(tempWall->value[0] == tempWall->value[2]   // Checks if start X == end X (prevents diagonal walls)
       && tempWall->value[1] != tempWall->value[3]){ // Checks if wall is not 0 long
-        makeBlueprint(&tempBlueprint, tempWall, 0);
+        makeBlueprint(tempBlueprint, tempWall, 0);
       }
       if(tempWall->value[1] == tempWall->value[3]   // Checks if start y == end y (prevents diagonal walls)
       && tempWall->value[0] != tempWall->value[2]){ // Checks if wall is not 0 long
-        makeBlueprint(&tempBlueprint, tempWall, 1);
+        makeBlueprint(tempBlueprint, tempWall, 1);
       }
       else
         ErrorCode(ERR_WALL);
@@ -80,6 +80,6 @@ Blueprint* convertToBlueprint(int WallQueuePointer){
     else
       ErrorCode(ERR_WALL);
   }
-  return &tempBlueprint;
+  return tempBlueprint;
 }
 
