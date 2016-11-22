@@ -3,7 +3,7 @@
 #include "Error.h";
 
 /*Reads an input stream from the USB port. Divides the input into wall structs, enqueues these structs and returns a pointer to the queue*/
-int readInput(){
+Queue* readInput(){
   Queue Walls = CreateQueue(sizeof(Wall*));
   /*loop runs while there is input waiting to be processed*/
   while(Serial.available() > 0){
@@ -56,7 +56,7 @@ Blueprint makeBlueprint(Blueprint* BP, Wall* W, int D){
 }
 
 /*Takes a pointer to queue containing Wall structs, converts these into a Blueprint struct and returns a pointer to said Blueprint struct*/
-Blueprint* convertToBlueprint(int WallQueuePointer){
+Blueprint* convertToBlueprint(Queue* WallQueuePointer){
   Wall* tempWall;
   struct Blueprint* tempBlueprint = createBlueprint();
   while(peek(WallQueuePointer) != NULL){
