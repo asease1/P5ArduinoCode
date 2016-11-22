@@ -27,37 +27,6 @@ int readInput(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     struct Wall wallTemp = createWall();
     for(int i = 0; i < 5; i++){
       wallTemp.value[i] = Serial.read();
