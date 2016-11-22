@@ -108,62 +108,30 @@ Instruction inst;
 										case placed: case empty:
 											switch (bp.pos[i][j-2][k])
 											{
-											case notPlaced:
-												bp.pos[i][j][k] = placed;
-												bp.pos[i][j-2][k] = placed;
-												//Place big brick)
+												case notPlaced:
+													bp.pos[i][j][k] = placed;
+													bp.pos[i][j-2][k] = placed;
+													//Place big brick)
+													break;
+												case placed: case empty:
+												default:
 												break;
-											case placed: case empty:
-										default:
-										break;
+											}
+											default:
+											break;
 										}
 									default:
 									break;
-									}
+								}
 							default:
 							break;
-							}
-						default:
-						break;
 						}
-				default:
-				break;
-				}
-				
-				
-				
-				/*
-				
-				if (bp.pos[i][j][k] == '1' && bp.pos[i][j][k].notPlaced == '1')
-				{
-					if (bp.pos[i+2][j][k] == '1' && bp.pos[i+2][j][k].notPlaced == '1')
-					{
-						bp.pos[i][j][k].notPlaced = '0';
-						bp.pos[i+2][j][k].notPlaced = '0';
-						//Place big brick
-					}
-					else if (bp.pos[i - 2][j][k] == '1' && bp.pos[i - 2][j][k].notPlaced == '1')
-					{
-						bp.pos[i][j][k].notPlaced = '0';
-						bp.pos[i - 2][j][k].notPlaced = '0';
-						//Place big brick
-					}
-					else if (bp.pos[i][j+2][k] == '1' && bp.pos[i][j+2][k].notPlaced == '1')
-					{
-						bp.pos[i][j][k].notPlaced = '0';
-						bp.pos[i][j+2][k].notPlaced = '0';
-						//Place big brick
-					}
-					else if (bp.pos[i][j-2][k] == '1' && bp.pos[i][j-2][k].notPlaced == '1')
-					{
-						bp.pos[i][j][k].notPlaced = '0';
-						bp.pos[i][j + 2][k].notPlaced = '0';
-						//Place big brick
-					}
-					*/
+					default:
+					break;
 				}
 			}
 		}
 	}
+
 	return inst;
 }
