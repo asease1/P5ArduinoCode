@@ -43,7 +43,7 @@ Instruction* currentInstruction;
 struct Queue queue;
 struct Controller myController;
 
-int* BlueprintCounter = 0;
+position * bpProgress;
 Blueprint bluePrint;
 
 
@@ -90,7 +90,10 @@ void setup() {
   
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
-  bluePrint = createBlueprint();
+  bluePrint = *createBlueprint();
+  bpProgress->x = 0;
+  bpProgress->y = 0;
+  bpProgress->z = 0;
  /* push(&queue, &CreateInstruction(0,500,100,50));
   push(&queue, &CreateInstruction(0,200,200,0));
   push(&queue, &CreateInstruction(0,0,0,0));
@@ -106,7 +109,7 @@ void loop() {
   //put your main code here, to run repeatedly:
 
   if(queue.size < MAX_QUEUE_SIZE)
-    push(&queue, &GetInstruction(bluePrint, BlueprintCounter));
+    push(&queue, &GetInstruction(bluePrint, bpProgress));
 
 
  delay(1000);

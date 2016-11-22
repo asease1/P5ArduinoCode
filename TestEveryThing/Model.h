@@ -66,9 +66,18 @@ void * createInstruction() {
 }
 
 
-Instruction GetInstruction(Blueprint bp, int * bpCounter) {
+Instruction GetInstruction(Blueprint bp, position * bpProgress) {
 	Instruction inst;
+	for (int i = bpProgress->x; i < MaxX; i++)
+	{
+		for (int i = bpProgress->y; i < MaxY; i++)
+		{
+			for (int i = bpProgress->z; i < MaxZ; i++)
+			{
 
+			}
+		}
+	}
 
 	return inst;
 }
