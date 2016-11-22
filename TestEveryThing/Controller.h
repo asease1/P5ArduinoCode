@@ -4,11 +4,18 @@
 //Margins
 #define ERROR_MARGIN1 2
 #define ERROR_MARGIN2 40
-#define ERROR_MARGIN3 200
+#define ERROR_MARGIN3 100
+
+#define SMALL_BRICK_DEPO_X 0
+#define SMALL_BRICK_DEPO_Z 1
+#define LARGE_BRICK_0_DEPO_X 0
+#define LARGE_BRICK_0_DEPO_Z 1
+#define LARGE_BRICK_90_DEPO_X 0
+#define LARGE_BRICK_90_DEPO_Z 1
 //Chanel is the current motor input Interupts
 enum Chanels {motorY, motorX, motorZ, motorRotation};
 enum MotorStates {forward, backward, hold};
-enum BrickType {smallBrick, largeBrick0, largeBrick90};
+enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
 
 //All data struct
 typedef struct Motor{
@@ -149,5 +156,37 @@ void ChangeMotor(Controller *myControl, Chanels newMotor){
       //place code for rotationMotor.
       break;
   }
+}
+
+int ConvertToGearDegrees(int BrickCord){
+  //return 100;
+  Serial.println(((15.0/0.32)*0.8*(float)BrickCord));
+  return (int)((15.0/0.32)*0.8*(float)BrickCord);
+}
+
+Instruction* PickUpBrick(BrickType brick){
+  Instruction* pickUpInstruction = malloc(sizeof(instruction));
+  Instruction tempInstruction;
+
+  switch(brick){
+    case smallBrick:
+      tempInstruction = CreateInstruction(ConvertToGearDegrees(SMALL_BRICK_DEPO_X),ConvertToGearDegrees(SMALL_BRICK_DEPO_Z), none);
+      break;
+    case largeBrick0:
+      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_0_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_0_DEPO_Z), none)
+      break;
+    case largeBrick90:
+      tempInstruction = CreateInstruction((ConvertToGearDegrees(LARGE_BRICK_90_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_90_DEPO_Z), none)
+      break;
+  }
+
+  tempInstruction.type = pickUp; 
+  
+  memcpy(pickUpInstruction, &tempInstruction, sizeof(instruction));
+  return pickUpInstruction;
+}
+
+void GrabBrick(){
+  
 }
 

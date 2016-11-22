@@ -4,14 +4,14 @@
 #define MaxZ 15 
  
 /*Contains a single position in 3d space*/ 
-typedef struct position{ 
+struct Position{ 
   char x; 
   char y; 
   char z; 
 }; 
  
-position CreatePosition(char x, char y, char z){ 
-  position newPosition; 
+Position CreatePosition(char x, char y, char z){ 
+  Position newPosition; 
   newPosition.x; 
   newPosition.y; 
   newPosition.z; 
@@ -22,12 +22,12 @@ position CreatePosition(char x, char y, char z){
 /*Contains a three-dimensional array of chars and te position of the brick pickup site*/ 
 typedef struct Blueprint{ 
   char pos[MaxX][MaxY][MaxZ]; 
-  position pickup; 
+  Position pickup; 
 }; 
  
 Blueprint* createBlueprint(){ 
   struct Blueprint* temp = malloc(sizeof(Blueprint)); 
-  struct position ps; 
+  struct Position ps; 
   char a, b, c; 
   /*initializing all values in the array to 0*/ 
   for(a = 0; a < MaxX; a++){ 
@@ -42,7 +42,7 @@ Blueprint* createBlueprint(){
   temp->pickup.y = 0; 
   temp->pickup.z = 0; 
   return temp; 
-  }
+}
 
   struct Wall{
   char value[5];
