@@ -18,7 +18,7 @@ int readInput(){
 
 
 //Insert values according to the Wall it has been given
-Blueprint makeBlueprint(Blueprint BP, Wall* W, int D){
+Blueprint makeBlueprint(Blueprint* BP, Wall* W, int D){
   int startval, endval;
   if(D){
     if(W->value[0] < W->value[2]){
@@ -33,7 +33,7 @@ Blueprint makeBlueprint(Blueprint BP, Wall* W, int D){
     int zval = W->value[1];
     for(startval; startval <= endval; startval++){
       for(int startH = 0; startH > endH; startH++)
-      BP.pos[startval][startH][zval] = 1;
+      BP->pos[startval][startH][zval] = 1;
     }
   }
   
@@ -50,13 +50,13 @@ Blueprint makeBlueprint(Blueprint BP, Wall* W, int D){
     int xval = W->value[0];
     for(startval; startval <= endval; startval++){
       for(int startH = 0; startH > endH; startH++)
-      BP.pos[xval][startH][startval] = 1;
+      BP->pos[xval][startH][startval] = 1;
     }
   }
 }
 
 /*Takes a pointer to queue containing Wall structs, converts these into a Blueprint struct and returns a pointer to said Blueprint struct*/
-struct Blueprint convertToBlueprint(int WallQueuePointer){
+Blueprint* convertToBlueprint(int WallQueuePointer){
   Wall* tempWall;
   struct Blueprint tempBlueprint = createBlueprint();
   while(peek(WallQueuePointer) != NULL){
@@ -68,11 +68,11 @@ struct Blueprint convertToBlueprint(int WallQueuePointer){
       && tempWall->value[3] >= 0 && tempWall->value[3] > MaxZ){ //not even gonna try
       if(tempWall->value[0] == tempWall->value[2]   // Checks if start X == end X (prevents diagonal walls)
       && tempWall->value[1] != tempWall->value[3]){ // Checks if wall is not 0 long
-        tempBlueprint = makeBlueprint(tempBlueprint, tempWall, 0);
+        makeBlueprint(&tempBlueprint, tempWall, 0);
       }
       if(tempWall->value[1] == tempWall->value[3]   // Checks if start y == end y (prevents diagonal walls)
       && tempWall->value[0] != tempWall->value[2]){ // Checks if wall is not 0 long
-        tempBlueprint = makeBlueprint(tempBlueprint, tempWall, 1);
+        makeBlueprint(&tempBlueprint, tempWall, 1);
       }
       else
         ErrorCode(ERR_WALL);
@@ -80,6 +80,6 @@ struct Blueprint convertToBlueprint(int WallQueuePointer){
     else
       ErrorCode(ERR_WALL);
   }
-  return tempBlueprint;
+  return &tempBlueprint;
 }
 
