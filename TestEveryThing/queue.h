@@ -96,5 +96,4 @@ Queue CreateQueue (int sizeOfElement) {
     queue.peek = &peek;
     queue.sizeOfElement = sizeOfElement;
     return queue;
-
 }

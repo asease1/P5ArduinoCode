@@ -151,4 +151,3 @@ void ChangeMotor(Controller *myControl, Chanels newMotor){
   }
 }
 
-

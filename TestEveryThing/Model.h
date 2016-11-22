@@ -1,4 +1,3 @@
-
 /*Defined values. Remember they're used in an array, so -1 for actual values!*/ 
 #define MaxX 26 
 #define MaxY 3 

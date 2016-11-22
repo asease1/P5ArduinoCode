@@ -2,10 +2,8 @@
 #define interupt1 2
 #define interupt2 3
 //Dircation pins x axis
-
 #define xPin1 4
 #define xPin2 5
-
 //Dircation pins y axis
 #define yPin1 6
 #define yPin2 7
@@ -22,23 +20,19 @@
 
 //gear are the amount of speed the motor should move at from 0-255
 #define gear1 255
-
 #define gear2 150
 #define gear3 150
-
 
 #define Hold_Delay 8000
 #define DELAY_FOR_MOTOR_MOVEMENT 1000
 
 #define MAX_QUEUE_SIZE 32
 
-
 #include "Wire.h"
 #include "queue.h"
 #include "Controller.h"
 //#include "InputHandler.h"
 #include "Model.h"
-
 
 struct Instruction{
   int positions[4];
@@ -55,7 +49,17 @@ bool queueIsEmpty = true;
 
 void setup() {
 
-
+/*   Wire.begin(); // wake up I2C bus
+// set I/O pins to outputs
+ Wire.beginTransmission(0x20);
+ Wire.write(0x00); // IODIRA register
+ Wire.write(0x00); // set all of port A to outputs
+ Wire.endTransmission();
+ Wire.beginTransmission(0x20);
+ Wire.write(0x01); // IODIRB register
+ Wire.write(0x00); // set all of port B to outputs
+ Wire.endTransmission();*/
+ 
   // define pin mode for chanels
   pinMode(chanelPin3, OUTPUT);
   pinMode(chanelPin2, OUTPUT);
@@ -86,7 +90,6 @@ void setup() {
   push(&queue, &CreateInstruction(0,500,100,50));
   push(&queue, &CreateInstruction(0,200,200,0));
   push(&queue, &CreateInstruction(0,0,0,0));
-
   NextInstruction();
   
   
@@ -102,7 +105,6 @@ void loop() {
     push(&queue, &GetInstrction());*/
  delay(1000);
  Serial.println(myController.motorZ.pos);
-
 }
 
 Instruction CreateInstruction(int rotation, int x, int y, int z){
@@ -116,6 +118,7 @@ Instruction CreateInstruction(int rotation, int x, int y, int z){
 
   return newInstruction;
 }
+
 
 void OnInterupts1(){
   //NXT lego motor encoder
@@ -278,7 +281,6 @@ void ResetSystem(){
   ResetMotor(motorX); 
   isResat = true;
   analogWrite(gearPin, 255);
-
 }
 
 void ResetMotor(Chanels motor){

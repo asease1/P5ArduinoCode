@@ -6,11 +6,6 @@ int readInput(){
   Queue Walls = CreateQueue(sizeof(Wall*));
   /*loop runs while there is input waiting to be processed*/
   while(Serial.available() > 0){
-
-
-
-
-
     struct Wall wallTemp = createWall();
     for(int i = 0; i < 5; i++){
       wallTemp.value[i] = Serial.read();
