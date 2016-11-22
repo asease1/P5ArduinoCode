@@ -114,6 +114,7 @@ Instruction inst;
 													//Place big brick)
 													break;
 												case placed: case empty:
+													//place small brick
 												default:
 												break;
 											}
