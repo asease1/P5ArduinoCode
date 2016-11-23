@@ -100,24 +100,24 @@ Instruction inst;
 									case placed: case empty:
 										switch (bp.pos[i][j+2][k])
 										{
-										case notPlaced:
-											bp.pos[i][j][k] = placed;
-											bp.pos[i][j+2][k] = placed;
-											//Place big brick)
-											break;
-										case placed: case empty:
-											switch (bp.pos[i][j-2][k])
-											{
-												case notPlaced:
-													bp.pos[i][j][k] = placed;
-													bp.pos[i][j-2][k] = placed;
-													//Place big brick)
-													break;
-												case placed: case empty:
-													//place small brick
-												default:
+											case notPlaced:
+												bp.pos[i][j][k] = placed;
+												bp.pos[i][j+2][k] = placed;
+												//Place big brick)
 												break;
-											}
+											case placed: case empty:
+												switch (bp.pos[i][j-2][k])
+												{
+													case notPlaced:
+														bp.pos[i][j][k] = placed;
+														bp.pos[i][j-2][k] = placed;
+														//Place big brick)
+														break;
+													case placed: case empty:
+														//place small brick
+													default:
+													break;
+												}
 											default:
 											break;
 										}
