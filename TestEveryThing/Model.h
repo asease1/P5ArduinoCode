@@ -3,33 +3,58 @@
 #define MaxY 3 
 #define MaxZ 15 
  
-
-
 /*Contains a single position in 3d space*/ 
-typedef struct position{ 
+struct Position{ 
   char x; 
   char y; 
   char z; 
 }; 
  
-position CreatePosition(char x, char y, char z){ 
-  position newPosition; 
+Position CreatePosition(char x, char y, char z){ 
+  Position newPosition; 
   newPosition.x; 
   newPosition.y; 
   newPosition.z; 
  
   return newPosition; 
 } 
+
+enum InstructionType {normal, pickUp, place};
+
+struct Instruction{
+  InstructionType type;
+  int positions[2];
+  short int count;
+  BrickType brick;
+};
+
+
+int ConvertToGearDegrees(int BrickCord){
+  //return 100;
+  Serial.println(((15.0/0.32)*0.8*(float)BrickCord));
+  return (int)((15.0/0.32)*0.8*(float)BrickCord);
+}
+
+Instruction CreateInstruction(int x, int z, BrickType brick){
+  Instruction newInstruction;
+  newInstruction.positions[0] = ConvertToGearDegrees(x);
+  newInstruction.positions[1] = ConvertToGearDegrees(z);
+  newInstruction.brick = brick;
+  newInstruction.count = 0;
+  newInstruction.type = normal;
+  return newInstruction;
+}
+
  
 /*Contains a three-dimensional array of chars and te position of the brick pickup site*/ 
 typedef struct Blueprint{ 
   char pos[MaxX][MaxY][MaxZ]; 
-  position pickup; 
+  Position pickup; 
 }; 
  
 Blueprint* createBlueprint(){ 
   struct Blueprint* temp = malloc(sizeof(Blueprint)); 
-  struct position ps; 
+  struct Position ps; 
   char a, b, c; 
   /*initializing all values in the array to 0*/ 
   for(a = 0; a < MaxX; a++){ 
@@ -44,88 +69,62 @@ Blueprint* createBlueprint(){
   temp->pickup.y = 0; 
   temp->pickup.z = 0; 
   return temp; 
-  }
-
-  struct Wall{
-  char value[5];
-};
-
-/*creates a new instance of the wall struct*/
-struct Wall createWall(){
-  struct Wall tempWall;
-  tempWall.value[0] = '0'; // Wall starting x
-  tempWall.value[1] = '0'; // Wall starting z
-  tempWall.value[2] = '0'; // Wall stopping x
-  tempWall.value[3] = '0'; // Wall stopping z
-  tempWall.value[4] = '0'; // Wall height
-  return tempWall;
 }
 
-Instruction CreateInstruction(int rotation, int x, int y, int z) {
-	Instruction newInstruction;
-	newInstruction.positions[0] = rotation;
-	newInstruction.positions[1] = x;
-	newInstruction.positions[2] = y;
-	newInstruction.positions[3] = z;
 
-	newInstruction.count = 1; //Change to 0 when doing rotation :3
-
-	return newInstruction;
-}
 
 enum brickState
 {
 	empty, notPlaced, placed
 };
 
-Instruction GetInstruction(Blueprint bp, position * bpProgress) {
+Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
 Instruction inst;
 
-	for (int yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
+	for (int i = bpProgress->x; i < MaxX; i+=2)
 	{
-		for (int zAxis = bpProgress->z; zAxis < MaxZ; zAxis+=2)
+		for (int j = bpProgress->z; j < MaxY; j+=2)
 		{
-			for (int xAxis = bpProgress->x; xAxis < MaxX; xAxis+=2)
+			for (int k = bpProgress->y; k < MaxZ; k++)
 			{
-				switch (bp.pos[xAxis][yAxis][zAxis])
+				switch (bp.pos[i][j][k])
 				{
 					case notPlaced:
-						switch (bp.pos[xAxis + 2][yAxis][zAxis])
+						switch (bp.pos[i + 2][j][k])
 						{
 							case notPlaced:
-								bp.pos[xAxis][yAxis][zAxis] = placed;
-								bp.pos[xAxis + 2][yAxis][zAxis] = placed;
-								inst = CreateInstruction();
+								bp.pos[i][j][k] = placed;
+								bp.pos[i + 2][j][k] = placed;
+								//Place big brick)
 							break;
 							case placed: case empty:
-								switch (bp.pos[xAxis - 2][yAxis][zAxis])
+								switch (bp.pos[i - 2][j][k])
 								{
 									case notPlaced:
-										bp.pos[xAxis][yAxis][zAxis] = placed;
-										bp.pos[xAxis - 2][yAxis][zAxis] = placed;
+										bp.pos[i][j][k] = placed;
+										bp.pos[i - 2][j][k] = placed;
 										//Place big brick)
 									break;
 									case placed: case empty:
-										switch (bp.pos[xAxis][yAxis+2][zAxis])
+										switch (bp.pos[i][j+2][k])
 										{
-											case notPlaced:
-												bp.pos[xAxis][yAxis][zAxis] = placed;
-												bp.pos[xAxis][yAxis+2][zAxis] = placed;
-												//Place big brick)
-												break;
-											case placed: case empty:
-												switch (bp.pos[xAxis][yAxis-2][zAxis])
-												{
-													case notPlaced:
-														bp.pos[xAxis][yAxis][zAxis] = placed;
-														bp.pos[xAxis][yAxis-2][zAxis] = placed;
-														//Place big brick)
-														break;
-													case placed: case empty:
-														//place small brick
-													default:
+										case notPlaced:
+											bp.pos[i][j][k] = placed;
+											bp.pos[i][j+2][k] = placed;
+											//Place big brick)
+											break;
+										case placed: case empty:
+											switch (bp.pos[i][j-2][k])
+											{
+												case notPlaced:
+													bp.pos[i][j][k] = placed;
+													bp.pos[i][j-2][k] = placed;
+													//Place big brick)
 													break;
-												}
+												case placed: case empty:
+												default:
+												break;
+											}
 											default:
 											break;
 										}
@@ -144,3 +143,5 @@ Instruction inst;
 
 	return inst;
 }
+
+
