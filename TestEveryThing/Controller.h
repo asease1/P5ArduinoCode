@@ -166,13 +166,13 @@ Instruction* PickUpBrick(BrickType brick){
 
   switch(brick){
     case smallBrick:
-      tempInstruction = CreateInstruction(ConvertToGearDegrees(SMALL_BRICK_DEPO_X),ConvertToGearDegrees(SMALL_BRICK_DEPO_Z), none);
+      tempInstruction = CreateInstruction(ConvertToGearDegrees(SMALL_BRICK_DEPO_X),ConvertToGearDegrees(SMALL_BRICK_DEPO_Z), 1, none);
       break;
     case largeBrick0:
-      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_0_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_0_DEPO_Z), none);
+      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_0_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_0_DEPO_Z), 1, none);
       break;
     case largeBrick90:
-      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_90_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_90_DEPO_Z), none);
+      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_90_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_90_DEPO_Z), 1, none);
       break;
   }
 

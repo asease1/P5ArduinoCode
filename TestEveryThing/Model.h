@@ -24,6 +24,7 @@ enum InstructionType {normal, pickUp, place};
 struct Instruction{
   InstructionType type;
   int positions[2];
+  int level;
   short int count;
   BrickType brick;
 };
@@ -35,10 +36,11 @@ int ConvertToGearDegrees(int BrickCord){
   return (int)((15.0/0.32)*0.8*(float)BrickCord);
 }
 
-Instruction CreateInstruction(int x, int z, BrickType brick){
+Instruction CreateInstruction(int x, int z, int level, BrickType brick){
   Instruction newInstruction;
   newInstruction.positions[0] = ConvertToGearDegrees(x);
   newInstruction.positions[1] = ConvertToGearDegrees(z);
+  newInstruction.level = level;
   newInstruction.brick = brick;
   newInstruction.count = 0;
   newInstruction.type = normal;
@@ -79,69 +81,89 @@ enum brickState
 };
 
 Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
-Instruction inst;
+	Instruction inst;
 
-	for (int i = bpProgress->x; i < MaxX; i+=2)
+	for (int yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
-		for (int j = bpProgress->z; j < MaxY; j+=2)
+		for (int zAxis = bpProgress->z; zAxis < MaxZ; zAxis += 2)
 		{
-			for (int k = bpProgress->y; k < MaxZ; k++)
+			for (int xAxis = bpProgress->x; xAxis < MaxX; xAxis += 2)
 			{
-				switch (bp.pos[i][j][k])
+				switch (bp.pos[xAxis][yAxis][zAxis])
 				{
+				case notPlaced:
+					switch (bp.pos[xAxis + 2][yAxis][zAxis])
+					{
 					case notPlaced:
-						switch (bp.pos[i + 2][j][k])
+						bp.pos[xAxis][yAxis][zAxis] = placed;
+						bp.pos[xAxis + 2][yAxis][zAxis] = placed;
+						bpProgress->x = xAxis;
+						bpProgress->y = yAxis;
+						bpProgress->z = zAxis;
+						return CreateInstruction(xAxis, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
+						break;
+					case placed: case empty:
+						switch (bp.pos[xAxis - 2][yAxis][zAxis])
 						{
-							case notPlaced:
-								bp.pos[i][j][k] = placed;
-								bp.pos[i + 2][j][k] = placed;
-								//Place big brick)
+						case notPlaced:
+							bp.pos[xAxis][yAxis][zAxis] = placed;
+							bp.pos[xAxis - 2][yAxis][zAxis] = placed;
+							bpProgress->x = xAxis;
+							bpProgress->y = yAxis;
+							bpProgress->z = zAxis;
+							return  CreateInstruction(xAxis, zAxis, yAxis, largeBrick90);
+							//Place big brick
 							break;
+						case placed: case empty:
+							switch (bp.pos[xAxis][yAxis + 2][zAxis])
+							{
+							case notPlaced:
+								bp.pos[xAxis][yAxis][zAxis] = placed;
+								bp.pos[xAxis][yAxis][zAxis + 2] = placed;
+								bpProgress->x = xAxis;
+								bpProgress->y = yAxis;
+								bpProgress->z = zAxis;
+								return  CreateInstruction(xAxis, zAxis, yAxis, largeBrick0);
+								//Place big brick)
+								break;
 							case placed: case empty:
-								switch (bp.pos[i - 2][j][k])
+								switch (bp.pos[xAxis][yAxis - 2][zAxis])
 								{
-									case notPlaced:
-										bp.pos[i][j][k] = placed;
-										bp.pos[i - 2][j][k] = placed;
-										//Place big brick)
+								case notPlaced:
+									bp.pos[xAxis][yAxis][zAxis] = placed;
+									bp.pos[xAxis][yAxis - 2][zAxis] = placed;
+									bpProgress->x = xAxis;
+									bpProgress->y = yAxis;
+									bpProgress->z = zAxis;
+									CreateInstruction(xAxis, zAxis, yAxis, largeBrick0);
+									//Place big brick)
 									break;
-									case placed: case empty:
-										switch (bp.pos[i][j+2][k])
-										{
-										case notPlaced:
-											bp.pos[i][j][k] = placed;
-											bp.pos[i][j+2][k] = placed;
-											//Place big brick)
-											break;
-										case placed: case empty:
-											switch (bp.pos[i][j-2][k])
-											{
-												case notPlaced:
-													bp.pos[i][j][k] = placed;
-													bp.pos[i][j-2][k] = placed;
-													//Place big brick)
-													break;
-												case placed: case empty:
-												default:
-												break;
-											}
-											default:
-											break;
-										}
-									default:
+								case placed: case empty:
+									bpProgress->x = xAxis;
+									bpProgress->y = yAxis;
+									bpProgress->z = zAxis;
+									CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
+									//place small brick
+								default:
 									break;
 								}
 							default:
+								break;
+							}
+						default:
 							break;
 						}
 					default:
+						break;
+					}
+				default:
 					break;
 				}
 			}
 		}
 	}
 
-	return inst;
+	return inst;//this should never happen
 }
 
 
