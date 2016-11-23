@@ -30,12 +30,10 @@ struct Instruction{
 
 
 int ConvertToGearDegrees(int BrickCord){
-  //return 100;
-  Serial.println(((15.0/0.32)*0.8*(float)BrickCord));
   return (int)((15.0/0.32)*0.8*(float)BrickCord);
 }
 
-Instruction CreateInstruction(int x, int z, BrickType brick){
+Instruction CreateInstruction(int x, int z,int y, BrickType brick){
   Instruction newInstruction;
   newInstruction.positions[0] = ConvertToGearDegrees(x);
   newInstruction.positions[1] = ConvertToGearDegrees(z);

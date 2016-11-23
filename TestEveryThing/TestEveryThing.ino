@@ -41,6 +41,7 @@ int TimeSinceLastInterrupt = 0;
 bool isResat = false;
 bool queueIsEmpty = true;
 bool isPosReached = false;
+bool newInstruction = false;
 
 void setup() {
 
@@ -82,10 +83,9 @@ void setup() {
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
   
-  push(&queue, &CreateInstruction(10,10, smallBrick));
-  push(&queue, &CreateInstruction(0,0, smallBrick));
-  push(&queue, &CreateInstruction(12,12, smallBrick));
-  push(&queue, &CreateInstruction(0,0, smallBrick));
+  push(&queue, &CreateInstruction(5,5,0, smallBrick));
+  push(&queue, &CreateInstruction(12,12,0, smallBrick));
+  push(&queue, &CreateInstruction(5,12,0, smallBrick));
   NextInstruction();
   
   
@@ -97,46 +97,55 @@ void setup() {
 
 void loop() {
   //put your main code here, to run repeatedly:
-
+  
   if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
+    
+    Serial.println(currentInstruction->count);
+    Serial.println(currentInstruction->type);
     switch(currentInstruction->count){
       case 0:
+        
+        
         if(currentInstruction->type == normal){
           savedInstruction = currentInstruction;
           currentInstruction = PickUpBrick(smallBrick);
-        Serial.println(111112);  
+          newInstruction = true;
+          Serial.println(111111);  
           break;
         }
-        
+        Serial.println(111112);
         currentInstruction->count = 1;
         ChangeMotor(&myController, motorZ);
+        
         break;
       case 1:
-        Serial.println(222222);
+        
         if(currentInstruction->type == pickUp){
           GrabBrick(&myController);
           free(currentInstruction);
           currentInstruction = savedInstruction;
           currentInstruction->type = place;
+          ChangeMotor(&myController, motorX);
+          Serial.println(222221);
           break;
         }
         
+        Serial.println(222222);
         //PlaceBrick();
         NextInstruction();
+        
         break;
     }
     if(!queueIsEmpty){
       StartMotor();
     }
-    
-    
   }
     
   /*if(queue.size < MAX_QUEUE_SIZE)
     push(&queue, &GetInstrction());*/
  delay(10);
- //Serial.println(myController.runningMotor->pos);
+ Serial.println(myController.runningMotor->pos);
 }
 
 
@@ -250,20 +259,20 @@ void OnInterrupt(){
   
   if(isResat && InterruptMotorPositionCheck()){
     isPosReached = true;
+    Serial.println(isPosReached);
   }
 }
 
 void StartMotor(){
+  //Serial.println(currentInstruction->positions[currentInstruction->count]);
   while(!MoveTo(currentInstruction->positions[currentInstruction->count],&myController)){
-      Serial.println(-9000);
-      
-      if(++currentInstruction->count == 2){
-        //Maybe remove this
-        /*if(currentInstruction->type != pickUp){
-          NextInstruction();
-        }
-        //to here
-        else{*/
+
+      if(newInstruction){
+        newInstruction = false;
+        isPosReached = true;
+        return;
+      }
+      else if(++currentInstruction->count == 2){        
            currentInstruction->count = 1;
            isPosReached = true;
            return;
@@ -295,6 +304,7 @@ void NextInstruction(){
 }
 
 void ResetSystem(){
+  isResat = false;
   analogWrite(gearPin, 180);
   ResetMotor(motorY);
   analogWrite(gearPin, 180);
