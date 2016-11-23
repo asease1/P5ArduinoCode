@@ -61,8 +61,16 @@ struct Wall createWall(){
   return tempWall;
 }
 
-void * createInstruction() {
+Instruction CreateInstruction(int rotation, int x, int y, int z) {
+	Instruction newInstruction;
+	newInstruction.positions[0] = rotation;
+	newInstruction.positions[1] = x;
+	newInstruction.positions[2] = y;
+	newInstruction.positions[3] = z;
 
+	newInstruction.count = 1; //Change to 0 when doing rotation :3
+
+	return newInstruction;
 }
 
 enum brickState
@@ -73,44 +81,44 @@ enum brickState
 Instruction GetInstruction(Blueprint bp, position * bpProgress) {
 Instruction inst;
 
-	for (int i = bpProgress->x; i < MaxX; i+=2)
+	for (int yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
-		for (int j = bpProgress->z; j < MaxY; j+=2)
+		for (int zAxis = bpProgress->z; zAxis < MaxZ; zAxis+=2)
 		{
-			for (int k = bpProgress->y; k < MaxZ; k++)
+			for (int xAxis = bpProgress->x; xAxis < MaxX; xAxis+=2)
 			{
-				switch (bp.pos[i][j][k])
+				switch (bp.pos[xAxis][yAxis][zAxis])
 				{
 					case notPlaced:
-						switch (bp.pos[i + 2][j][k])
+						switch (bp.pos[xAxis + 2][yAxis][zAxis])
 						{
 							case notPlaced:
-								bp.pos[i][j][k] = placed;
-								bp.pos[i + 2][j][k] = placed;
-								//Place big brick)
+								bp.pos[xAxis][yAxis][zAxis] = placed;
+								bp.pos[xAxis + 2][yAxis][zAxis] = placed;
+								inst = CreateInstruction();
 							break;
 							case placed: case empty:
-								switch (bp.pos[i - 2][j][k])
+								switch (bp.pos[xAxis - 2][yAxis][zAxis])
 								{
 									case notPlaced:
-										bp.pos[i][j][k] = placed;
-										bp.pos[i - 2][j][k] = placed;
+										bp.pos[xAxis][yAxis][zAxis] = placed;
+										bp.pos[xAxis - 2][yAxis][zAxis] = placed;
 										//Place big brick)
 									break;
 									case placed: case empty:
-										switch (bp.pos[i][j+2][k])
+										switch (bp.pos[xAxis][yAxis+2][zAxis])
 										{
 											case notPlaced:
-												bp.pos[i][j][k] = placed;
-												bp.pos[i][j+2][k] = placed;
+												bp.pos[xAxis][yAxis][zAxis] = placed;
+												bp.pos[xAxis][yAxis+2][zAxis] = placed;
 												//Place big brick)
 												break;
 											case placed: case empty:
-												switch (bp.pos[i][j-2][k])
+												switch (bp.pos[xAxis][yAxis-2][zAxis])
 												{
 													case notPlaced:
-														bp.pos[i][j][k] = placed;
-														bp.pos[i][j-2][k] = placed;
+														bp.pos[xAxis][yAxis][zAxis] = placed;
+														bp.pos[xAxis][yAxis-2][zAxis] = placed;
 														//Place big brick)
 														break;
 													case placed: case empty:
