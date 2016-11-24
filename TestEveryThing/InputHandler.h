@@ -1,4 +1,4 @@
-#include "Error.h";
+#include "Error.h"
 #include "queue.h"
 
 /*Reads an input stream from the USB port. Divides the input into wall structs, enqueues these structs and returns a pointer to the queue*/

@@ -45,7 +45,7 @@ Instruction CreateInstruction(int x, int z,int y, BrickType brick){
 
  
 /*Contains a three-dimensional array of chars and te position of the brick pickup site*/ 
-typedef struct Blueprint{ 
+struct Blueprint{ 
   char pos[MaxX][MaxY][MaxZ]; 
   Position pickup; 
 }; 

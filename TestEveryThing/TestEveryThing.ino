@@ -20,11 +20,11 @@
 
 //gear are the amount of speed the motor should move at from 0-255
 #define gear1 255
-#define gear2 200
-#define gear3 150
+#define gear2 255
+#define gear3 255
 
 #define Hold_Delay 8000
-#define DELAY_FOR_MOTOR_MOVEMENT 1000
+#define DELAY_FOR_MOTOR_MOVEMENT 200
 
 #define MAX_QUEUE_SIZE 32
 
@@ -35,26 +35,15 @@
 struct Instruction* currentInstruction;
 struct Instruction* savedInstruction;
 struct Queue queue;
-struct Controller myController;
+volatile struct Controller myController;
 
-int TimeSinceLastInterrupt = 0;
+unsigned long int TimeSinceLastInterrupt = 0;
 bool isResat = false;
 bool queueIsEmpty = true;
 bool isPosReached = false;
 bool newInstruction = false;
 
 void setup() {
-
-/*   Wire.begin(); // wake up I2C bus
-// set I/O pins to outputs
- Wire.beginTransmission(0x20);
- Wire.write(0x00); // IODIRA register
- Wire.write(0x00); // set all of port A to outputs
- Wire.endTransmission();
- Wire.beginTransmission(0x20);
- Wire.write(0x01); // IODIRB register
- Wire.write(0x00); // set all of port B to outputs
- Wire.endTransmission();*/
  
   // define pin mode for chanels
   pinMode(chanelPin3, OUTPUT);
@@ -86,23 +75,33 @@ void setup() {
   push(&queue, &CreateInstruction(5,5,0, smallBrick));
   push(&queue, &CreateInstruction(12,12,0, smallBrick));
   push(&queue, &CreateInstruction(5,12,0, smallBrick));
+  push(&queue, &CreateInstruction(12,5,0, smallBrick));
+  push(&queue, &CreateInstruction(5,5,0, smallBrick));
+  push(&queue, &CreateInstruction(12,12,0, smallBrick));
+  push(&queue, &CreateInstruction(5,12,0, smallBrick));
+  push(&queue, &CreateInstruction(12,5,0, smallBrick));
+  push(&queue, &CreateInstruction(5,5,0, smallBrick));
+  push(&queue, &CreateInstruction(12,12,0, smallBrick));
+  push(&queue, &CreateInstruction(5,12,0, smallBrick));
+  push(&queue, &CreateInstruction(12,5,0, smallBrick));
   NextInstruction();
   
   
   ResetSystem();
-  
+  //analogWrite(gearPin, 120);
   //StartMotor();
   isPosReached = true;
 }
 
 void loop() {
   //put your main code here, to run repeatedly:
-  
+  Serial.println(queue.size);
+  //Serial.println(isPosReached);
   if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
     
-    Serial.println(currentInstruction->count);
-    Serial.println(currentInstruction->type);
+    //Serial.println(currentInstruction->count);
+    //Serial.println(currentInstruction->type);
     switch(currentInstruction->count){
       case 0:
         
@@ -111,28 +110,27 @@ void loop() {
           savedInstruction = currentInstruction;
           currentInstruction = PickUpBrick(smallBrick);
           newInstruction = true;
-          Serial.println(111111);  
+          //Serial.println(111111);  
           break;
         }
-        Serial.println(111112);
+        //Serial.println(111112);
         currentInstruction->count = 1;
         ChangeMotor(&myController, motorZ);
         
         break;
       case 1:
-        
         if(currentInstruction->type == pickUp){
           GrabBrick(&myController);
           free(currentInstruction);
           currentInstruction = savedInstruction;
           currentInstruction->type = place;
           ChangeMotor(&myController, motorX);
-          Serial.println(222221);
+          //Serial.println(222221);
           break;
         }
-        
-        Serial.println(222222);
-        //PlaceBrick();
+          digitalWrite(gearpin, HIGH);
+        //Serial.println(222222);
+        PlaceBrick(&myController);
         NextInstruction();
         
         break;
@@ -144,12 +142,20 @@ void loop() {
     
   /*if(queue.size < MAX_QUEUE_SIZE)
     push(&queue, &GetInstrction());*/
- delay(10);
- Serial.println(myController.runningMotor->pos);
+ //delay(10);
+ //Serial.println(freeRam());
+}
+
+//DebugCode
+int freeRam () {
+  extern int __heap_start, *__brkval; 
+  int v; 
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
 
 
 void OnInterupts1(){
+  //Serial.println(11);
   //NXT lego motor encoder
   //A1100
   //B0110 Code for the clockwise rotation
@@ -177,9 +183,11 @@ void OnInterupts1(){
       break;
   }  
   OnInterrupt();
+  //Serial.println(21);
 }
 
 void OnInterupts2(){
+  //Serial.println(12);
   //NXT lego motor encoder
   //A1100
   //B0110 Code for the clockwise rotation
@@ -212,6 +220,7 @@ void OnInterupts2(){
   }
 
    OnInterrupt();
+   //Serial.println(22);
 }
 
 bool InterruptMotorPositionCheck(){
@@ -222,7 +231,7 @@ bool InterruptMotorPositionCheck(){
         if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN1){
           ChangeMotorState(hold, myController.runningMotor);
           //Reset the speed of the motor
-          //digitalWrite(gearPin, HIGH);
+          analogWrite(gearPin, gear1);
           halted = true;
         }
         else if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN2){
@@ -236,7 +245,7 @@ bool InterruptMotorPositionCheck(){
         if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN1){
           ChangeMotorState(hold, myController.runningMotor);
           //Reset the speed of the motor
-          //analogWrite(gearPin, gear1);
+          analogWrite(gearPin, gear1);
           halted = true;
         }
         else if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN2){
@@ -259,7 +268,6 @@ void OnInterrupt(){
   
   if(isResat && InterruptMotorPositionCheck()){
     isPosReached = true;
-    Serial.println(isPosReached);
   }
 }
 
@@ -327,7 +335,7 @@ void ResetMotor(Chanels motor){
 }
 
 bool IsCurrentMotorMoving(){
-  
+  //Serial.println(TimeSinceLastInterrupt);
   if(millis() > TimeSinceLastInterrupt + DELAY_FOR_MOTOR_MOVEMENT){
     return false;
   }

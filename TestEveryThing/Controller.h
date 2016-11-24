@@ -19,7 +19,7 @@ enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
 #include "Model.h"
 
 //All data struct
-typedef struct Motor{
+struct Motor{
     volatile int pos;
     int maxPos;
     int minPos;
@@ -32,12 +32,12 @@ typedef struct Motor{
 
 
 
-typedef struct Controller{
+struct Controller{
   int targetPos;
   Motor motorX;
   Motor motorY;
   Motor motorZ;
-  Motor *runningMotor;
+  volatile Motor *runningMotor;
 };
 
 
@@ -187,6 +187,15 @@ void GrabBrick(Controller *myController){
   delay(1000);
   ChangeMotorState(backward, &myController->motorY);
   delay(1000);
+  ChangeMotorState(hold, &myController->motorY);
+}
+
+void PlaceBrick(Controller *myController){
+
+  ChangeMotorState(forward, &myController->motorY);
+  delay(2000);
+  ChangeMotorState(backward, &myController->motorY);
+  delay(2000);
   ChangeMotorState(hold, &myController->motorY);
 }
 
