@@ -69,7 +69,10 @@ void setup() {
 
   Serial.begin(9600);
 
+  
   //queue = CreateQueue();
+
+  wallQueue = CreateQueue(sizeof(Wall*));
   
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
@@ -80,12 +83,23 @@ void setup() {
   //ChangeMotor(&myController, motorX);
   
   //StartMotor();
-  ResetSystem();
+  //ResetSystem();
+  
+  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+  if(progress == 0){ // run input handler
+    beginInputHandler();
+  }
+  if(progress == 1){
+    Blueprint* MyBlueprint = convertToBlueprint(&wallQueue);
+    Serial.println("Stuff");
+    Serial.println(MyBlueprint->pos[1][0][1]);
+    progress = 2;
+  }
+  
   //if(queue.size < MAX_QUEUE_SIZE)
     //push(&queue, &GetInstrction());
   

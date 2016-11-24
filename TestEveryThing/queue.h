@@ -72,7 +72,6 @@ void* pop (Queue* queue) {
     queue->size--;
     // free the memory of original head
     free(head);
-    Serial.println((int)item);
     return item;
 }
 
