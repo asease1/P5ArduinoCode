@@ -100,7 +100,8 @@ Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
 						bpProgress->x = xAxis;
 						bpProgress->y = yAxis;
 						bpProgress->z = zAxis;
-						return CreateInstruction(xAxis, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
+						return CreateInstruction(xAxis+1, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
+						//Place big brick
 						break;
 					case placed: case empty:
 						switch (bp.pos[xAxis - 2][yAxis][zAxis])
@@ -111,7 +112,7 @@ Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
 							bpProgress->x = xAxis;
 							bpProgress->y = yAxis;
 							bpProgress->z = zAxis;
-							return  CreateInstruction(xAxis, zAxis, yAxis, largeBrick90);
+							return  CreateInstruction(xAxis-1, zAxis, yAxis, largeBrick90);
 							//Place big brick
 							break;
 						case placed: case empty:
@@ -123,8 +124,8 @@ Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
 								bpProgress->x = xAxis;
 								bpProgress->y = yAxis;
 								bpProgress->z = zAxis;
-								return  CreateInstruction(xAxis, zAxis, yAxis, largeBrick0);
-								//Place big brick)
+								return  CreateInstruction(xAxis, zAxis+1, yAxis, largeBrick0);
+								//Place big brick
 								break;
 							case placed: case empty:
 								switch (bp.pos[xAxis][yAxis - 2][zAxis])
@@ -135,8 +136,8 @@ Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
 									bpProgress->x = xAxis;
 									bpProgress->y = yAxis;
 									bpProgress->z = zAxis;
-									CreateInstruction(xAxis, zAxis, yAxis, largeBrick0);
-									//Place big brick)
+									CreateInstruction(xAxis, zAxis-1, yAxis, largeBrick0);
+									//Place big brick
 									break;
 								case placed: case empty:
 									bpProgress->x = xAxis;
