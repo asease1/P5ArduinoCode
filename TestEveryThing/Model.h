@@ -136,14 +136,14 @@ Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
 									bpProgress->x = xAxis;
 									bpProgress->y = yAxis;
 									bpProgress->z = zAxis;
-									CreateInstruction(xAxis, zAxis-1, yAxis, largeBrick0);
+									return CreateInstruction(xAxis, zAxis-1, yAxis, largeBrick0);
 									//Place big brick
 									break;
 								case placed: case empty:
 									bpProgress->x = xAxis;
 									bpProgress->y = yAxis;
 									bpProgress->z = zAxis;
-									CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
+									return CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
 									//place small brick
 								default:
 									break;
