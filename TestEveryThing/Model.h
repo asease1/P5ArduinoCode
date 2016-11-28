@@ -21,13 +21,13 @@ position CreatePosition(char x, char y, char z){
  
 /*Contains a three-dimensional array of chars and te position of the brick pickup site*/ 
 typedef struct Blueprint{ 
-  char pos[MaxX][MaxY][MaxZ]; 
+  char pos[MaxX][MaxY][MaxZ];
   position pickup; 
 }; 
  
 Blueprint* createBlueprint(){ 
-  struct Blueprint* temp = malloc(sizeof(Blueprint)); 
-  struct position ps; 
+  struct Blueprint* temp = malloc(sizeof(Blueprint));
+  struct position ps;
   char a, b, c; 
   /*initializing all values in the array to 0*/ 
   for(a = 0; a < MaxX; a++){ 
@@ -42,7 +42,7 @@ Blueprint* createBlueprint(){
   temp->pickup.y = 0; 
   temp->pickup.z = 0; 
   return temp; 
-  }
+}
 
   struct Wall{
   char value[5];

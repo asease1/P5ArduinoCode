@@ -33,8 +33,6 @@ typedef struct Queue {
     // get item from head but keep it in queue
     void* (*peek) (struct Queue*);
     // display all element in queue
-    void (*display) (struct Queue*);
-    // size of this queue
     int size;
 } Queue;
 
