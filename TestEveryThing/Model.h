@@ -30,7 +30,8 @@ struct Instruction{
 
 
 int ConvertToGearDegrees(int BrickCord){
-  return (int)((15.0/0.32)*0.8*(float)BrickCord);
+  return BrickCord;
+  //return (int)((15.0/0.32)*0.8*(float)BrickCord);
 }
 
 Instruction CreateInstruction(int x, int z,int y, BrickType brick){

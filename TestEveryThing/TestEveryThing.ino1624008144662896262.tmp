@@ -89,53 +89,47 @@ void loop() {
   
   if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
-    Serial.println(CheckPositionMargen()); 
-    Serial.println(myController.runningMotor->pos);
-    Serial.println(currentInstruction->positions[currentInstruction->count]); 
-    if(!CheckPositionMargen()){
-      Serial.println("test");
+    if(!CheckPositionMargen){
       //Start motor to get closer to target if we have moved to far;
-      MoveTo(currentInstruction->positions[currentInstruction->count], &myController);
     }
-    else{
-         
-       
-      //Serial.println(currentInstruction->count);
-      //Serial.println(currentInstruction->type);
-      switch(currentInstruction->count){
-        case 0:   
-          if(currentInstruction->type == normal){
-            savedInstruction = currentInstruction;
-            currentInstruction = PickUpBrick(smallBrick);
-            newInstruction = true;
-            //Serial.println(111111);  
-            break;
-          }
-          //Serial.println(111112);
-          currentInstruction->count = 1;
-          ChangeMotor(&myController, motorZ);
-          
+
+    
+    //Serial.println(myController.runningMotor->pos);  
+    //Serial.println(currentInstruction->count);
+    //Serial.println(currentInstruction->type);
+    switch(currentInstruction->count){
+      case 0:   
+        if(currentInstruction->type == normal){
+          savedInstruction = currentInstruction;
+          currentInstruction = PickUpBrick(smallBrick);
+          newInstruction = true;
+          //Serial.println(111111);  
           break;
-        case 1:
-          if(currentInstruction->type == pickUp){
-            GrabBrick(&myController);
-            free(currentInstruction);
-            currentInstruction = savedInstruction;
-            currentInstruction->type = place;
-            ChangeMotor(&myController, motorX);
-            //Serial.println(222221);
-            break;
-          }
-            digitalWrite(gearPin, HIGH);
-          //Serial.println(222222);
-          PlaceBrick(&myController);
-          NextInstruction();
-          
+        }
+        //Serial.println(111112);
+        currentInstruction->count = 1;
+        ChangeMotor(&myController, motorZ);
+        
+        break;
+      case 1:
+        if(currentInstruction->type == pickUp){
+          GrabBrick(&myController);
+          free(currentInstruction);
+          currentInstruction = savedInstruction;
+          currentInstruction->type = place;
+          ChangeMotor(&myController, motorX);
+          //Serial.println(222221);
           break;
-      }
-      if(!queueIsEmpty){
-        StartMotor();
-      }
+        }
+          digitalWrite(gearPin, HIGH);
+        //Serial.println(222222);
+        PlaceBrick(&myController);
+        NextInstruction();
+        
+        break;
+    }
+    if(!queueIsEmpty){
+      StartMotor();
     }
   }
     

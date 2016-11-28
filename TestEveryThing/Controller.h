@@ -3,8 +3,8 @@
 //Have struct for position/3DVector and a brickData struckt
 //Margins
 #define ERROR_MARGIN1 2
-#define ERROR_MARGIN2 40
-#define ERROR_MARGIN3 100
+#define ERROR_MARGIN2 5
+#define ERROR_MARGIN3 150
 
 #define SMALL_BRICK_DEPO_X 0
 #define SMALL_BRICK_DEPO_Z 0
@@ -17,6 +17,8 @@ enum Chanels {motorY, motorX, motorZ, motorRotation};
 enum MotorStates {forward, backward, hold};
 enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
 #include "Model.h"
+
+unsigned long int TimeSinceLastInterrupt = 0;
 
 //All data struct
 struct Motor{
@@ -46,7 +48,7 @@ struct Controller{
 //Counstructers for all the struct
 Controller CreateController(Motor motorX, Motor motorY, Motor motorZ){
   Controller newController;
-  newController.targetPos;
+  newController.targetPos = 0;
   newController.motorX = motorX;
   newController.motorY = motorY;
   newController.motorZ = motorZ;
@@ -92,7 +94,7 @@ void ChangeMotorState(MotorStates state, Motor* motor){
       digitalWrite(motor->pin2, HIGH);
       break;
     case hold:
-     /* if(motor->state == forward)
+      /*if(motor->state == forward)
         ChangeMotorState(backward, motor);
       else if(motor->state == backward)  
         ChangeMotorState(forward, motor);
@@ -182,20 +184,34 @@ Instruction* PickUpBrick(BrickType brick){
   return pickUpInstruction;
 }
 
+bool IsCurrentMotorMoving(){
+  //Serial.println(TimeSinceLastInterrupt);
+  if(millis() > TimeSinceLastInterrupt + DELAY_FOR_MOTOR_MOVEMENT){
+    return false;
+  }
+  else{
+    //Serial.println(myController.runningMotor->pos);
+    return true;
+  }
+}
+
 void GrabBrick(Controller *myController){
   ChangeMotorState(forward, &myController->motorY);
-  while(IsCurrentMotorMoving()){}
+  delay(1000);
   ChangeMotorState(backward, &myController->motorY);
-  while(IsCurrentMotorMoving()){}
+  delay(1000);
+  //while(!IsCurrentMotorMoving()){}
   ChangeMotorState(hold, &myController->motorY);
 }
 
 void PlaceBrick(Controller *myController){
 
   ChangeMotorState(forward, &myController->motorY);
-  while(IsCurrentMotorMoving()){}
+  delay(2000);
+  //while(!IsCurrentMotorMoving()){}
   ChangeMotorState(backward, &myController->motorY);
-  while(IsCurrentMotorMoving()){}
+  delay(2000);
+  //while(!IsCurrentMotorMoving()){}
   ChangeMotorState(hold, &myController->motorY);
 }
 
