@@ -36,6 +36,8 @@ struct Instruction* currentInstruction;
 struct Instruction* savedInstruction;
 struct Queue queue;
 struct Controller myController;
+struct BluePrint bp;
+Position BPProgress;
 
 int TimeSinceLastInterrupt = 0;
 bool isResat = false;
@@ -79,6 +81,11 @@ void setup() {
   Serial.begin(9600);
 
   queue = CreateQueue(sizeof(Instruction));
+
+  BPProgress.x = 0;
+  BPProgress.y = 0;
+  BPProgress.z = 0;
+  bp = createBlueprint();
   
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
@@ -97,7 +104,7 @@ void setup() {
 
 void loop() {
   //put your main code here, to run repeatedly:
-  
+ 
   if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
     
@@ -107,7 +114,7 @@ void loop() {
       case 0:
         
         
-        if(currentInstruction->type == normal){
+        if(currentInstruction->type == normalInst){
           savedInstruction = currentInstruction;
           currentInstruction = PickUpBrick(smallBrick);
           newInstruction = true;
@@ -142,8 +149,8 @@ void loop() {
     }
   }
     
-  /*if(queue.size < MAX_QUEUE_SIZE)
-    push(&queue, &GetInstrction());*/
+  if(queue.size < MAX_QUEUE_SIZE)
+    push(&queue, &GetInstruction(&bp, &BPProgress));
  delay(10);
  Serial.println(myController.runningMotor->pos);
 }

@@ -34,11 +34,11 @@ int ConvertToGearDegrees(int BrickCord){
   return (int)((15.0/0.32)*0.8*(float)BrickCord);
 }
 
-Instruction CreateInstruction(int x, int z,int y, BrickType brick, int level){
+Instruction CreateInstruction(int x, int z,int y, BrickType brick){
   Instruction newInstruction;
   newInstruction.positions[0] = ConvertToGearDegrees(x);
   newInstruction.positions[1] = ConvertToGearDegrees(z);
-  newInstruction.level = level;
+  newInstruction.level = y;
   newInstruction.brick = brick;
   newInstruction.count = 0;
   newInstruction.type = normalInst;
@@ -78,7 +78,7 @@ enum brickState
 	empty, notPlaced, placed
 };
 
-Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
+Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 Instruction inst;
 
 	for (int yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
@@ -87,14 +87,14 @@ Instruction inst;
 		{
 			for (int xAxis = bpProgress->x; xAxis < MaxX; xAxis += 2)
 			{
-				switch (bp.pos[xAxis][yAxis][zAxis])
+				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
 				case notPlaced:
-					switch (bp.pos[xAxis + 2][yAxis][zAxis])
+					switch (bp->pos[xAxis + 2][yAxis][zAxis])
 					{
 					case notPlaced:
-						bp.pos[xAxis][yAxis][zAxis] = placed;
-						bp.pos[xAxis + 2][yAxis][zAxis] = placed;
+						bp->pos[xAxis][yAxis][zAxis] = placed;
+						bp->pos[xAxis + 2][yAxis][zAxis] = placed;
 						bpProgress->x = xAxis;
 						bpProgress->y = yAxis;
 						bpProgress->z = zAxis;
@@ -102,11 +102,11 @@ Instruction inst;
 						//Place big brick
 						break;
 					case placed: case empty:
-						switch (bp.pos[xAxis - 2][yAxis][zAxis])
+						switch (bp->pos[xAxis - 2][yAxis][zAxis])
 						{
 						case notPlaced:
-							bp.pos[xAxis][yAxis][zAxis] = placed;
-							bp.pos[xAxis - 2][yAxis][zAxis] = placed;
+							bp->pos[xAxis][yAxis][zAxis] = placed;
+							bp->pos[xAxis - 2][yAxis][zAxis] = placed;
 							bpProgress->x = xAxis;
 							bpProgress->y = yAxis;
 							bpProgress->z = zAxis;
@@ -114,11 +114,11 @@ Instruction inst;
 							//Place big brick
 							break;
 						case placed: case empty:
-							switch (bp.pos[xAxis][yAxis + 2][zAxis])
+							switch (bp->pos[xAxis][yAxis + 2][zAxis])
 							{
 							case notPlaced:
-								bp.pos[xAxis][yAxis][zAxis] = placed;
-								bp.pos[xAxis][yAxis][zAxis + 2] = placed;
+								bp->pos[xAxis][yAxis][zAxis] = placed;
+								bp->pos[xAxis][yAxis][zAxis + 2] = placed;
 								bpProgress->x = xAxis;
 								bpProgress->y = yAxis;
 								bpProgress->z = zAxis;
@@ -126,11 +126,11 @@ Instruction inst;
 								//Place big brick
 								break;
 							case placed: case empty:
-								switch (bp.pos[xAxis][yAxis - 2][zAxis])
+								switch (bp->pos[xAxis][yAxis - 2][zAxis])
 								{
 								case notPlaced:
-									bp.pos[xAxis][yAxis][zAxis] = placed;
-									bp.pos[xAxis][yAxis - 2][zAxis] = placed;
+									bp->pos[xAxis][yAxis][zAxis] = placed;
+									bp->pos[xAxis][yAxis - 2][zAxis] = placed;
 									bpProgress->x = xAxis;
 									bpProgress->y = yAxis;
 									bpProgress->z = zAxis;
