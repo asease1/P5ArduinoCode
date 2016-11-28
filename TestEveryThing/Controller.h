@@ -7,7 +7,7 @@
 #define ERROR_MARGIN3 100
 
 #define SMALL_BRICK_DEPO_X 0
-#define SMALL_BRICK_DEPO_Z 1
+#define SMALL_BRICK_DEPO_Z 0
 #define LARGE_BRICK_0_DEPO_X 0
 #define LARGE_BRICK_0_DEPO_Z 1
 #define LARGE_BRICK_90_DEPO_X 0
@@ -166,20 +166,18 @@ Instruction* PickUpBrick(BrickType brick){
 
   switch(brick){
     case smallBrick:
-      tempInstruction = CreateInstruction(ConvertToGearDegrees(SMALL_BRICK_DEPO_X),ConvertToGearDegrees(SMALL_BRICK_DEPO_Z), 1, none);
+      tempInstruction = CreateInstruction(SMALL_BRICK_DEPO_X,SMALL_BRICK_DEPO_Z,0, none);
       break;
     case largeBrick0:
-      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_0_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_0_DEPO_Z), 1, none);
+      tempInstruction = CreateInstruction(LARGE_BRICK_0_DEPO_X, LARGE_BRICK_0_DEPO_Z,0, none);
       break;
     case largeBrick90:
-      tempInstruction = CreateInstruction(ConvertToGearDegrees(LARGE_BRICK_90_DEPO_X), ConvertToGearDegrees(LARGE_BRICK_90_DEPO_Z), 1, none);
+      tempInstruction = CreateInstruction(LARGE_BRICK_90_DEPO_X, LARGE_BRICK_90_DEPO_Z,0, none);
       break;
   }
 
   tempInstruction.type = pickUp; 
-  
   memcpy(pickUpInstruction, &tempInstruction, sizeof(Instruction));
-  Serial.println(pickUpInstruction->positions[0]);
   return pickUpInstruction;
 }
 

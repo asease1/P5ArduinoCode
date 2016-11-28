@@ -19,7 +19,7 @@ Position CreatePosition(char x, char y, char z){
   return newPosition; 
 } 
 
-enum InstructionType {normal, pickUp, place};
+enum InstructionType {normalInst, pickUp, place};
 
 struct Instruction{
   InstructionType type;
@@ -31,19 +31,17 @@ struct Instruction{
 
 
 int ConvertToGearDegrees(int BrickCord){
-  //return 100;
-  Serial.println(((15.0/0.32)*0.8*(float)BrickCord));
   return (int)((15.0/0.32)*0.8*(float)BrickCord);
 }
 
-Instruction CreateInstruction(int x, int z, int level, BrickType brick){
+Instruction CreateInstruction(int x, int z,int y, BrickType brick, int level){
   Instruction newInstruction;
   newInstruction.positions[0] = ConvertToGearDegrees(x);
   newInstruction.positions[1] = ConvertToGearDegrees(z);
   newInstruction.level = level;
   newInstruction.brick = brick;
   newInstruction.count = 0;
-  newInstruction.type = normal;
+  newInstruction.type = normalInst;
   return newInstruction;
 }
 
@@ -81,7 +79,7 @@ enum brickState
 };
 
 Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
-	Instruction inst;
+Instruction inst;
 
 	for (int yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
@@ -166,5 +164,3 @@ Instruction GetInstruction(Blueprint bp, Position * bpProgress) {
 
 	return inst;//this should never happen
 }
-
-
