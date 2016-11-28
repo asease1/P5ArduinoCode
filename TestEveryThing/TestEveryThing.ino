@@ -72,7 +72,7 @@ void setup() {
   
   //queue = CreateQueue();
 
-  wallQueue = CreateQueue(sizeof(Wall*));
+  wallQueue = CreateQueue(sizeof(Wall));
   
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
@@ -95,8 +95,8 @@ void loop() {
   }
   if(progress == 1){
     Blueprint* MyBlueprint = convertToBlueprint(&wallQueue);
-    Serial.println("Stuff");
-    Serial.println(MyBlueprint->pos[1][0][1]);
+    Serial.print("Coord(1,1,1): ");
+    Serial.println(MyBlueprint->pos[1][1][1]);
     progress = 2;
   }
   
