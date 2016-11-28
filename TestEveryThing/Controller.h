@@ -184,18 +184,18 @@ Instruction* PickUpBrick(BrickType brick){
 
 void GrabBrick(Controller *myController){
   ChangeMotorState(forward, &myController->motorY);
-  delay(1000);
+  while(IsCurrentMotorMoving()){}
   ChangeMotorState(backward, &myController->motorY);
-  delay(1000);
+  while(IsCurrentMotorMoving()){}
   ChangeMotorState(hold, &myController->motorY);
 }
 
 void PlaceBrick(Controller *myController){
 
   ChangeMotorState(forward, &myController->motorY);
-  delay(2000);
+  while(IsCurrentMotorMoving()){}
   ChangeMotorState(backward, &myController->motorY);
-  delay(2000);
+  while(IsCurrentMotorMoving()){}
   ChangeMotorState(hold, &myController->motorY);
 }
 

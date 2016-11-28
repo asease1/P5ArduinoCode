@@ -20,8 +20,8 @@
 
 //gear are the amount of speed the motor should move at from 0-255
 #define gear1 255
-#define gear2 255
-#define gear3 255
+#define gear2 150
+#define gear3 200
 
 #define Hold_Delay 8000
 #define DELAY_FOR_MOTOR_MOVEMENT 200
@@ -128,7 +128,7 @@ void loop() {
           //Serial.println(222221);
           break;
         }
-          digitalWrite(gearpin, HIGH);
+          digitalWrite(gearPin, HIGH);
         //Serial.println(222222);
         PlaceBrick(&myController);
         NextInstruction();
