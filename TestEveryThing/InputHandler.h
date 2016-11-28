@@ -2,23 +2,49 @@
 #include "Model.h";
 #include "Error.h";
 
+int wallInt[5];
+int wallCount = 0;
+
+int progress = 0;
+
+Queue wallQueue;
+
+String tempNumber = "";
+
 /*Reads an input stream from the USB port. Divides the input into wall structs, enqueues these structs and returns a pointer to the queue*/
-Queue* readInput(){
-  Queue Walls = CreateQueue(sizeof(Wall*));
+void readInput(int wallInt[], Queue* Walls){
   /*loop runs while there is input waiting to be processed*/
-  while(Serial.available() > 0){
-    struct Wall wallTemp = createWall();
+  struct Wall wallTemp = createWall();
     for(int i = 0; i < 5; i++){
-      wallTemp.value[i] = Serial.read();
-    }
-    push(&Walls, &wallTemp);
+      wallTemp.value[i] = wallInt[i];
+      //Serial.println(wallTemp.value[i]);
   }
-  return &Walls;
+  push(Walls, &wallTemp);
 }
 
+beginInputHandler(){
+  if(Serial.available()){
+    if((char)Serial.peek() != 'k'){
+      tempNumber = tempNumber + (char)Serial.read();
+    }
+    else{
+      Serial.read();
+      wallInt[(wallCount++%5)] = (byte)tempNumber.toInt();
+      tempNumber = "";
+    }
+  }
+  if(wallCount%5 == 0 && wallCount != 0){
+    readInput(wallInt, &wallQueue);
+    wallCount = 0;
+  }
+  if((char)Serial.peek() == 'e'){
+    Serial.read();
+    progress = 1;
+  }
+}
 
 //Insert values according to the Wall it has been given
-Blueprint makeBlueprint(Blueprint* BP, Wall* W, int D){
+makeBlueprint(Blueprint* BP, Wall* W, int D){
   int startval, endval;
   if(D){
     if(W->value[0] < W->value[2]){
@@ -58,8 +84,10 @@ Blueprint makeBlueprint(Blueprint* BP, Wall* W, int D){
 /*Takes a pointer to queue containing Wall structs, converts these into a Blueprint struct and returns a pointer to said Blueprint struct*/
 Blueprint* convertToBlueprint(Queue* WallQueuePointer){
   Wall* tempWall;
+  
+    Serial.println("Hej");
   struct Blueprint* tempBlueprint = createBlueprint();
-  while(peek(WallQueuePointer) != NULL){
+  while(WallQueuePointer->size != 0){
     tempWall = pop(WallQueuePointer);
     if(tempWall->value[4] > 0 && tempWall->value[4] < MaxY //Checks wall height for 0 < h <= max height
       && tempWall->value[0] >= 0 && tempWall->value[0] > MaxX // Check if value is within model bounds
@@ -80,6 +108,8 @@ Blueprint* convertToBlueprint(Queue* WallQueuePointer){
     else
       ErrorCode(ERR_WALL);
   }
+
+  Serial.println("Coord: " + tempBlueprint->pos[1][0][1]);
   return tempBlueprint;
 }
 
