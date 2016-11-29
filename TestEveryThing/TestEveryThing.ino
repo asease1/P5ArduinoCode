@@ -14,13 +14,11 @@
 #define chanelPin3 10
 #define chanelPin2 11
 #define chanelPin1 12
-//Gear Pin
-//Pin to the PVM pins(3,5,6,9,10,11)
-#define gearPin 9
+
 
 //gear are the amount of speed the motor should move at from 0-255
 #define gear1 255
-#define gear2 100
+#define gear2 110
 #define gear3 140
 
 #define Hold_Delay 500
@@ -71,7 +69,7 @@ void setup() {
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
   
-  push(&queue, &CreateInstruction(100,100,0, smallBrick));
+  push(&queue, &CreateInstruction(5,5,0, smallBrick));
   push(&queue, &CreateInstruction(12,12,0, smallBrick));
   NextInstruction();
   
@@ -92,14 +90,13 @@ void loop() {
     Serial.println(CheckPositionMargen()); 
     Serial.println(myController.runningMotor->pos);
     Serial.println(currentInstruction->positions[currentInstruction->count]); 
-    if(!CheckPositionMargen()){
+   /*if(!CheckPositionMargen()){
       Serial.println("test");
       //Start motor to get closer to target if we have moved to far;
       MoveTo(currentInstruction->positions[currentInstruction->count], &myController);
     }
     else{
-         
-       
+     */    
       //Serial.println(currentInstruction->count);
       //Serial.println(currentInstruction->type);
       switch(currentInstruction->count){
@@ -136,7 +133,7 @@ void loop() {
       if(!queueIsEmpty){
         StartMotor();
       }
-    }
+    //}
   }
     
   /*if(queue.size < MAX_QUEUE_SIZE)
@@ -235,7 +232,10 @@ bool InterruptMotorPositionCheck(){
           halted = true;
         }
         else if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN2){
-          analogWrite(gearPin, gear2);
+          if(myController.runningMotor == &myController.motorZ)
+            analogWrite(gearPin, gear2+10);
+          else
+            analogWrite(gearPin, gear2);
           
         }
         else if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN3){
@@ -251,7 +251,10 @@ bool InterruptMotorPositionCheck(){
           halted = true;
         }
         else if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN2){
-          analogWrite(gearPin, gear2);
+          if(myController.runningMotor == &myController.motorZ)
+            analogWrite(gearPin, gear2+10);
+          else
+            analogWrite(gearPin, gear2);
           
         }
         else if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN3){

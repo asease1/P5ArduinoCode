@@ -3,8 +3,8 @@
 //Have struct for position/3DVector and a brickData struckt
 //Margins
 #define ERROR_MARGIN1 2
-#define ERROR_MARGIN2 5
-#define ERROR_MARGIN3 150
+#define ERROR_MARGIN2 40
+#define ERROR_MARGIN3 300
 
 #define SMALL_BRICK_DEPO_X 0
 #define SMALL_BRICK_DEPO_Z 0
@@ -12,6 +12,10 @@
 #define LARGE_BRICK_0_DEPO_Z 1
 #define LARGE_BRICK_90_DEPO_X 0
 #define LARGE_BRICK_90_DEPO_Z 1
+
+//Gear Pin
+//Pin to the PVM pins(3,5,6,9,10,11)
+#define gearPin 9
 //Chanel is the current motor input Interupts
 enum Chanels {motorY, motorX, motorZ, motorRotation};
 enum MotorStates {forward, backward, hold};
@@ -196,6 +200,7 @@ bool IsCurrentMotorMoving(){
 }
 
 void GrabBrick(Controller *myController){
+  digitalWrite(gearPin,HIGH);
   ChangeMotorState(forward, &myController->motorY);
   delay(1000);
   ChangeMotorState(backward, &myController->motorY);
