@@ -66,6 +66,10 @@ void setup() {
 
   queue = CreateQueue(sizeof(Instruction));
   
+  //queue = CreateQueue();
+
+  wallQueue = CreateQueue(sizeof(Wall));
+  
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
   
@@ -81,6 +85,19 @@ void setup() {
 }
 
 void loop() {
+  // put your main code here, to run repeatedly:
+  if(progress == 0){ // run input handler
+    beginInputHandler();
+  }
+  if(progress == 1){
+    Blueprint* MyBlueprint = convertToBlueprint(&wallQueue);
+    Serial.print("Coord(1,1,1): ");
+    Serial.println(MyBlueprint->pos[1][1][1]);
+    progress = 2;
+  }
+  
+  //if(queue.size < MAX_QUEUE_SIZE)
+    //push(&queue, &GetInstrction());
   //put your main code here, to run repeatedly:
   //Serial.println(queue.size);
   //Serial.println(isPosReached);
