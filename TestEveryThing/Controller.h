@@ -81,7 +81,7 @@ Motor CreateMotor(int maxPos, int pin1, int pin2){
 
 //Take a motor and set the pins to the diraction you want it to move and chance the state
 //Have to watch out for that you can run a motor that the channel is not on if this is don't you cannot update its position.
-void ChangeMotorState(MotorStates state, Motor* motor){
+void ChangeMotorState(MotorStates state, volatile Motor* motor){
   switch(state){
     case forward:
       motor->state = state;
@@ -116,7 +116,7 @@ void ChangeMotorState(MotorStates state, Motor* motor){
 }
 
 //Update the controller targetpos to the new position and start the runningMotor in the dircation of target
-bool MoveTo(int pos, Controller *control){
+bool MoveTo(int pos, volatile Controller *control){
   if(pos > control->runningMotor->maxPos)
     return false;
 
@@ -139,7 +139,7 @@ bool MoveTo(int pos, Controller *control){
 
 
 //Swi'tch the runningMotor on the Controller to a new Motor
-void ChangeMotor(Controller *myControl, Chanels newMotor){
+void ChangeMotor(volatile Controller *myControl, Chanels newMotor){
   switch(newMotor){
     case motorX:
       digitalWrite(chanelPin1, HIGH);
@@ -198,7 +198,7 @@ bool IsCurrentMotorMoving(){
   }
 }
 
-void GrabBrick(Controller *myController){
+void GrabBrick(volatile Controller *myController){
   digitalWrite(gearPin,HIGH);
   ChangeMotorState(forward, &myController->motorY);
   delay(1000);
@@ -208,7 +208,7 @@ void GrabBrick(Controller *myController){
   ChangeMotorState(hold, &myController->motorY);
 }
 
-void PlaceBrick(Controller *myController){
+void PlaceBrick(volatile Controller *myController){
 
   ChangeMotorState(forward, &myController->motorY);
   delay(2000);

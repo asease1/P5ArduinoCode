@@ -33,9 +33,9 @@
 struct Instruction* currentInstruction;
 struct Instruction* savedInstruction;
 struct Queue queue;
-struct BluePrint bp;
+Blueprint bp;
 Position BPProgress;
-volatile struct Controller myController;
+struct Controller myController;
 
 bool isResat = false;
 bool queueIsEmpty = true;
@@ -60,6 +60,7 @@ void setup() {
 
   pinMode(interupt1, INPUT_PULLUP);
   pinMode(interupt2, INPUT_PULLUP);
+
   attachInterrupt(digitalPinToInterrupt(interupt1), OnInterupts1, CHANGE);
   attachInterrupt(digitalPinToInterrupt(interupt2), OnInterupts2, CHANGE);
 
@@ -71,9 +72,7 @@ void setup() {
   BPProgress.x = 0;
   BPProgress.y = 0;
   BPProgress.z = 0;
-  bp = createBlueprint();
-  
-  //queue = CreateQueue();
+  bp = *createBlueprint();
 
   wallQueue = CreateQueue(sizeof(Wall));
   
@@ -125,7 +124,7 @@ void loop() {
       //Serial.println(currentInstruction->type);
       switch(currentInstruction->count){
         case 0:   
-          if(currentInstruction->type == normal){
+          if(currentInstruction->type == normalInst){
             savedInstruction = currentInstruction;
             currentInstruction = PickUpBrick(smallBrick);
             newInstruction = true;
