@@ -14,11 +14,13 @@
 #define chanelPin3 10
 #define chanelPin2 11
 #define chanelPin1 12
-
+//Gear Pin
+//Pin to the PVM pins(3,5,6,9,10,11)
+#define gearPin 9
 
 //gear are the amount of speed the motor should move at from 0-255
 #define gear1 255
-#define gear2 110
+#define gear2 100
 #define gear3 140
 
 #define Hold_Delay 500
@@ -33,8 +35,6 @@
 struct Instruction* currentInstruction;
 struct Instruction* savedInstruction;
 struct Queue queue;
-struct BluePrint bp;
-Position BPProgress;
 volatile struct Controller myController;
 
 bool isResat = false;
@@ -67,20 +67,11 @@ void setup() {
   Serial.begin(9600);
 
   queue = CreateQueue(sizeof(Instruction));
-
-  BPProgress.x = 0;
-  BPProgress.y = 0;
-  BPProgress.z = 0;
-  bp = createBlueprint();
-  
-  //queue = CreateQueue();
-
-  wallQueue = CreateQueue(sizeof(Wall));
   
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
   
-  push(&queue, &CreateInstruction(5,5,0, smallBrick));
+  push(&queue, &CreateInstruction(100,100,0, smallBrick));
   push(&queue, &CreateInstruction(12,12,0, smallBrick));
   NextInstruction();
   
@@ -92,76 +83,58 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  if(progress == 0){ // run input handler
-    beginInputHandler();
-  }
-  if(progress == 1){
-    Blueprint* MyBlueprint = convertToBlueprint(&wallQueue);
-    Serial.print("Coord(1,1,1): ");
-    Serial.println(MyBlueprint->pos[1][1][1]);
-    progress = 2;
-  }
-  
-  //if(queue.size < MAX_QUEUE_SIZE)
-    //push(&queue, &GetInstrction());
   //put your main code here, to run repeatedly:
   //Serial.println(queue.size);
   //Serial.println(isPosReached);
   
   if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
-    Serial.println(CheckPositionMargen()); 
-    Serial.println(myController.runningMotor->pos);
-    Serial.println(currentInstruction->positions[currentInstruction->count]); 
-   /*if(!CheckPositionMargen()){
-      Serial.println("test");
+    if(!CheckPositionMargen){
       //Start motor to get closer to target if we have moved to far;
-      MoveTo(currentInstruction->positions[currentInstruction->count], &myController);
     }
-    else{
-     */    
-      //Serial.println(currentInstruction->count);
-      //Serial.println(currentInstruction->type);
-      switch(currentInstruction->count){
-        case 0:   
-          if(currentInstruction->type == normal){
-            savedInstruction = currentInstruction;
-            currentInstruction = PickUpBrick(smallBrick);
-            newInstruction = true;
-            //Serial.println(111111);  
-            break;
-          }
-          //Serial.println(111112);
-          currentInstruction->count = 1;
-          ChangeMotor(&myController, motorZ);
+
+    
+    //Serial.println(myController.runningMotor->pos);  
+    //Serial.println(currentInstruction->count);
+    //Serial.println(currentInstruction->type);
+    switch(currentInstruction->count){
+      case 0:   
+        if(currentInstruction->type == normal){
+          savedInstruction = currentInstruction;
+          currentInstruction = PickUpBrick(smallBrick);
+          newInstruction = true;
+          //Serial.println(111111);  
           break;
-        case 1:
-          if(currentInstruction->type == pickUp){
-            GrabBrick(&myController);
-            free(currentInstruction);
-            currentInstruction = savedInstruction;
-            currentInstruction->type = place;
-            ChangeMotor(&myController, motorX);
-            //Serial.println(222221);
-            break;
-          }
-            digitalWrite(gearPin, HIGH);
-          //Serial.println(222222);
-          PlaceBrick(&myController);
-          NextInstruction();
-          
+        }
+        //Serial.println(111112);
+        currentInstruction->count = 1;
+        ChangeMotor(&myController, motorZ);
+        
+        break;
+      case 1:
+        if(currentInstruction->type == pickUp){
+          GrabBrick(&myController);
+          free(currentInstruction);
+          currentInstruction = savedInstruction;
+          currentInstruction->type = place;
+          ChangeMotor(&myController, motorX);
+          //Serial.println(222221);
           break;
-      }
-      if(!queueIsEmpty){
-        StartMotor();
-      }
+        }
+          digitalWrite(gearPin, HIGH);
+        //Serial.println(222222);
+        PlaceBrick(&myController);
+        NextInstruction();
+        
+        break;
+    }
+    if(!queueIsEmpty){
+      StartMotor();
+    }
   }
     
-  if(queue.size < MAX_QUEUE_SIZE)
-    push(&queue, &GetInstruction(&bp, &BPProgress));
- delay(10);
- Serial.println(myController.runningMotor->pos);
+  /*if(queue.size < MAX_QUEUE_SIZE)
+    push(&queue, &GetInstrction());*/
  //delay(10);
  //Serial.println(freeRam());
 }
@@ -256,10 +229,7 @@ bool InterruptMotorPositionCheck(){
           halted = true;
         }
         else if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN2){
-          if(myController.runningMotor == &myController.motorZ)
-            analogWrite(gearPin, gear2+10);
-          else
-            analogWrite(gearPin, gear2);
+          analogWrite(gearPin, gear2);
           
         }
         else if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN3){
@@ -275,10 +245,7 @@ bool InterruptMotorPositionCheck(){
           halted = true;
         }
         else if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN2){
-          if(myController.runningMotor == &myController.motorZ)
-            analogWrite(gearPin, gear2+10);
-          else
-            analogWrite(gearPin, gear2);
+          analogWrite(gearPin, gear2);
           
         }
         else if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN3){

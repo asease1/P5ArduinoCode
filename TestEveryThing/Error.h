@@ -1,4 +1,4 @@
-#include "Wire.h";
+#include "Wire.h"
 
 #define ERR_FATAL 0 //generic everything is R.I.P error
 #define ERR_WALL 1 //If we recieve a invalid wall
