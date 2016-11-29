@@ -2,7 +2,15 @@
 #define MaxX 26 
 #define MaxY 3 
 #define MaxZ 15 
- 
+
+enum wallSpecs {
+  StartX,
+  StartZ,
+  EndX,
+  EndZ,
+  Height
+} wallSpecs;
+
 /*Contains a single position in 3d space*/ 
 typedef struct position{ 
   byte x; 
@@ -53,10 +61,10 @@ struct Wall{
 /*creates a new instance of the wall struct*/
 Wall* createWall(){
   struct Wall* tempWall = malloc(sizeof(Wall));
-  tempWall->value[0] = 0; // Wall starting x
-  tempWall->value[1] = 0; // Wall starting z
-  tempWall->value[2] = 0; // Wall stopping x
-  tempWall->value[3] = 0; // Wall stopping z
-  tempWall->value[4] = 0; // Wall height
+  tempWall->value[StartX] = 0; // Wall starting x
+  tempWall->value[StartZ] = 0; // Wall starting z
+  tempWall->value[EndX] = 0; // Wall stopping x
+  tempWall->value[EndZ] = 0; // Wall stopping z
+  tempWall->value[Height] = 0; // Wall height
   return tempWall;
 }

@@ -15,10 +15,12 @@ String tempNumber = "";
 void readInput(int wallInt[], Queue* Walls){
   /*loop runs while there is input waiting to be processed*/
   Wall* wallTemp = createWall();
-    for(int i = 0; i < 5; i++){
-      wallTemp->value[i] = wallInt[i];
-      //Serial.println(wallTemp->value[i]);
-  }
+  wallTemp->value[StartX] = wallInt[StartX];
+  wallTemp->value[StartZ] = wallInt[StartZ];
+  wallTemp->value[EndX] = wallInt[EndX];
+  wallTemp->value[EndZ] = wallInt[EndZ];
+  wallTemp->value[Height] = wallInt[Height];
+  //Serial.println(wallTemp->value[??]);
   push(Walls, wallTemp);
 }
 
@@ -47,16 +49,16 @@ beginInputHandler(){
 makeBlueprint(Blueprint* BP, Wall* W, int D){
   int startval, endval;
   if(D){
-    if(W->value[0] < W->value[2]){
-      startval = W->value[0];
-      endval = W->value[2];
+    if(W->value[StartX] < W->value[EndX]){
+      startval = W->value[StartX];
+      endval = W->value[EndX];
     }
     else{
-      startval = W->value[2];
-      endval = W->value[0];
+      startval = W->value[EndX];
+      endval = W->value[StartX];
     }
-    int endH = W->value[4];
-    int zval = W->value[1];
+    int endH = W->value[Height];
+    int zval = W->value[StartZ];
     for(startval; startval <= endval; startval++){
       for(int startH = 0; startH < endH; startH++)
         BP->pos[startval][startH][zval] = 1;
@@ -64,16 +66,16 @@ makeBlueprint(Blueprint* BP, Wall* W, int D){
   }
   
   else{
-    if(W->value[1] < W->value[3]){
-      startval = W->value[1];
-      endval = W->value[3];
+    if(W->value[StartZ] < W->value[EndZ]){
+      startval = W->value[StartZ];
+      endval = W->value[EndZ];
     }
     else{
-      startval = W->value[3];
-      endval = W->value[1];
+      startval = W->value[EndZ];
+      endval = W->value[StartZ];
     }
-    int endH = W->value[4];
-    int xval = W->value[0];
+    int endH = W->value[Height];
+    int xval = W->value[StartX];
     for(startval; startval <= endval; startval++){
       for(int startH = 0; startH < endH; startH++)
       BP->pos[xval][startH][startval] = 1;
@@ -87,17 +89,17 @@ Blueprint* convertToBlueprint(Queue* WallQueuePointer){
   struct Blueprint* tempBlueprint = createBlueprint();
   while(WallQueuePointer->size != 0){
     tempWall = pop(WallQueuePointer);
-    if(tempWall->value[4] > 0 && tempWall->value[4] <= MaxY //Checks wall height for 0 < h <= max height
-      && tempWall->value[0] >= 0 && tempWall->value[0] < MaxX // Check if value is within model bounds
-      && tempWall->value[1] >= 0 && tempWall->value[1] < MaxZ // Same
-      && tempWall->value[2] >= 0 && tempWall->value[2] < MaxX //You get the idea
-      && tempWall->value[3] >= 0 && tempWall->value[3] < MaxZ){ //not even gonna try
-      if(tempWall->value[0] == tempWall->value[2]   // Checks if start X == end X (prevents diagonal walls)
-      && tempWall->value[1] != tempWall->value[3]){ // Checks if wall is not 0 long
+    if(tempWall->value[Height] > 0 && tempWall->value[Height] <= MaxY //Checks wall height for 0 < h <= max height
+      && tempWall->value[StartX] >= 0 && tempWall->value[StartX] < MaxX // Check if value is within model bounds
+      && tempWall->value[StartZ] >= 0 && tempWall->value[StartZ] < MaxZ // Same
+      && tempWall->value[EndX] >= 0 && tempWall->value[EndX] < MaxX //You get the idea
+      && tempWall->value[EndZ] >= 0 && tempWall->value[EndZ] < MaxZ){ //not even gonna try
+      if(tempWall->value[StartX] == tempWall->value[EndX]   // Checks if start X == end X (prevents diagonal walls)
+      && tempWall->value[StartZ] != tempWall->value[EndZ]){ // Checks if wall is not 0 long
         makeBlueprint(tempBlueprint, tempWall, 0);
       }
-      else if(tempWall->value[1] == tempWall->value[3]   // Checks if start Z == end Z (prevents diagonal walls)
-      && tempWall->value[0] != tempWall->value[2]){ // Checks if wall is not 0 long
+      else if(tempWall->value[StartZ] == tempWall->value[EndZ]   // Checks if start Z == end Z (prevents diagonal walls)
+      && tempWall->value[StartX] != tempWall->value[EndX]){ // Checks if wall is not 0 long
         makeBlueprint(tempBlueprint, tempWall, 1);
       }
       else{
