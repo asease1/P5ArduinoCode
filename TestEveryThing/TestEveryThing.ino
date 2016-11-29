@@ -33,7 +33,7 @@
 struct Instruction* currentInstruction;
 struct Instruction* savedInstruction;
 struct Queue queue;
-Blueprint bp;
+Blueprint* bp;
 Position BPProgress;
 struct Controller myController;
 
@@ -48,7 +48,6 @@ void setup() {
   pinMode(chanelPin3, OUTPUT);
   pinMode(chanelPin2, OUTPUT);
   pinMode(chanelPin1, OUTPUT);
-  
   pinMode(xPin1, OUTPUT);
   pinMode(xPin2, OUTPUT);
   pinMode(yPin1, OUTPUT);
@@ -72,7 +71,6 @@ void setup() {
   BPProgress.x = 0;
   BPProgress.y = 0;
   BPProgress.z = 0;
-  bp = *createBlueprint();
 
   wallQueue = CreateQueue(sizeof(Wall));
   
@@ -96,12 +94,35 @@ void loop() {
     beginInputHandler();
   }
   if(progress == 1){
-    Blueprint* MyBlueprint = convertToBlueprint(&wallQueue);
+	Serial.println("hej");
+    bp = convertToBlueprint(&wallQueue);
     Serial.print("Coord(1,1,1): ");
-    Serial.println(MyBlueprint->pos[1][1][1]);
+    Serial.println(bp->pos[1][1][1]);
     progress = 2;
   }
-  
+  if (progress == 2)
+  {
+	  if (queue.size < MAX_QUEUE_SIZE) {
+		  push(&queue, &GetInstruction(bp, &BPProgress));
+		  Instruction* inst;
+		  inst = (Instruction*)peek(&queue);
+		  Serial.print(BPProgress.x);
+		  Serial.print(", ");
+		  Serial.print(BPProgress.z);
+		  Serial.print(", ");
+		  Serial.print(BPProgress.y);
+		  Serial.println(" progresspoint");
+		  Serial.print(inst->brick);
+		  Serial.println(" brick");
+		  Serial.print(inst->positions[0]);
+		  Serial.println(" x");
+		  Serial.print(inst->positions[1]);
+		  Serial.println(" z");
+		  Serial.print(inst->level);
+		  Serial.println(" y");
+	  }
+	  progress++;
+  }
   //if(queue.size < MAX_QUEUE_SIZE)
     //push(&queue, &GetInstrction());
   //put your main code here, to run repeatedly:
@@ -110,9 +131,9 @@ void loop() {
   
   if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
-    Serial.println(CheckPositionMargen()); 
-    Serial.println(myController.runningMotor->pos);
-    Serial.println(currentInstruction->positions[currentInstruction->count]); 
+    //Serial.println(CheckPositionMargen()); 
+    //Serial.println(myController.runningMotor->pos);
+    //Serial.println(currentInstruction->positions[currentInstruction->count]); 
    /*if(!CheckPositionMargen()){
       Serial.println("test");
       //Start motor to get closer to target if we have moved to far;
@@ -157,10 +178,9 @@ void loop() {
       }
   }
     
-  if(queue.size < MAX_QUEUE_SIZE)
-    push(&queue, &GetInstruction(&bp, &BPProgress));
+  
  delay(10);
- Serial.println(myController.runningMotor->pos);
+ //Serial.println(myController.runningMotor->pos);
  //delay(10);
  //Serial.println(freeRam());
 }
@@ -338,7 +358,7 @@ void NextInstruction(){
   else
     queueIsEmpty = false;
   
-  currentInstruction = pop(&queue);
+  currentInstruction = (Instruction*)pop(&queue);
 }
 
 void ResetSystem(){
