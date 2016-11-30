@@ -1,5 +1,5 @@
 /*Defined values. Remember they're used in an array, so -1 for actual values!*/ 
-#define MaxX 26 
+#define MaxX 15 
 #define MaxY 3 
 #define MaxZ 15 
 
@@ -57,7 +57,11 @@ Instruction CreateInstruction(int x, int z,int y, BrickType brick){
   newInstruction.type = normalInst;
   return newInstruction;
 }
-
+int freeRam() {
+	extern int __heap_start, *__brkval;
+	int v;
+	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+}
  
 /*Contains a three-dimensional array of chars and te position of the brick pickup site*/ 
 typedef struct Blueprint{
@@ -66,15 +70,16 @@ typedef struct Blueprint{
 }; 
  
 Blueprint* createBlueprint(){
-  struct Blueprint* temp = malloc(sizeof(Blueprint));
+	struct Blueprint* temp = malloc(sizeof(Blueprint));
   /*initializing all values in the array to 0*/ 
-  for(int a = 0; a < MaxX; a++){ 
-    for(int b = 0; b < MaxY; b++){ 
+  for(int a = 0; a < MaxX; a++){
+    for(int b = 0; b < MaxY; b++){
       for(int c = 0; c < MaxZ; c++){ 
         temp->pos[a][b][c] = 0;
       } 
     }
   }
+  Serial.println(freeRam());
   /*initializing pickup site position to (0, 0, 0)*/
   temp->pickup.x = 0; 
   temp->pickup.y = 0; 
@@ -89,7 +94,6 @@ Blueprint* createBlueprint(){
 struct Wall{
   byte value[5];
 };
-
 
 Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	Instruction inst;

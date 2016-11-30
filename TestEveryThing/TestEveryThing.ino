@@ -94,7 +94,6 @@ void loop() {
     beginInputHandler();
   }
   if(progress == 1){
-	Serial.println(freeRam());
     bp = convertToBlueprint(&wallQueue);
     Serial.print("Coord(1,1,1): ");
     Serial.println(bp->pos[1][1][1]);
@@ -103,6 +102,8 @@ void loop() {
   if (progress == 2)
   {
 	  if (queue.size < MAX_QUEUE_SIZE) {
+		  Serial.print(queue.size);
+		  Serial.println(" queue size");
 		  push(&queue, &GetInstruction(bp, &BPProgress));
 		  Instruction* inst;
 		  inst = (Instruction*)peek(&queue);
@@ -120,8 +121,8 @@ void loop() {
 		  Serial.println(" z");
 		  Serial.print(inst->level);
 		  Serial.println(" y");
+		  pop(&queue);
 	  }
-	  progress = 3;
   }
   //if(queue.size < MAX_QUEUE_SIZE)
     //push(&queue, &GetInstrction());
@@ -129,68 +130,62 @@ void loop() {
   //Serial.println(queue.size);
   //Serial.println(isPosReached);
   
-  if(isPosReached && !IsCurrentMotorMoving()){
-    isPosReached = false;
-    //Serial.println(CheckPositionMargen()); 
-    //Serial.println(myController.runningMotor->pos);
-    //Serial.println(currentInstruction->positions[currentInstruction->count]); 
-   /*if(!CheckPositionMargen()){
-      Serial.println("test");
-      //Start motor to get closer to target if we have moved to far;
-      MoveTo(currentInstruction->positions[currentInstruction->count], &myController);
-    }
-    else{
-     */    
-      //Serial.println(currentInstruction->count);
-      //Serial.println(currentInstruction->type);
-      switch(currentInstruction->count){
-        case 0:   
-          if(currentInstruction->type == normalInst){
-            savedInstruction = currentInstruction;
-            currentInstruction = PickUpBrick(smallBrick);
-            newInstruction = true;
-            //Serial.println(111111);  
-            break;
-          }
-          //Serial.println(111112);
-          currentInstruction->count = 1;
-          ChangeMotor(&myController, motorZ);
-          break;
-        case 1:
-          if(currentInstruction->type == pickUp){
-            GrabBrick(&myController);
-            free(currentInstruction);
-            currentInstruction = savedInstruction;
-            currentInstruction->type = place;
-            ChangeMotor(&myController, motorX);
-            //Serial.println(222221);
-            break;
-          }
-            digitalWrite(gearPin, HIGH);
-          //Serial.println(222222);
-          PlaceBrick(&myController);
-          NextInstruction();
-          
-          break;
-      }
-      if(!queueIsEmpty){
-        StartMotor();
-      }
-  }
+  //if(isPosReached && !IsCurrentMotorMoving()){
+  //  isPosReached = false;
+  //  //Serial.println(CheckPositionMargen()); 
+  //  //Serial.println(myController.runningMotor->pos);
+  //  //Serial.println(currentInstruction->positions[currentInstruction->count]); 
+  // /*if(!CheckPositionMargen()){
+  //    Serial.println("test");
+  //    //Start motor to get closer to target if we have moved to far;
+  //    MoveTo(currentInstruction->positions[currentInstruction->count], &myController);
+  //  }
+  //  else{
+  //   */    
+  //    //Serial.println(currentInstruction->count);
+  //    //Serial.println(currentInstruction->type);
+  //    switch(currentInstruction->count){
+  //      case 0:   
+  //        if(currentInstruction->type == normalInst){
+  //          savedInstruction = currentInstruction;
+  //          currentInstruction = PickUpBrick(smallBrick);
+  //          newInstruction = true;
+  //          //Serial.println(111111);  
+  //          break;
+  //        }
+  //        //Serial.println(111112);
+  //        currentInstruction->count = 1;
+  //        ChangeMotor(&myController, motorZ);
+  //        break;
+  //      case 1:
+  //        if(currentInstruction->type == pickUp){
+  //          GrabBrick(&myController);
+  //          free(currentInstruction);
+  //          currentInstruction = savedInstruction;
+  //          currentInstruction->type = place;
+  //          ChangeMotor(&myController, motorX);
+  //          //Serial.println(222221);
+  //          break;
+  //        }
+  //          digitalWrite(gearPin, HIGH);
+  //        //Serial.println(222222);
+  //        PlaceBrick(&myController);
+  //        NextInstruction();
+  //        
+  //        break;
+  //    }
+  //    if(!queueIsEmpty){
+  //      StartMotor();
+  //    }
+  //}
     
-  
- delay(10);
  //Serial.println(myController.runningMotor->pos);
  //delay(10);
  //Serial.println(freeRam());
 }
 
 //DebugCode
-int freeRam () {
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
-}
+
 
 
 void OnInterupts1(){
@@ -357,7 +352,6 @@ void NextInstruction(){
     queueIsEmpty = true;
   else
     queueIsEmpty = false;
-  
   currentInstruction = (Instruction*)pop(&queue);
 }
 
