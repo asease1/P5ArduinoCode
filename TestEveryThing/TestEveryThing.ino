@@ -94,7 +94,7 @@ void loop() {
     beginInputHandler();
   }
   if(progress == 1){
-	Serial.println("hej");
+	Serial.println(freeRam());
     bp = convertToBlueprint(&wallQueue);
     Serial.print("Coord(1,1,1): ");
     Serial.println(bp->pos[1][1][1]);
@@ -121,7 +121,7 @@ void loop() {
 		  Serial.print(inst->level);
 		  Serial.println(" y");
 	  }
-	  progress++;
+	  progress = 3;
   }
   //if(queue.size < MAX_QUEUE_SIZE)
     //push(&queue, &GetInstrction());
