@@ -2,14 +2,14 @@
 #define interupt1 2
 #define interupt2 3
 //Dircation pins x axis
-#define xPin1 4
-#define xPin2 5
+#define xPin1 5
+#define xPin2 4
 //Dircation pins y axis
 #define yPin1 6
 #define yPin2 7
 //Diraction pins z axis
-#define zPin1 8
-#define zPin2 13
+#define zPin1 13
+#define zPin2 8
 //Chanel Pins
 #define chanelPin3 10
 #define chanelPin2 11
@@ -22,7 +22,7 @@
 #define gear3 140
 
 #define Hold_Delay 500
-#define DELAY_FOR_MOTOR_MOVEMENT 200
+#define DELAY_FOR_MOTOR_MOVEMENT 600
 
 #define MAX_QUEUE_SIZE 32
 
@@ -70,11 +70,12 @@ void setup() {
 
   wallQueue = CreateQueue(sizeof(Wall));
   
-  myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
+  myController = CreateController(CreateMotor(3000, xPin1, xPin2),CreateMotor(3050, yPin1, yPin2),CreateMotor(3050, zPin1, zPin2));
 
   
   push(&queue, &CreateInstruction(5,5,0, smallBrick));
-  push(&queue, &CreateInstruction(12,12,0, smallBrick));
+  push(&queue, &CreateInstruction(5,9,0, smallBrick));
+   push(&queue, &CreateInstruction(5,13,0, smallBrick));
   NextInstruction();
   
   
@@ -119,6 +120,7 @@ void loop() {
       switch(currentInstruction->count){
         case 0:   
           if(currentInstruction->type == normal){
+            
             savedInstruction = currentInstruction;
             currentInstruction = PickUpBrick(smallBrick);
             newInstruction = true;
@@ -143,6 +145,7 @@ void loop() {
             digitalWrite(gearPin, HIGH);
           //Serial.println(222222);
           PlaceBrick(&myController);
+          //ResetSystem();
           NextInstruction();
           
           break;
@@ -339,9 +342,9 @@ void ResetSystem(){
   isResat = false;
   analogWrite(gearPin, 180);
   ResetMotor(motorY);
-  analogWrite(gearPin, 180);
+  analogWrite(gearPin, 140);
   ResetMotor(motorZ);
-  analogWrite(gearPin, 180);
+  analogWrite(gearPin, 140);
   ResetMotor(motorX); 
   isResat = true;
   analogWrite(gearPin, 255);

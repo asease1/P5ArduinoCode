@@ -213,7 +213,22 @@ void PlaceBrick(Controller *myController){
 
   ChangeMotorState(forward, &myController->motorY);
   delay(2000);
-  //while(!IsCurrentMotorMoving()){}
+  analogWrite(gearPin, 180);
+
+  int i = 0;
+  for(i = 0; i < 1; i++){
+    ChangeMotorState(forward, &myController->motorX);
+    delay(400);
+    ChangeMotorState(backward, &myController->motorX);
+    delay(800);
+    ChangeMotorState(forward, &myController->motorX);
+    delay(400);
+    
+    ChangeMotorState(hold, &myController->motorX);
+    delay(700);  
+  }
+
+  analogWrite(gearPin, 255);
   ChangeMotorState(backward, &myController->motorY);
   delay(2000);
   //while(!IsCurrentMotorMoving()){}
