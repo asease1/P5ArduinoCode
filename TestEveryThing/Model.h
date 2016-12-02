@@ -97,7 +97,7 @@ struct Wall{
 
 Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	Instruction inst;
-
+	Serial.println("GetInstruction");
 	for (int yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
 		for (int zAxis = bpProgress->z; zAxis < MaxZ; zAxis += 2)

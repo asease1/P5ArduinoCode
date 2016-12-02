@@ -104,6 +104,7 @@ void loop() {
 	  if (queue.size < MAX_QUEUE_SIZE) {
 		  Serial.print(queue.size);
 		  Serial.println(" queue size");
+		  Serial.println("Before GetInstruction");
 		  push(&queue, &GetInstruction(bp, &BPProgress));
 		  Instruction* inst;
 		  inst = (Instruction*)peek(&queue);
@@ -121,6 +122,19 @@ void loop() {
 		  Serial.println(" z");
 		  Serial.print(inst->level);
 		  Serial.println(" y");
+		  for (int i = 0; i < MaxY; i++)
+		  {
+			  Serial.println("");
+			  for (int j = 0; j < MaxZ; j++)
+			  {
+				  Serial.println("");
+				  for (int k = 0; k < MaxX; k++)
+				  {
+					  Serial.print(bp->pos[k][i][j]);
+				  }
+			  }
+		  }
+		  Serial.println("");
 		  pop(&queue);
 	  }
   }
