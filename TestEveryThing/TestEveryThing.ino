@@ -77,8 +77,8 @@ void setup() {
   myController = CreateController(CreateMotor(1050, xPin1, xPin2),CreateMotor(1050, yPin1, yPin2),CreateMotor(1050, zPin1, zPin2));
 
   
-  push(&queue, &CreateInstruction(5,5,0, smallBrick));
-  push(&queue, &CreateInstruction(12,12,0, smallBrick));
+  //push(&queue, &CreateInstruction(5,5,0, smallBrick));
+  //push(&queue, &CreateInstruction(12,12,0, smallBrick));
   NextInstruction();
   
   
@@ -102,11 +102,24 @@ void loop() {
   if (progress == 2)
   {
 	  if (queue.size < MAX_QUEUE_SIZE) {
-		  Serial.print(queue.size);
-		  Serial.println(" queue size");
-		  push(&queue, &GetInstruction(bp, &BPProgress));
-		  Instruction* inst;
-		  inst = (Instruction*)peek(&queue);
+		  for (int i = 0; i < MaxY; i++)
+		  {
+			  Serial.println("");
+			  for (int j = 0; j < MaxZ; j++)
+			  {
+				  Serial.println("");
+				  for (int k = 0; k < MaxX; k++)
+				  {
+					  Serial.print(bp->pos[k][i][j]);
+				  }
+			  }
+		  }
+		  Serial.println("");
+		  //Serial.print(queue.size);
+		  //Serial.println(" queue size");
+		  Serial.println("Before GetInstruction");
+		  Instruction* inst = &GetInstruction(bp, &BPProgress);
+		  push(&queue, inst);
 		  Serial.print(BPProgress.x);
 		  Serial.print(", ");
 		  Serial.print(BPProgress.z);
@@ -121,6 +134,8 @@ void loop() {
 		  Serial.println(" z");
 		  Serial.print(inst->level);
 		  Serial.println(" y");
+
+		  Serial.println("");
 		  pop(&queue);
 	  }
   }
