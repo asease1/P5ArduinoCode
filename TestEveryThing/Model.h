@@ -106,9 +106,9 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	Serial.println("GetInstruction");
 	for (int yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
-		for (int zAxis = bpProgress->z; zAxis < MaxZ; zAxis += 2)
+		for (int zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
 		{
-			for (int xAxis = bpProgress->x; xAxis < MaxX; xAxis += 2)
+			for (int xAxis = bpProgress->x; xAxis < MaxX; xAxis++)
 			{
 				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
@@ -131,7 +131,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 							bpProgress->z = zAxis;
 							Serial.println("LB90");
 							return CreateInstruction(xAxis + 1, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};																								   
-																								   //Place big brick
+							//Place big brick
 							break;
 						}
 
@@ -146,9 +146,9 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 								bp->pos[xAxis - 2][yAxis][zAxis] = placed;
 								bp->pos[xAxis - 3][yAxis][zAxis] = placed;
 								bp->pos[xAxis][yAxis][zAxis + 1] = placed;
-								bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
-								bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
-								bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
+								bp->pos[xAxis - 1][yAxis][zAxis + 1] = placed;
+								bp->pos[xAxis - 2][yAxis][zAxis + 1] = placed;
+								bp->pos[xAxis - 3][yAxis][zAxis + 1] = placed;
 								bpProgress->x = xAxis;
 								bpProgress->y = yAxis;
 								bpProgress->z = zAxis;
@@ -188,13 +188,13 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 									if (xAxis >= 0 && xAxis + 1 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ)
 									{
 										bp->pos[xAxis][yAxis][zAxis] = placed;
-										bp->pos[xAxis][yAxis - 1][zAxis] = placed;
-										bp->pos[xAxis][yAxis - 2][zAxis] = placed;
-										bp->pos[xAxis][yAxis - 3][zAxis] = placed;
+										bp->pos[xAxis][yAxis][zAxis - 1] = placed;
+										bp->pos[xAxis][yAxis][zAxis - 2] = placed;
+										bp->pos[xAxis][yAxis][zAxis - 3] = placed;
 										bp->pos[xAxis + 1][yAxis][zAxis] = placed;
-										bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
-										bp->pos[xAxis + 1][yAxis][zAxis + 2] = placed;
-										bp->pos[xAxis + 1][yAxis][zAxis + 3] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis - 1] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis - 2] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis - 3] = placed;
 										bpProgress->x = xAxis;
 										bpProgress->y = yAxis;
 										bpProgress->z = zAxis;
