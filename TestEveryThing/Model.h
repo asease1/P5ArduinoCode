@@ -136,112 +136,103 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 						}
 
 					case placed: case empty:
-						if (xAxis - 2 >= ArrMin)
+						switch (bp->pos[xAxis - 2][yAxis][zAxis])
 						{
-							switch (bp->pos[xAxis - 2][yAxis][zAxis])
+						case notPlaced:
+							if (xAxis < MaxX && xAxis - 3 >= ArrMin && yAxis < MaxY && yAxis >= ArrMin && zAxis < MaxZ && zAxis - 1 >= ArrMin)
+							{
+								bp->pos[xAxis][yAxis][zAxis] = placed;
+								bp->pos[xAxis - 1][yAxis][zAxis] = placed;
+								bp->pos[xAxis - 2][yAxis][zAxis] = placed;
+								bp->pos[xAxis - 3][yAxis][zAxis] = placed;
+								bp->pos[xAxis][yAxis][zAxis + 1] = placed;
+								bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
+								bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
+								bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
+								bpProgress->x = xAxis;
+								bpProgress->y = yAxis;
+								bpProgress->z = zAxis;
+								Serial.println("LB90");
+								return  CreateInstruction(xAxis - 1, zAxis, yAxis, largeBrick90);
+								//Place big brick
+								break;
+							}
+								
+						case placed: case empty:
+							switch (bp->pos[xAxis][yAxis][zAxis + 2])
 							{
 							case notPlaced:
-								if (xAxis < MaxX && xAxis - 3 >= ArrMin && yAxis < MaxY && yAxis >= ArrMin && zAxis < MaxZ && zAxis - 1 >= ArrMin)
+								if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ)
 								{
 									bp->pos[xAxis][yAxis][zAxis] = placed;
-									bp->pos[xAxis - 1][yAxis][zAxis] = placed;
-									bp->pos[xAxis - 2][yAxis][zAxis] = placed;
-									bp->pos[xAxis - 3][yAxis][zAxis] = placed;
 									bp->pos[xAxis][yAxis][zAxis + 1] = placed;
+									bp->pos[xAxis][yAxis][zAxis + 2] = placed;
+									bp->pos[xAxis][yAxis][zAxis + 3] = placed;
+									bp->pos[xAxis + 1][yAxis][zAxis] = placed;
 									bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
-									bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
-									bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
+									bp->pos[xAxis + 1][yAxis][zAxis + 2] = placed;
+									bp->pos[xAxis + 1][yAxis][zAxis + 3] = placed;
 									bpProgress->x = xAxis;
 									bpProgress->y = yAxis;
 									bpProgress->z = zAxis;
-									Serial.println("LB90");
-									return  CreateInstruction(xAxis - 1, zAxis, yAxis, largeBrick90);
+									Serial.println("LB0");
+									return  CreateInstruction(xAxis, zAxis + 1, yAxis, largeBrick0);
 									//Place big brick
 									break;
 								}
-								
+										
 							case placed: case empty:
-								if (zAxis + 2 < MaxZ)
+								switch (bp->pos[xAxis][yAxis][zAxis - 2])
 								{
-									switch (bp->pos[xAxis][yAxis][zAxis + 2])
+								case notPlaced:
+									if (xAxis >= 0 && xAxis + 1 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ)
 									{
-									case notPlaced:
-										if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ)
-										{
-											bp->pos[xAxis][yAxis][zAxis] = placed;
-											bp->pos[xAxis][yAxis][zAxis + 1] = placed;
-											bp->pos[xAxis][yAxis][zAxis + 2] = placed;
-											bp->pos[xAxis][yAxis][zAxis + 3] = placed;
-											bp->pos[xAxis + 1][yAxis][zAxis] = placed;
-											bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
-											bp->pos[xAxis + 1][yAxis][zAxis + 2] = placed;
-											bp->pos[xAxis + 1][yAxis][zAxis + 3] = placed;
-											bpProgress->x = xAxis;
-											bpProgress->y = yAxis;
-											bpProgress->z = zAxis;
-											Serial.println("LB0");
-											return  CreateInstruction(xAxis, zAxis + 1, yAxis, largeBrick0);
-											//Place big brick
-											break;
-										}
-										
-									case placed: case empty:
-										if (zAxis - 2 >= ArrMin)
-										{
-											switch (bp->pos[xAxis][yAxis][zAxis - 2])
-											{
-											case notPlaced:
-												if (xAxis >= 0 && xAxis + 1 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ)
-												{
-													bp->pos[xAxis][yAxis][zAxis] = placed;
-													bp->pos[xAxis][yAxis - 1][zAxis] = placed;
-													bp->pos[xAxis][yAxis - 2][zAxis] = placed;
-													bp->pos[xAxis][yAxis - 3][zAxis] = placed;
-													bp->pos[xAxis + 1][yAxis][zAxis] = placed;
-													bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
-													bp->pos[xAxis + 1][yAxis][zAxis + 2] = placed;
-													bp->pos[xAxis + 1][yAxis][zAxis + 3] = placed;
-													bpProgress->x = xAxis;
-													bpProgress->y = yAxis;
-													bpProgress->z = zAxis;
-													Serial.println("LB0");
-													return CreateInstruction(xAxis, zAxis - 1, yAxis, largeBrick0);
-													//Place big brick
-													break;
-												}
-												
-											case placed: case empty:
-												if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 1 < MaxZ)
-												{
-													bp->pos[xAxis][yAxis][zAxis] = placed;
-													bp->pos[xAxis + 1][yAxis][zAxis] = placed;
-													bp->pos[xAxis][yAxis][zAxis + 1] = placed;
-													bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
-													bpProgress->x = xAxis;
-													bpProgress->y = yAxis;
-													bpProgress->z = zAxis;
-													Serial.println("SB90");
-													return CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
-													//place small brick
-												}
-												else
-												{
-													//No brick can be placed
-												}
-												
-											default:
-												break;
-											}
-										}
-										
-									default:
+										bp->pos[xAxis][yAxis][zAxis] = placed;
+										bp->pos[xAxis][yAxis - 1][zAxis] = placed;
+										bp->pos[xAxis][yAxis - 2][zAxis] = placed;
+										bp->pos[xAxis][yAxis - 3][zAxis] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis + 2] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis + 3] = placed;
+										bpProgress->x = xAxis;
+										bpProgress->y = yAxis;
+										bpProgress->z = zAxis;
+										Serial.println("LB0");
+										return CreateInstruction(xAxis, zAxis - 1, yAxis, largeBrick0);
+										//Place big brick
 										break;
 									}
+												
+								case placed: case empty:
+									if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 1 < MaxZ)
+									{
+										bp->pos[xAxis][yAxis][zAxis] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis] = placed;
+										bp->pos[xAxis][yAxis][zAxis + 1] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
+										bpProgress->x = xAxis;
+										bpProgress->y = yAxis;
+										bpProgress->z = zAxis;
+										Serial.println("SB90");
+										return CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
+										//place small brick
+									}
+									else
+									{
+										//No brick can be placed
+									}
+												
+								default:
+									break;
 								}
-								
+										
 							default:
 								break;
 							}
+								
+						default:
+							break;
 						}
 					default:
 						break;
