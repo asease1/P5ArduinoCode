@@ -3,6 +3,7 @@
 #define MaxY 3 
 #define MaxZ 15
 #define ArrMin 0
+#include <HardwareSerial.h>
 
 enum wallSpecs {
   StartX,
@@ -111,22 +112,22 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 			{
 				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
-				case notPlaced:
-					if (true)
-					{
+          if (true)
+          {
 
-					}
+          }
+				case notPlaced:
 					switch (bp->pos[xAxis + 2][yAxis][zAxis])
 					{
 					case notPlaced:
-						bp->pos[xAxis][yAxis][zAxis] = placed;
-						bp->pos[xAxis + 1][yAxis][zAxis] = placed;
-						bp->pos[xAxis + 2][yAxis][zAxis] = placed;
-						bp->pos[xAxis + 3][yAxis][zAxis] = placed;
-						bp->pos[xAxis][yAxis][zAxis +1] = placed;
-						bp->pos[xAxis + 1][yAxis][zAxis +1] = placed;
-						bp->pos[xAxis + 2][yAxis][zAxis +1] = placed;
-						bp->pos[xAxis + 3][yAxis][zAxis +1] = placed;
+            bp->pos[xAxis][yAxis][zAxis] = placed;
+            bp->pos[xAxis + 1][yAxis][zAxis] = placed;
+            bp->pos[xAxis + 2][yAxis][zAxis] = placed;
+            bp->pos[xAxis + 3][yAxis][zAxis] = placed;
+            bp->pos[xAxis][yAxis][zAxis + 1] = placed;
+            bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
+            bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
+            bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
 						bpProgress->x = xAxis;
 						bpProgress->y = yAxis;
 						bpProgress->z = zAxis;
