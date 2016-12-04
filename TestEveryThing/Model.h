@@ -100,6 +100,16 @@ struct Wall{
   byte value[5];
 };
 
+void PlaceBrick(Blueprint * bp, Position * bpProgress, int xAxis, int yAxis, int zAxis)
+{
+	
+	if (xAxis < 0 || xAxis > MaxX || yAxis < 0 || yAxis > MaxY || zAxis < 0 || zAxis > MaxZ)
+	{
+		return;
+	}
+	bp->pos[xAxis][yAxis][zAxis] = placed;
+	return;
+}
 Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	Instruction inst;
 	Serial.println("GetInstruction");
@@ -119,14 +129,14 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 					switch (bp->pos[xAxis + 2][yAxis][zAxis])
 					{
 					case notPlaced:
-						bp->pos[xAxis][yAxis][zAxis] = placed;
-						bp->pos[xAxis + 1][yAxis][zAxis] = placed;
-						bp->pos[xAxis + 2][yAxis][zAxis] = placed;
-						bp->pos[xAxis + 3][yAxis][zAxis] = placed;
-						bp->pos[xAxis][yAxis][zAxis +1] = placed;
-						bp->pos[xAxis + 1][yAxis][zAxis +1] = placed;
-						bp->pos[xAxis + 2][yAxis][zAxis +1] = placed;
-						bp->pos[xAxis + 3][yAxis][zAxis +1] = placed;
+						PlaceBrick(bp, bpProgress, xAxis, yAxis, zAxis);
+						PlaceBrick(bp, bpProgress, xAxis + 1, yAxis, zAxis);
+						PlaceBrick(bp, bpProgress, xAxis + 2, yAxis, zAxis);
+						PlaceBrick(bp, bpProgress, xAxis + 3, yAxis, zAxis);
+						PlaceBrick(bp, bpProgress, xAxis, yAxis, zAxis+1);
+						PlaceBrick(bp, bpProgress, xAxis + 1, yAxis, zAxis + 1);
+						PlaceBrick(bp, bpProgress, xAxis + 2, yAxis, zAxis + 1);
+						PlaceBrick(bp, bpProgress, xAxis + 3, yAxis, zAxis + 1);
 						bpProgress->x = xAxis;
 						bpProgress->y = yAxis;
 						bpProgress->z = zAxis;
