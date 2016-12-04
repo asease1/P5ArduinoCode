@@ -112,29 +112,29 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 			{
 				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
-          if (true)
-          {
-
-          }
 				case notPlaced:
 					switch (bp->pos[xAxis + 2][yAxis][zAxis])
 					{
 					case notPlaced:
-            bp->pos[xAxis][yAxis][zAxis] = placed;
-            bp->pos[xAxis + 1][yAxis][zAxis] = placed;
-            bp->pos[xAxis + 2][yAxis][zAxis] = placed;
-            bp->pos[xAxis + 3][yAxis][zAxis] = placed;
-            bp->pos[xAxis][yAxis][zAxis + 1] = placed;
-            bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
-            bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
-            bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
-						bpProgress->x = xAxis;
-						bpProgress->y = yAxis;
-						bpProgress->z = zAxis;
-						Serial.println("LB90");
-						return CreateInstruction(xAxis + 1, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
-						//Place big brick
-						break;
+						if (xAxis >= 0 && xAxis < MaxX && xAxis + 1 < MaxX && xAxis + 2 < MaxX && xAxis + 3 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= 0 && zAxis < MaxZ && zAxis + 1 < MaxZ && zAxis + 2 < MaxZ && zAxis + 3 < MaxZ)
+						{
+							bp->pos[xAxis][yAxis][zAxis] = placed;
+							bp->pos[xAxis + 1][yAxis][zAxis] = placed;
+							bp->pos[xAxis + 2][yAxis][zAxis] = placed;
+							bp->pos[xAxis + 3][yAxis][zAxis] = placed;
+							bp->pos[xAxis][yAxis][zAxis + 1] = placed;
+							bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
+							bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
+							bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
+							bpProgress->x = xAxis;
+							bpProgress->y = yAxis;
+							bpProgress->z = zAxis;
+							Serial.println("LB90");
+							return CreateInstruction(xAxis + 1, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};																								   
+																								   //Place big brick
+							break;
+						}
+
 					case placed: case empty:
 						if (xAxis - 2 >= ArrMin)
 						{
