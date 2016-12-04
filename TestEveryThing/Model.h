@@ -101,13 +101,11 @@ struct Wall{
 };
 
 void PlaceBrick(Blueprint * bp, Position * bpProgress, int xAxis, int yAxis, int zAxis)
-{
-	
-	if (xAxis < 0 || xAxis > MaxX || yAxis < 0 || yAxis > MaxY || zAxis < 0 || zAxis > MaxZ)
+{	
+	if (xAxis >= 0 && xAxis <= MaxX && yAxis >= 0 && yAxis <= MaxY && zAxis >= 0 && zAxis <= MaxZ)
 	{
-		return;
+		bp->pos[xAxis][yAxis][zAxis] = placed;
 	}
-	bp->pos[xAxis][yAxis][zAxis] = placed;
 	return;
 }
 Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
@@ -122,10 +120,6 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
 				case notPlaced:
-					if (true)
-					{
-
-					}
 					switch (bp->pos[xAxis + 2][yAxis][zAxis])
 					{
 					case notPlaced:
