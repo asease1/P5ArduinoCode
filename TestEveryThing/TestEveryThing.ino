@@ -24,7 +24,7 @@
 #define Hold_Delay 500
 #define DELAY_FOR_MOTOR_MOVEMENT 200
 
-#define MAX_QUEUE_SIZE 34
+#define MAX_QUEUE_SIZE 25
 
 #include "Wire.h"
 #include "Controller.h"
