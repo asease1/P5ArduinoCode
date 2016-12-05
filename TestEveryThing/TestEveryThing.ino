@@ -24,7 +24,7 @@
 #define Hold_Delay 500
 #define DELAY_FOR_MOTOR_MOVEMENT 200
 
-#define MAX_QUEUE_SIZE 32
+#define MAX_QUEUE_SIZE 1
 
 #include "Wire.h"
 #include "Controller.h"
@@ -136,7 +136,6 @@ void loop() {
 		  Serial.println(" y");
 
 		  Serial.println("");
-		  pop(&queue);
 	  }
   }
   //if(queue.size < MAX_QUEUE_SIZE)

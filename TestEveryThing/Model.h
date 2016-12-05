@@ -3,6 +3,7 @@
 #define MaxY 3 
 #define MaxZ 15
 #define ArrMin 0
+#define InstErr -1
 #include <HardwareSerial.h>
 
 enum wallSpecs {
@@ -39,7 +40,7 @@ enum InstructionType {normalInst, pickUp, place};
 struct Instruction{
   InstructionType type;
   int positions[2];
-  int level;
+  int level; //hvis denne er -1 så er instruktionen fejlslagen
   short int count;
   BrickType brick;
 };
@@ -103,6 +104,13 @@ struct Wall{
 
 Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	Instruction inst;
+	inst.brick = none;
+	inst.count = 0;
+	inst.level = -1;
+	inst.positions[0] = -1;
+	inst.positions[1] = -1;
+	inst.type = normalInst;
+
 	Serial.println("GetInstruction");
 	for (int yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
@@ -207,22 +215,18 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 								case placed: case empty:
 									if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 1 < MaxZ)
 									{
+										//Okay så vi har ingen ide om hvorfor det er nødvendigt med minus 1 her, but it is. Der er nok et eller andet sted der tæller progresspointeren op forkert, not sure. 
 										bp->pos[xAxis][yAxis][zAxis] = placed;
-										bp->pos[xAxis + 1][yAxis][zAxis] = placed;
+										bp->pos[xAxis - 1][yAxis][zAxis] = placed;
 										bp->pos[xAxis][yAxis][zAxis + 1] = placed;
-										bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
+										bp->pos[xAxis - 1][yAxis][zAxis + 1] = placed;
 										bpProgress->x = xAxis;
 										bpProgress->y = yAxis;
 										bpProgress->z = zAxis;
 										Serial.println("SB90");
 										return CreateInstruction(xAxis - 1, zAxis, yAxis, smallBrick);
 										//place small brick
-									}
-									else
-									{
-										//No brick can be placed
-									}
-												
+									}											
 								default:
 									break;
 
@@ -241,10 +245,13 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 				default:
 					break;
 				}
+				bpProgress->x = xAxis;
+				bpProgress->y = yAxis;
+				bpProgress->z = zAxis;
 			}
 		}
 	}
-
+	inst.level = InstErr;
 	return inst;//this should never happen
 }
 /*creates a new instance of the wall struct*/
