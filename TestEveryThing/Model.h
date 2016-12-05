@@ -21,12 +21,12 @@ enum brickState
 
 /*Contains a single position in 3d space*/ 
 typedef struct Position{ 
-  byte x; 
-  byte y; 
-  byte z; 
+  int8_t x; 
+  int8_t y; 
+  int8_t z; 
 }; 
  
-Position CreatePosition(byte x, byte y, byte z){ 
+Position CreatePosition(int8_t x, int8_t y, int8_t z){ 
   Position newPosition; 
   newPosition.x; 
   newPosition.y; 
@@ -106,21 +106,22 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	Instruction inst;
 	inst.brick = none;
 	inst.count = 0;
-	inst.level = -1;
-	inst.positions[0] = -1;
-	inst.positions[1] = -1;
+	inst.level = 0;
+	inst.positions[0] = 0;
+	inst.positions[1] = 0;
 	inst.type = normalInst;
 
 	Serial.println("GetInstruction");
-	for (int yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
+	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
-		for (int zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
+		for (int8_t zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
 		{
-			for (int xAxis = bpProgress->x; xAxis < MaxX; xAxis++)
+			for (int8_t xAxis = bpProgress->x; xAxis < MaxX; xAxis++)
 			{
 				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
 				case notPlaced:
+
 					switch (bp->pos[xAxis + 2][yAxis][zAxis])
 					{
 					case notPlaced:
@@ -142,7 +143,6 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 							//Place big brick
 							break;
 						}
-
 					case placed: case empty:
 						switch (bp->pos[xAxis - 2][yAxis][zAxis])
 						{
@@ -217,14 +217,14 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 									{
 										//Okay så vi har ingen ide om hvorfor det er nødvendigt med minus 1 her, but it is. Der er nok et eller andet sted der tæller progresspointeren op forkert, not sure. 
 										bp->pos[xAxis][yAxis][zAxis] = placed;
-										bp->pos[xAxis - 1][yAxis][zAxis] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis] = placed;
 										bp->pos[xAxis][yAxis][zAxis + 1] = placed;
-										bp->pos[xAxis - 1][yAxis][zAxis + 1] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
 										bpProgress->x = xAxis;
 										bpProgress->y = yAxis;
 										bpProgress->z = zAxis;
 										Serial.println("SB90");
-										return CreateInstruction(xAxis - 1, zAxis, yAxis, smallBrick);
+										return CreateInstruction(xAxis + 1, zAxis, yAxis, smallBrick);
 										//place small brick
 									}											
 								default:
@@ -246,13 +246,14 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 					break;
 				}
 				bpProgress->x = xAxis;
-				bpProgress->y = yAxis;
-				bpProgress->z = zAxis;
 			}
+			bpProgress->z = zAxis;
+			bpProgress->x = ArrMin;
 		}
+		bpProgress->y = yAxis;
+		bpProgress->z = ArrMin;
 	}
-	inst.level = InstErr;
-	return inst;//this should never happen
+	return CreateInstruction(inst.positions[0], inst.positions[1], inst.level, inst.brick);//this should never happen
 }
 /*creates a new instance of the wall struct*/
 Wall* createWall(){
