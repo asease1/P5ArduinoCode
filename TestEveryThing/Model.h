@@ -101,6 +101,10 @@ Blueprint* createBlueprint(){
 struct Wall{
   byte value[5];
 };
+enum allowed
+{
+	none, right, left, down, up;
+};
 
 Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	Instruction inst;
@@ -115,6 +119,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
 		int isFirstBrick = 1;
+		int notAllowed = none;
 		for (int8_t zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
 		{
 			for (int8_t xAxis = bpProgress->x; xAxis < MaxX; xAxis++)
@@ -125,7 +130,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
 				case notPlaced:
-					if (yAxis % 2 == 1 && isFirstBrick == 1) //every other level starts with small brick to make stretcher bond
+					if (yAxis % 2 == 1 && isFirstBrick == 1) //stretcher bond
 					{
 						if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 1 < MaxZ)
 						{
@@ -144,7 +149,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 					switch (bp->pos[xAxis + 2][yAxis][zAxis])
 					{
 					case notPlaced:
-						if (xAxis >= 0 && xAxis + 3 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= 0 && zAxis + 1 < MaxZ)
+						if (xAxis >= 0 && xAxis + 3 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= 0 && zAxis + 1 < MaxZ && !(yAxis % 2 == 1 && isFirstBrick == 1 && notAllowed == right))
 						{
 							bp->pos[xAxis][yAxis][zAxis] = placed;
 							bp->pos[xAxis + 1][yAxis][zAxis] = placed;
@@ -154,6 +159,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 							bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
 							bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
 							bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
+							notAllowed = right;
 							isFirstBrick = 0;
 							Serial.println("LB90");
 							return CreateInstruction(xAxis + 1, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};																								   
