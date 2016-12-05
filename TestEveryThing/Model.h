@@ -204,7 +204,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 							switch (bp->pos[xAxis][yAxis][zAxis + 2])
 							{
 							case notPlaced:
-								if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ !(yAxis % 2 == 1 && isFirstBrick == 1 && notAllowed == down))
+								if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ && !(yAxis % 2 == 1 && isFirstBrick == 1 && notAllowed == down))
 								{
 									bp->pos[xAxis][yAxis][zAxis] = placed;
 									bp->pos[xAxis][yAxis][zAxis + 1] = placed;
