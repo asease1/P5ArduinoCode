@@ -101,7 +101,7 @@ Blueprint* createBlueprint(){
 struct Wall{
   byte value[5];
 };
-enum notAllowed
+enum notAllowedEnum
 {
 	allowed, right, left, down, up
 };
@@ -129,28 +129,13 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 		{
 			for (int8_t xAxis = bpProgress->x; xAxis < MaxX; xAxis++)
 			{
+
 				bpProgress->x = xAxis;
 				bpProgress->y = yAxis;
 				bpProgress->z = zAxis;
 				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
 				case notPlaced:
-					//if (yAxis % 2 == 1 && isFirstBrick == 1) //stretcher bond
-					//{
-					//	if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 1 < MaxZ)
-					//	{
-					//		//Okay så vi har ingen ide om hvorfor det er nødvendigt med minus 1 her, but it is. Der er nok et eller andet sted der tæller progresspointeren op forkert, not sure. 
-					//		bp->pos[xAxis][yAxis][zAxis] = placed;
-					//		bp->pos[xAxis + 1][yAxis][zAxis] = placed;
-					//		bp->pos[xAxis][yAxis][zAxis + 1] = placed;
-					//		bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
-					//		isFirstBrick = 0;
-					//		Serial.println("SB90");
-					//		return CreateInstruction(xAxis + 1, zAxis, yAxis, smallBrick);
-					//		//place small brick
-					//		break;
-					//	}
-					//}
 					switch (bp->pos[xAxis + 2][yAxis][zAxis])
 					{
 					case notPlaced:
