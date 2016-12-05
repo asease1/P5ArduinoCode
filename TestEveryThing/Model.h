@@ -116,10 +116,15 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	inst.type = normalInst;
 
 	Serial.println("GetInstruction");
+	int notAllowed = allowed;
 	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
 		int isFirstBrick = 1;
-		int notAllowed = allowed;
+		if (yAxis % 2 == 0)
+		{
+			notAllowed = allowed;
+		}
+		
 		for (int8_t zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
 		{
 			for (int8_t xAxis = bpProgress->x; xAxis < MaxX; xAxis++)
@@ -159,7 +164,11 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 							bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
 							bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
 							bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
-							notAllowed = right;
+							if (isFirstBrick == 1)
+							{
+								notAllowed = right;
+							}
+							
 							isFirstBrick = 0;
 							Serial.println("LB90");
 							return CreateInstruction(xAxis + 1, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};																								   
