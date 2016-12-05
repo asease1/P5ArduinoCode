@@ -179,7 +179,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 						switch (bp->pos[xAxis - 2][yAxis][zAxis])
 						{
 						case notPlaced:
-							if (xAxis < MaxX && xAxis - 3 >= ArrMin && yAxis < MaxY && yAxis >= ArrMin && zAxis < MaxZ && zAxis - 1 >= ArrMin)
+							if (xAxis < MaxX && xAxis - 3 >= ArrMin && yAxis < MaxY && yAxis >= ArrMin && zAxis < MaxZ && zAxis - 1 >= ArrMin && !(yAxis % 2 == 1 && isFirstBrick == 1 && notAllowed == left))
 							{
 								bp->pos[xAxis][yAxis][zAxis] = placed;
 								bp->pos[xAxis - 1][yAxis][zAxis] = placed;
@@ -189,6 +189,10 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 								bp->pos[xAxis - 1][yAxis][zAxis + 1] = placed;
 								bp->pos[xAxis - 2][yAxis][zAxis + 1] = placed;
 								bp->pos[xAxis - 3][yAxis][zAxis + 1] = placed;
+								if (isFirstBrick == 1)
+								{
+									notAllowed = left;
+								}
 								isFirstBrick = 0;
 								Serial.println("LB90");
 								return  CreateInstruction(xAxis - 1, zAxis, yAxis, largeBrick90);
@@ -200,7 +204,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 							switch (bp->pos[xAxis][yAxis][zAxis + 2])
 							{
 							case notPlaced:
-								if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ)
+								if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ !(yAxis % 2 == 1 && isFirstBrick == 1 && notAllowed == down))
 								{
 									bp->pos[xAxis][yAxis][zAxis] = placed;
 									bp->pos[xAxis][yAxis][zAxis + 1] = placed;
@@ -210,6 +214,10 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 									bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
 									bp->pos[xAxis + 1][yAxis][zAxis + 2] = placed;
 									bp->pos[xAxis + 1][yAxis][zAxis + 3] = placed;
+									if (isFirstBrick == 1)
+									{
+										notAllowed = down;
+									}
 									isFirstBrick = 0;
 									Serial.println("LB0");
 									return  CreateInstruction(xAxis, zAxis + 1, yAxis, largeBrick0);
@@ -221,7 +229,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 								switch (bp->pos[xAxis][yAxis][zAxis - 2])
 								{
 								case notPlaced:
-									if (xAxis >= 0 && xAxis + 1 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ)
+									if (xAxis >= 0 && xAxis + 1 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ && !(yAxis % 2 == 1 && isFirstBrick == 1 && notAllowed == up))
 									{
 										bp->pos[xAxis][yAxis][zAxis] = placed;
 										bp->pos[xAxis][yAxis][zAxis - 1] = placed;
@@ -231,6 +239,10 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 										bp->pos[xAxis + 1][yAxis][zAxis - 1] = placed;
 										bp->pos[xAxis + 1][yAxis][zAxis - 2] = placed;
 										bp->pos[xAxis + 1][yAxis][zAxis - 3] = placed;
+										if (isFirstBrick == 1)
+										{
+											notAllowed = up;
+										}
 										isFirstBrick = 0;
 										Serial.println("LB0");
 										return CreateInstruction(xAxis, zAxis - 1, yAxis, largeBrick0);
