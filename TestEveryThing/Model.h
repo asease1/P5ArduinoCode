@@ -215,7 +215,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 										bpProgress->y = yAxis;
 										bpProgress->z = zAxis;
 										Serial.println("SB90");
-										return CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
+										return CreateInstruction(xAxis - 1, zAxis, yAxis, smallBrick);
 										//place small brick
 									}
 									else
@@ -225,6 +225,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 												
 								default:
 									break;
+
 								}
 										
 							default:
