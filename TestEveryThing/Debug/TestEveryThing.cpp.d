@@ -15,6 +15,7 @@ C:\Users\krist\AppData\Local\Temp\VMicroBuilds\TestEveryThing\uno\TestEveryThing
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/Stream.h \
  C:\Users\krist\AppData\Local\Temp\VMicroBuilds\TestEveryThing\uno\Controller.h \
  C:\Users\krist\AppData\Local\Temp\VMicroBuilds\TestEveryThing\uno\Model.h \
+ C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/HardwareSerial.h \
  C:\Users\krist\AppData\Local\Temp\VMicroBuilds\TestEveryThing\uno\InputHandler.h \
  C:\Users\krist\AppData\Local\Temp\VMicroBuilds\TestEveryThing\uno\Error.h \
  C:\Users\krist\AppData\Local\Temp\VMicroBuilds\TestEveryThing\uno\queue.h \

@@ -131,7 +131,8 @@ void loop() {
 		  Serial.println(" z");
 		  Serial.print(inst->level);
 		  Serial.println(" y");
-
+		  Serial.print("RAMFREE: ");
+		  Serial.println(freeRam());
 		  Serial.println("");
 	  }
   }

@@ -119,21 +119,18 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	bool skipCase = false;
 	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
-		Serial.println("y");
 		if (yAxis % 2)
 		{
 			skipCase = true;
 		}
 		
-		for (int8_t zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
+		for (int16_t zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
 		{
-			Serial.println("z");
-			for (int8_t xAxis = bpProgress->x; xAxis < MaxX; xAxis++)
+			for (int16_t xAxis = bpProgress->x; xAxis < MaxX; xAxis++)
 			{
-				Serial.println("x");
-				bpProgress->x = xAxis;
-				bpProgress->y = yAxis;
-				bpProgress->z = zAxis;
+				//bpProgress->x = xAxis;
+				//bpProgress->y = yAxis;
+				//bpProgress->z = zAxis;
 				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
 				case notPlaced:
@@ -241,8 +238,8 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 										//Okay så vi har ingen ide om hvorfor det er nødvendigt med minus 1 her, but it is. Der er nok et eller andet sted der tæller progresspointeren op forkert, not sure. 
 										bp->pos[xAxis][yAxis][zAxis] = placed;
 										bp->pos[xAxis + 1][yAxis][zAxis] = placed;
-										bp->pos[xAxis][yAxis][zAxis -1] = placed;
-										bp->pos[xAxis + 1][yAxis][zAxis - 1] = placed;
+										bp->pos[xAxis][yAxis][zAxis+1] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis+1] = placed;
 										Serial.println("SB90");
 										return CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
 										//place small brick
