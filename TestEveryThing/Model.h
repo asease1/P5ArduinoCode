@@ -240,9 +240,9 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 									{
 										//Okay så vi har ingen ide om hvorfor det er nødvendigt med minus 1 her, but it is. Der er nok et eller andet sted der tæller progresspointeren op forkert, not sure. 
 										bp->pos[xAxis][yAxis][zAxis] = placed;
-										bp->pos[xAxis + 1][yAxis - 1][zAxis] = placed;
-										bp->pos[xAxis][yAxis - 1][zAxis + 1] = placed;
-										bp->pos[xAxis + 1][yAxis-1][zAxis + 1] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis] = placed;
+										bp->pos[xAxis][yAxis][zAxis -1] = placed;
+										bp->pos[xAxis + 1][yAxis][zAxis - 1] = placed;
 										Serial.println("SB90");
 										return CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
 										//place small brick
