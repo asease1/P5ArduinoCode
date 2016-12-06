@@ -36,7 +36,6 @@ struct Queue queue;
 Blueprint* bp;
 Position BPProgress;
 struct Controller myController;
-notAllowedEnum notAllowed;
 
 bool isResat = false;
 bool queueIsEmpty = true;
@@ -66,7 +65,6 @@ void setup() {
 
 
   Serial.begin(9600);
-  notAllowed = allowed;
   queue = CreateQueue(sizeof(Instruction));
 
   BPProgress.x = 0;
@@ -116,10 +114,8 @@ void loop() {
 			  }
 		  }
 		  Serial.println("");
-		  //Serial.print(queue.size);
-		  //Serial.println(" queue size");
 		  Serial.println("Before GetInstruction");
-		  Instruction* inst = &GetInstruction(bp, &BPProgress, notAllowed);
+		  Instruction* inst = &GetInstruction(bp, &BPProgress);
 		  push(&queue, inst);
 		  Serial.print(BPProgress.x);
 		  Serial.print(", ");
