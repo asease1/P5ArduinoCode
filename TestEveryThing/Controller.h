@@ -7,7 +7,7 @@
 #define ERROR_MARGIN3 300
 
 #define SMALL_BRICK_DEPO_X 0
-#define SMALL_BRICK_DEPO_Z 0
+#define SMALL_BRICK_DEPO_Z 0.9
 #define LARGE_BRICK_0_DEPO_X 0
 #define LARGE_BRICK_0_DEPO_Z 1
 #define LARGE_BRICK_90_DEPO_X 0
@@ -63,7 +63,7 @@ Controller CreateController(Motor motorX, Motor motorY, Motor motorZ){
 
 
 //Function that create the motor with the values that a dynamic at the start
-Motor CreateMotor(int maxPos, int pin1, int pin2){
+Motor CreateMotor(int maxPos, float pin1, float pin2){
   //maybe move pin setyp in to this function.
   Motor newMotor;
   newMotor.pos = 0;
@@ -200,13 +200,28 @@ bool IsCurrentMotorMoving(){
 }
 
 void GrabBrick(Controller *myController){
-  digitalWrite(gearPin,HIGH);
   ChangeMotorState(forward, &myController->motorY);
-  delay(1000);
+  delay(2000);
+  analogWrite(gearPin, 255);
+  ChangeMotor(myController, motorZ);
+  for(int i = 0; i < 1; i++){
+    ChangeMotorState(forward, &myController->runningMotor);
+    delay(4000);
+    ChangeMotorState(backward, &myController->runningMotor);
+    delay(8000);
+    ChangeMotorState(forward, &myController->runningMotor);
+    delay(4000);
+    
+    ChangeMotorState(hold, &myController->runningMotor);
+    delay(7000);  
+  }
+
+  analogWrite(gearPin, 255);
   ChangeMotorState(backward, &myController->motorY);
-  delay(1000);
+  delay(2000);
   //while(!IsCurrentMotorMoving()){}
   ChangeMotorState(hold, &myController->motorY);
+  ChangeMotor(myController, motorX);
 }
 
 void PlaceBrick(Controller *myController){
@@ -215,8 +230,7 @@ void PlaceBrick(Controller *myController){
   delay(2000);
   analogWrite(gearPin, 180);
 
-  int i = 0;
-  for(i = 0; i < 1; i++){
+  for(int i = 0; i < 1; i++){
     ChangeMotorState(forward, &myController->motorX);
     delay(400);
     ChangeMotorState(backward, &myController->motorX);

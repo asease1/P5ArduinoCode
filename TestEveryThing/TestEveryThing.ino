@@ -76,6 +76,7 @@ void setup() {
   push(&queue, &CreateInstruction(5,5,0, smallBrick));
   push(&queue, &CreateInstruction(5,9,0, smallBrick));
    push(&queue, &CreateInstruction(5,13,0, smallBrick));
+  push(&queue, &CreateInstruction(5,7,0, smallBrick));
   NextInstruction();
   
   
@@ -159,7 +160,7 @@ void loop() {
   /*if(queue.size < MAX_QUEUE_SIZE)
     push(&queue, &GetInstrction());*/
  //delay(10);
- //Serial.println(freeRam());
+ //Serial.println(myController.runningMotor->pos);
 }
 
 //DebugCode
@@ -253,7 +254,7 @@ bool InterruptMotorPositionCheck(){
         }
         else if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN2){
           if(myController.runningMotor == &myController.motorZ)
-            analogWrite(gearPin, gear2+10);
+            analogWrite(gearPin, gear2-50);
           else
             analogWrite(gearPin, gear2);
           
@@ -272,7 +273,7 @@ bool InterruptMotorPositionCheck(){
         }
         else if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN2){
           if(myController.runningMotor == &myController.motorZ)
-            analogWrite(gearPin, gear2+10);
+            analogWrite(gearPin, gear2-50);
           else
             analogWrite(gearPin, gear2);
           
