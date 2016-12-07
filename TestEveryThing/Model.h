@@ -137,7 +137,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 					switch (bp->pos[xAxis + 2][yAxis][zAxis])
 					{
 					case notPlaced:
-						if (xAxis >= 0 && xAxis + 3 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= 0 && zAxis + 1 < MaxZ /*&& !skipCase*/)
+						if (xAxis >= 0 && xAxis + 3 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= 0 && zAxis + 1 < MaxZ && !skipCase)
 						{
 							bp->pos[xAxis][yAxis][zAxis] = placed;
 							bp->pos[xAxis + 1][yAxis][zAxis] = placed;
@@ -157,11 +157,11 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 							Serial.println("lb90 skipcase");
 							skipCase = false;
 						}
-					case placed: case empty:
+					case placed: case empty: default:
 						switch (bp->pos[xAxis - 2][yAxis][zAxis])
 						{
 						case notPlaced:
-							if (xAxis < MaxX && xAxis - 3 >= ArrMin && yAxis < MaxY && yAxis >= ArrMin && zAxis < MaxZ && zAxis - 1 >= ArrMin /*&& !skipCase*/)
+							if (xAxis < MaxX && xAxis - 3 >= ArrMin && yAxis < MaxY && yAxis >= ArrMin && zAxis < MaxZ && zAxis - 1 >= ArrMin && !skipCase)
 							{
 								bp->pos[xAxis][yAxis][zAxis] = placed;
 								bp->pos[xAxis - 1][yAxis][zAxis] = placed;
@@ -182,11 +182,11 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 								skipCase = false;
 							}
 								
-						case placed: case empty:
+						case placed: case empty: default:
 							switch (bp->pos[xAxis][yAxis][zAxis + 2])
 							{
 							case notPlaced:
-								if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ /*&& !skipCase*/)
+								if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ && !skipCase)
 								{
 									bp->pos[xAxis][yAxis][zAxis] = placed;
 									bp->pos[xAxis][yAxis][zAxis + 1] = placed;
@@ -207,11 +207,11 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 									skipCase = false;
 								}
 										
-							case placed: case empty:
+							case placed: case empty: default:
 								switch (bp->pos[xAxis][yAxis][zAxis - 2])
 								{
 								case notPlaced:
-									if (xAxis >= 0 && xAxis + 1 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ /*&& !skipCase */)
+									if (xAxis >= 0 && xAxis + 1 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ && !skipCase )
 									{
 										bp->pos[xAxis][yAxis][zAxis] = placed;
 										bp->pos[xAxis][yAxis][zAxis - 1] = placed;
@@ -232,10 +232,9 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 										skipCase = false;
 									}
 												
-								case placed: case empty:
+								case placed: case empty: default:
 									if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 1 < MaxZ)
 									{
-										//Okay så vi har ingen ide om hvorfor det er nødvendigt med minus 1 her, but it is. Der er nok et eller andet sted der tæller progresspointeren op forkert, not sure. 
 										bp->pos[xAxis][yAxis][zAxis] = placed;
 										bp->pos[xAxis + 1][yAxis][zAxis] = placed;
 										bp->pos[xAxis][yAxis][zAxis+1] = placed;
@@ -244,23 +243,11 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 										return CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
 										//place small brick
 									}											
-								default:
-									break;
 
 								}
-										
-							default:
-								break;
 							}
-								
-						default:
-							break;
 						}
-					default:
-						break;
 					}
-				default:
-					break;
 				}
 				bpProgress->x = xAxis;
 			}
@@ -270,6 +257,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 		bpProgress->y = yAxis;
 		bpProgress->z = ArrMin;
 	}
+	Serial.println("No instruction created.");
 	return CreateInstruction(inst.positions[0], inst.positions[1], inst.level, inst.brick);//this should never happen
 }
 /*creates a new instance of the wall struct*/
