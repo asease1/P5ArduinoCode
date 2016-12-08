@@ -2,7 +2,7 @@
 #define MaxX 26 
 #define MaxY 3 
 #define MaxZ 15 
-#define OFFSET 45
+#define OFFSET 0
 
 enum wallSpecs {
   StartX,

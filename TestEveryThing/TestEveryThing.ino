@@ -35,7 +35,7 @@ struct Instruction* savedInstruction;
 struct Queue queue;
 volatile struct Controller myController;
 
-bool isResat = false;
+
 bool queueIsEmpty = true;
 bool isPosReached = false;
 bool newInstruction = false;

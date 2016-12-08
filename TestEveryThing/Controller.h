@@ -7,7 +7,7 @@
 #define ERROR_MARGIN3 300
 
 #define SMALL_BRICK_DEPO_X 0
-#define SMALL_BRICK_DEPO_Z 0.9
+#define SMALL_BRICK_DEPO_Z 0
 #define LARGE_BRICK_0_DEPO_X 0
 #define LARGE_BRICK_0_DEPO_Z 1
 #define LARGE_BRICK_90_DEPO_X 0
@@ -23,6 +23,9 @@ enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
 #include "Model.h"
 
 unsigned long int TimeSinceLastInterrupt = 0;
+
+
+bool isResat = false;
 
 //All data struct
 struct Motor{
@@ -202,21 +205,24 @@ bool IsCurrentMotorMoving(){
 void GrabBrick(Controller *myController){
   ChangeMotorState(forward, &myController->motorY);
   delay(2000);
-  analogWrite(gearPin, 255);
+  analogWrite(gearPin, 180);
+  isResat = false;
   ChangeMotor(myController, motorZ);
-  for(int i = 0; i < 1; i++){
-    ChangeMotorState(forward, &myController->runningMotor);
-    delay(4000);
-    ChangeMotorState(backward, &myController->runningMotor);
-    delay(8000);
-    ChangeMotorState(forward, &myController->runningMotor);
-    delay(4000);
+  for(int i = 0; i < 0; i++){
+    ChangeMotorState(forward, myController->runningMotor);
+    delay(200);
+    ChangeMotorState(backward, myController->runningMotor);
+    delay(400);
+    ChangeMotorState(forward, myController->runningMotor);
+    delay(200);
     
-    ChangeMotorState(hold, &myController->runningMotor);
-    delay(7000);  
+    ChangeMotorState(hold, myController->runningMotor);
+    delay(700);  
   }
+  
+  ChangeMotor(myController, motorZ);
+  isResat = true;
 
-  analogWrite(gearPin, 255);
   ChangeMotorState(backward, &myController->motorY);
   delay(2000);
   //while(!IsCurrentMotorMoving()){}
@@ -229,19 +235,22 @@ void PlaceBrick(Controller *myController){
   ChangeMotorState(forward, &myController->motorY);
   delay(2000);
   analogWrite(gearPin, 180);
-
+  isResat = false;
+  ChangeMotor(myController, motorX);
   for(int i = 0; i < 1; i++){
-    ChangeMotorState(forward, &myController->motorX);
+    ChangeMotorState(forward, myController->runningMotor);
     delay(400);
-    ChangeMotorState(backward, &myController->motorX);
+    ChangeMotorState(backward, myController->runningMotor);
     delay(800);
-    ChangeMotorState(forward, &myController->motorX);
+    ChangeMotorState(forward, myController->runningMotor);
     delay(400);
     
-    ChangeMotorState(hold, &myController->motorX);
+    ChangeMotorState(hold, myController->runningMotor);
     delay(700);  
   }
-
+  
+  ChangeMotor(myController, motorZ);
+  isResat = true;
   analogWrite(gearPin, 255);
   ChangeMotorState(backward, &myController->motorY);
   delay(2000);
