@@ -123,7 +123,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool skipCaseC
 		{
 			skipCase = true;
 		}
-		if (!(yAxis % 2))
+		if (yAxis % 2 == 0)
 		{
 			skipCaseChecker = false;
 		}
