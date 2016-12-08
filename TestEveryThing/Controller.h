@@ -207,7 +207,7 @@ void GrabBrick(Controller *myController){
   analogWrite(gearPin, 180);
   isResat = false;
   ChangeMotor(myController, motorZ);
-  for(int i = 0; i < 0; i++){
+  for(int i = 0; i < 1; i++){
     ChangeMotorState(forward, myController->runningMotor);
     delay(200);
     ChangeMotorState(backward, myController->runningMotor);

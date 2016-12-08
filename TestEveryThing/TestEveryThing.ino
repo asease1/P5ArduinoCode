@@ -118,8 +118,8 @@ void loop() {
 		  }*/
 		  //Serial.println("");
 		  //Serial.println("Before GetInstruction");
-		  Instruction* inst = &GetInstruction(bp, &BPProgress, &skipCaseChecker);
-		  push(&queue, inst);
+		  //Instruction* inst = &GetInstruction(bp, &BPProgress, &skipCaseChecker);
+		  //push(&queue, inst);
 		  //Serial.print(BPProgress.x);
 		  //Serial.print(", ");
 		  //Serial.print(BPProgress.z);
@@ -161,7 +161,7 @@ void loop() {
       //Serial.println(currentInstruction->type);
       switch(currentInstruction->count){
         case 0:   
-          if(currentInstruction->type == normal){
+          if(currentInstruction->type == normalInst){
             
             savedInstruction = currentInstruction;
             currentInstruction = PickUpBrick(smallBrick);
@@ -290,7 +290,7 @@ bool InterruptMotorPositionCheck(){
         }
         else if(myController.runningMotor->pos >= currentInstruction->positions[currentInstruction->count] - ERROR_MARGIN2){
           if(myController.runningMotor == &myController.motorZ)
-            analogWrite(gearPin, gear2-50);
+            analogWrite(gearPin, gear2-30);
           else
             analogWrite(gearPin, gear2);
           
@@ -309,7 +309,7 @@ bool InterruptMotorPositionCheck(){
         }
         else if(myController.runningMotor->pos <= currentInstruction->positions[currentInstruction->count] + ERROR_MARGIN2){
           if(myController.runningMotor == &myController.motorZ)
-            analogWrite(gearPin, gear2-50);
+            analogWrite(gearPin, gear2-30);
           else
             analogWrite(gearPin, gear2);
           

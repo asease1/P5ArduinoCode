@@ -26,7 +26,7 @@ typedef struct Position{
   int16_t z; 
 }; 
  
-Position CreatePosition(int8_t x, int8_t y, int8_t z){ 
+Position CreatePosition(int16_t x, int16_t y, int16_t z){ 
   Position newPosition; 
   newPosition.x; 
   newPosition.y; 
