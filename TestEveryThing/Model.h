@@ -106,7 +106,7 @@ enum notAllowedEnum
 	allowed, right, left, down, up
 };
 
-Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
+Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool skipCaseChecker) {
 	Instruction inst;
 	inst.brick = none;
 	inst.count = 0;
@@ -119,9 +119,13 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 	bool skipCase = false;
 	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
-		if (yAxis % 2)
+		if (yAxis % 2 && !skipCaseChecker)
 		{
 			skipCase = true;
+		}
+		if (!(yAxis % 2))
+		{
+			skipCaseChecker = false;
 		}
 		
 		for (int16_t zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
@@ -156,6 +160,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 						{
 							Serial.println("lb90 skipcase");
 							skipCase = false;
+							skipCaseChecker = true;
 						}
 					case placed: case empty: default:
 						switch (bp->pos[xAxis - 2][yAxis][zAxis])
@@ -180,6 +185,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 							{
 								Serial.println("-lb90 skipcase");
 								skipCase = false;
+								skipCaseChecker = true;
 							}
 								
 						case placed: case empty: default:
@@ -205,6 +211,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 								{
 									Serial.println("lb0 skipcase");
 									skipCase = false;
+									skipCaseChecker = true;
 								}
 										
 							case placed: case empty: default:
@@ -230,6 +237,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 									{
 										Serial.println("-lb0 skipcase");
 										skipCase = false;
+										skipCaseChecker = true;
 									}
 												
 								case placed: case empty: default:
@@ -242,7 +250,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress) {
 										Serial.println("SB90");
 										return CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
 										//place small brick
-									}											
+									}								
 
 								}
 							}

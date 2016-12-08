@@ -41,6 +41,7 @@ bool isResat = false;
 bool queueIsEmpty = true;
 bool isPosReached = false;
 bool newInstruction = false;
+bool skipCaseChecker = false;
 
 void setup() {
  
@@ -115,7 +116,7 @@ void loop() {
 		  }
 		  Serial.println("");
 		  Serial.println("Before GetInstruction");
-		  Instruction* inst = &GetInstruction(bp, &BPProgress);
+		  Instruction* inst = &GetInstruction(bp, &BPProgress, skipCaseChecker);
 		  push(&queue, inst);
 		  Serial.print(BPProgress.x);
 		  Serial.print(", ");
