@@ -21,9 +21,9 @@ enum brickState
 
 /*Contains a single position in 3d space*/ 
 typedef struct Position{ 
-  int8_t x; 
-  int8_t y; 
-  int8_t z; 
+  int16_t x; 
+  int16_t y; 
+  int16_t z; 
 }; 
  
 Position CreatePosition(int8_t x, int8_t y, int8_t z){ 
@@ -106,7 +106,7 @@ enum notAllowedEnum
 	allowed, right, left, down, up
 };
 
-Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool skipCaseChecker) {
+Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCaseChecker) {
 	Instruction inst;
 	inst.brick = none;
 	inst.count = 0;
@@ -117,24 +117,30 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool skipCaseC
 
 	Serial.println("GetInstruction");
 	bool skipCase = false;
+	Serial.print(bpProgress->y);
+	Serial.println("before loop");
 	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
 	{
 		if (yAxis % 2 && !skipCaseChecker)
 		{
 			skipCase = true;
+			Serial.println("skipCase==tru");
 		}
+		Serial.print(yAxis);
+		Serial.println(" yaxis");
 		if (yAxis % 2 == 0)
 		{
-			skipCaseChecker = false;
+			*skipCaseChecker = false;
+			Serial.println("checker reset");
 		}
 		
 		for (int16_t zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
 		{
 			for (int16_t xAxis = bpProgress->x; xAxis < MaxX; xAxis++)
 			{
-				//bpProgress->x = xAxis;
-				//bpProgress->y = yAxis;
-				//bpProgress->z = zAxis;
+				bpProgress->x = xAxis;
+				bpProgress->y = yAxis;
+				bpProgress->z = zAxis;
 				switch (bp->pos[xAxis][yAxis][zAxis])
 				{
 				case notPlaced:
@@ -160,7 +166,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool skipCaseC
 						{
 							Serial.println("lb90 skipcase");
 							skipCase = false;
-							skipCaseChecker = true;
+							*skipCaseChecker = true;
 						}
 					case placed: case empty: default:
 						switch (bp->pos[xAxis - 2][yAxis][zAxis])
@@ -185,7 +191,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool skipCaseC
 							{
 								Serial.println("-lb90 skipcase");
 								skipCase = false;
-								skipCaseChecker = true;
+								*skipCaseChecker = true;
 							}
 								
 						case placed: case empty: default:
@@ -211,7 +217,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool skipCaseC
 								{
 									Serial.println("lb0 skipcase");
 									skipCase = false;
-									skipCaseChecker = true;
+									*skipCaseChecker = true;
 								}
 										
 							case placed: case empty: default:
@@ -237,7 +243,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool skipCaseC
 									{
 										Serial.println("-lb0 skipcase");
 										skipCase = false;
-										skipCaseChecker = true;
+										*skipCaseChecker = true;
 									}
 												
 								case placed: case empty: default:

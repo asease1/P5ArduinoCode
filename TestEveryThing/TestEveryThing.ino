@@ -116,7 +116,7 @@ void loop() {
 		  }
 		  Serial.println("");
 		  Serial.println("Before GetInstruction");
-		  Instruction* inst = &GetInstruction(bp, &BPProgress, skipCaseChecker);
+		  Instruction* inst = &GetInstruction(bp, &BPProgress, &skipCaseChecker);
 		  push(&queue, inst);
 		  Serial.print(BPProgress.x);
 		  Serial.print(", ");
