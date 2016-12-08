@@ -84,10 +84,13 @@ makeBlueprint(Blueprint* BP, Wall* W, int D){
 
 /*Takes a pointer to queue containing Wall structs, converts these into a Blueprint struct and returns a pointer to said Blueprint struct*/
 Blueprint* convertToBlueprint(Queue* WallQueuePointer){
-  Wall* tempWall;
+	Wall* tempWall;
+
   struct Blueprint* tempBlueprint = createBlueprint();
+
   while(WallQueuePointer->size != 0){
-    tempWall = pop(WallQueuePointer);
+
+    tempWall = (Wall*)pop(WallQueuePointer);
     if(tempWall->value[Height] > 0 && tempWall->value[Height] <= MaxY //Checks wall height for 0 < h <= max height
       && tempWall->value[StartX] >= 0 && tempWall->value[StartX] < MaxX // Check if value is within model bounds
       && tempWall->value[StartZ] >= 0 && tempWall->value[StartZ] < MaxZ // Same

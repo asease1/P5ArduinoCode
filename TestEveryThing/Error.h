@@ -10,5 +10,7 @@ void ErrorCode(int error_Code) {
 	Wire.write(0x12); // choice the side of the chip
 					  //side A 0x13 and B 0x13 
 	Wire.write(error_Code); //turn on the pin with a number from 0-255
+	Serial.print("ERROR ENCOUNTERED: ");
+	Serial.println(error_Code);
 	Wire.endTransmission();
 }

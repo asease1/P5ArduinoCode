@@ -24,7 +24,7 @@
 #define Hold_Delay 500
 #define DELAY_FOR_MOTOR_MOVEMENT 600
 
-#define MAX_QUEUE_SIZE 32
+#define MAX_QUEUE_SIZE 25
 
 #include "Wire.h"
 #include "Controller.h"
@@ -33,12 +33,15 @@
 struct Instruction* currentInstruction;
 struct Instruction* savedInstruction;
 struct Queue queue;
-volatile struct Controller myController;
+Blueprint* bp;
+Position BPProgress;
+struct Controller myController;
 
 
 bool queueIsEmpty = true;
 bool isPosReached = false;
 bool newInstruction = false;
+bool skipCaseChecker = false;
 
 void setup() {
  
@@ -46,7 +49,6 @@ void setup() {
   pinMode(chanelPin3, OUTPUT);
   pinMode(chanelPin2, OUTPUT);
   pinMode(chanelPin1, OUTPUT);
-  
   pinMode(xPin1, OUTPUT);
   pinMode(xPin2, OUTPUT);
   pinMode(yPin1, OUTPUT);
@@ -58,15 +60,17 @@ void setup() {
 
   pinMode(interupt1, INPUT_PULLUP);
   pinMode(interupt2, INPUT_PULLUP);
+
   attachInterrupt(digitalPinToInterrupt(interupt1), OnInterupts1, CHANGE);
   attachInterrupt(digitalPinToInterrupt(interupt2), OnInterupts2, CHANGE);
 
 
   Serial.begin(9600);
-
   queue = CreateQueue(sizeof(Instruction));
-  
-  //queue = CreateQueue();
+
+  BPProgress.x = 0;
+  BPProgress.y = 0;
+  BPProgress.z = 0;
 
   wallQueue = CreateQueue(sizeof(Wall));
   
@@ -92,12 +96,49 @@ void loop() {
     beginInputHandler();
   }
   if(progress == 1){
-    Blueprint* MyBlueprint = convertToBlueprint(&wallQueue);
-    Serial.print("Coord(1,1,1): ");
-    Serial.println(MyBlueprint->pos[1][1][1]);
+    bp = convertToBlueprint(&wallQueue);
+    //Serial.print("Coord(1,1,1): ");
+    //Serial.println(bp->pos[1][1][1]);
     progress = 2;
   }
-  
+  if (progress == 2)
+  {
+	  if (queue.size < MAX_QUEUE_SIZE) {
+		  /*for (int i = 0; i < MaxY; i++)
+		  {
+			  Serial.println("");
+			  for (int j = 0; j < MaxZ; j++)
+			  {
+				  Serial.println("");
+				  for (int k = 0; k < MaxX; k++)
+				  {
+					  Serial.print(bp->pos[k][i][j]);
+				  }
+			  }
+		  }*/
+		  //Serial.println("");
+		  //Serial.println("Before GetInstruction");
+		  Instruction* inst = &GetInstruction(bp, &BPProgress, &skipCaseChecker);
+		  push(&queue, inst);
+		  //Serial.print(BPProgress.x);
+		  //Serial.print(", ");
+		  //Serial.print(BPProgress.z);
+		  //Serial.print(", ");
+		  //Serial.print(BPProgress.y);
+		  //Serial.println(" progresspoint");
+		  //Serial.print(inst->brick);
+		  //Serial.println(" brick");
+		  //Serial.print(inst->positions[0]);
+		  //Serial.println(" x");
+		  //Serial.print(inst->positions[1]);
+		  //Serial.println(" z");
+		  //Serial.print(inst->level);
+		  //Serial.println(" y");
+		  //Serial.print("RAMFREE: ");
+		  //Serial.println(freeRam());
+		  //Serial.println("");
+	  }
+  }
   //if(queue.size < MAX_QUEUE_SIZE)
     //push(&queue, &GetInstrction());
   //put your main code here, to run repeatedly:
@@ -157,18 +198,13 @@ void loop() {
     //}
   }
     
-  /*if(queue.size < MAX_QUEUE_SIZE)
-    push(&queue, &GetInstrction());*/
+ //Serial.println(myController.runningMotor->pos);
  //delay(10);
  //Serial.println(myController.runningMotor->pos);
 }
 
 //DebugCode
-int freeRam () {
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
-}
+
 
 
 void OnInterupts1(){
@@ -335,8 +371,7 @@ void NextInstruction(){
     queueIsEmpty = true;
   else
     queueIsEmpty = false;
-  
-  currentInstruction = pop(&queue);
+  currentInstruction = (Instruction*)pop(&queue);
 }
 
 void ResetSystem(){
