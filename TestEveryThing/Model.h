@@ -92,8 +92,8 @@ Blueprint* createBlueprint(){
   temp->pickup.y = 0; 
   temp->pickup.z = 0;
 
-  Serial.print("Coord(1,1,1): ");
-  Serial.println(temp->pos[1][1][1]);
+  //Serial.print("Coord(1,1,1): ");
+  //Serial.println(temp->pos[1][1][1]);
   
   return temp; 
 }
@@ -115,23 +115,18 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCas
 	inst.positions[1] = 0;
 	inst.type = normalInst;
 
-	Serial.println("GetInstruction");
+	//Serial.print("GetInstruction:");
+	//Serial.println(freeRam());
 	bool skipCase = false;
-	Serial.print(bpProgress->y);
-	Serial.println("before loop");
-	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++)
+	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++) // lol det skal være en int_8t her, ellers går den amok
 	{
-		if (yAxis % 2 && !skipCaseChecker)
+		if (yAxis % 2 == 1 && !(*skipCaseChecker))
 		{
 			skipCase = true;
-			Serial.println("skipCase==tru");
 		}
-		Serial.print(yAxis);
-		Serial.println(" yaxis");
 		if (yAxis % 2 == 0)
 		{
 			*skipCaseChecker = false;
-			Serial.println("checker reset");
 		}
 		
 		for (int16_t zAxis = bpProgress->z; zAxis < MaxZ; zAxis++)
@@ -157,14 +152,14 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCas
 							bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
 							bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
 							bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
-							Serial.println("LB90");
+							//Serial.println("LB90");
 							return CreateInstruction(xAxis + 1, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};																								   
 							//Place big brick
 							break;
 						}
 						else if (xAxis >= 0 && xAxis + 3 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= 0 && zAxis + 1 < MaxZ)
 						{
-							Serial.println("lb90 skipcase");
+							//Serial.println("lb90 skipcase");
 							skipCase = false;
 							*skipCaseChecker = true;
 						}
@@ -182,14 +177,14 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCas
 								bp->pos[xAxis - 1][yAxis][zAxis + 1] = placed;
 								bp->pos[xAxis - 2][yAxis][zAxis + 1] = placed;
 								bp->pos[xAxis - 3][yAxis][zAxis + 1] = placed;
-								Serial.println("-LB90");
+								//Serial.println("-LB90");
 								return  CreateInstruction(xAxis - 1, zAxis, yAxis, largeBrick90);
 								//Place big brick
 								break;
 							}
 							else if (xAxis < MaxX && xAxis - 3 >= ArrMin && yAxis < MaxY && yAxis >= ArrMin && zAxis < MaxZ && zAxis - 1 >= ArrMin)
 							{
-								Serial.println("-lb90 skipcase");
+								//Serial.println("-lb90 skipcase");
 								skipCase = false;
 								*skipCaseChecker = true;
 							}
@@ -208,14 +203,14 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCas
 									bp->pos[xAxis + 1][yAxis][zAxis + 1] = placed;
 									bp->pos[xAxis + 1][yAxis][zAxis + 2] = placed;
 									bp->pos[xAxis + 1][yAxis][zAxis + 3] = placed;
-									Serial.println("LB0");
+									//Serial.println("LB0");
 									return  CreateInstruction(xAxis, zAxis + 1, yAxis, largeBrick0);
 									//Place big brick
 									break;
 								}
 								else if (xAxis >= ArrMin && xAxis + 1 < MaxX && yAxis >= ArrMin && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ)
 								{
-									Serial.println("lb0 skipcase");
+									//Serial.println("lb0 skipcase");
 									skipCase = false;
 									*skipCaseChecker = true;
 								}
@@ -234,14 +229,14 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCas
 										bp->pos[xAxis + 1][yAxis][zAxis - 1] = placed;
 										bp->pos[xAxis + 1][yAxis][zAxis - 2] = placed;
 										bp->pos[xAxis + 1][yAxis][zAxis - 3] = placed;
-										Serial.println("-LB0");
+										//Serial.println("-LB0");
 										return CreateInstruction(xAxis, zAxis - 1, yAxis, largeBrick0);
 										//Place big brick
 										break;
 									}
 									else if (xAxis >= 0 && xAxis + 1 < MaxX && yAxis >= 0 && yAxis < MaxY && zAxis >= ArrMin && zAxis + 3 < MaxZ)
 									{
-										Serial.println("-lb0 skipcase");
+										//Serial.println("-lb0 skipcase");
 										skipCase = false;
 										*skipCaseChecker = true;
 									}
@@ -253,7 +248,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCas
 										bp->pos[xAxis + 1][yAxis][zAxis] = placed;
 										bp->pos[xAxis][yAxis][zAxis+1] = placed;
 										bp->pos[xAxis + 1][yAxis][zAxis+1] = placed;
-										Serial.println("SB90");
+										//Serial.println("SB90");
 										return CreateInstruction(xAxis, zAxis, yAxis, smallBrick);
 										//place small brick
 									}								

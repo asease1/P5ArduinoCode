@@ -95,14 +95,14 @@ void loop() {
   }
   if(progress == 1){
     bp = convertToBlueprint(&wallQueue);
-    Serial.print("Coord(1,1,1): ");
-    Serial.println(bp->pos[1][1][1]);
+    //Serial.print("Coord(1,1,1): ");
+    //Serial.println(bp->pos[1][1][1]);
     progress = 2;
   }
   if (progress == 2)
   {
 	  if (queue.size < MAX_QUEUE_SIZE) {
-		  for (int i = 0; i < MaxY; i++)
+		  /*for (int i = 0; i < MaxY; i++)
 		  {
 			  Serial.println("");
 			  for (int j = 0; j < MaxZ; j++)
@@ -113,28 +113,28 @@ void loop() {
 					  Serial.print(bp->pos[k][i][j]);
 				  }
 			  }
-		  }
-		  Serial.println("");
-		  Serial.println("Before GetInstruction");
+		  }*/
+		  //Serial.println("");
+		  //Serial.println("Before GetInstruction");
 		  Instruction* inst = &GetInstruction(bp, &BPProgress, &skipCaseChecker);
 		  push(&queue, inst);
-		  Serial.print(BPProgress.x);
-		  Serial.print(", ");
-		  Serial.print(BPProgress.z);
-		  Serial.print(", ");
-		  Serial.print(BPProgress.y);
-		  Serial.println(" progresspoint");
-		  Serial.print(inst->brick);
-		  Serial.println(" brick");
-		  Serial.print(inst->positions[0]);
-		  Serial.println(" x");
-		  Serial.print(inst->positions[1]);
-		  Serial.println(" z");
-		  Serial.print(inst->level);
-		  Serial.println(" y");
-		  Serial.print("RAMFREE: ");
-		  Serial.println(freeRam());
-		  Serial.println("");
+		  //Serial.print(BPProgress.x);
+		  //Serial.print(", ");
+		  //Serial.print(BPProgress.z);
+		  //Serial.print(", ");
+		  //Serial.print(BPProgress.y);
+		  //Serial.println(" progresspoint");
+		  //Serial.print(inst->brick);
+		  //Serial.println(" brick");
+		  //Serial.print(inst->positions[0]);
+		  //Serial.println(" x");
+		  //Serial.print(inst->positions[1]);
+		  //Serial.println(" z");
+		  //Serial.print(inst->level);
+		  //Serial.println(" y");
+		  //Serial.print("RAMFREE: ");
+		  //Serial.println(freeRam());
+		  //Serial.println("");
 	  }
   }
   //if(queue.size < MAX_QUEUE_SIZE)
