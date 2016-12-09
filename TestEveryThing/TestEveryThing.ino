@@ -76,11 +76,14 @@ void setup() {
   
   myController = CreateController(CreateMotor(3000, xPin1, xPin2),CreateMotor(3050, yPin1, yPin2),CreateMotor(3050, zPin1, zPin2));
 
-  
+  /*
   push(&queue, &CreateInstruction(5,5,0, smallBrick));
   push(&queue, &CreateInstruction(5,9,0, smallBrick));
-   push(&queue, &CreateInstruction(5,13,0, smallBrick));
+  push(&queue, &CreateInstruction(5,13,0, smallBrick));
   push(&queue, &CreateInstruction(5,7,0, smallBrick));
+  push(&queue, &CreateInstruction(5,11,0, smallBrick));
+  */
+  
   NextInstruction();
   
   
@@ -95,68 +98,34 @@ void loop() {
   if(progress == 0){ // run input handler
     beginInputHandler();
   }
-  if(progress == 1){
+  else if(progress == 1){
     bp = convertToBlueprint(&wallQueue);
     progress = 2;
   }
-  if (progress == 2)
+  else if (progress == 2)
   {
-	  if (queue.size < MAX_QUEUE_SIZE) {
-		  /*for (int i = 0; i < MaxY; i++)
-		  {
-			  Serial.println("");
-			  for (int j = 0; j < MaxZ; j++)
-			  {
-				  Serial.println("");
-				  for (int k = 0; k < MaxX; k++)
-				  {
-					  Serial.print(bp->pos[k][i][j]);
-				  }
-			  }
-		  }*/
-		  //Serial.println("");
-		  //Serial.println("Before GetInstruction");
-		  //Instruction* inst = &GetInstruction(bp, &BPProgress, &skipCaseChecker);
-		  //push(&queue, inst);
-		  //Serial.print(BPProgress.x);
-		  //Serial.print(", ");
-		  //Serial.print(BPProgress.z);
-		  //Serial.print(", ");
-		  //Serial.print(BPProgress.y);
-		  //Serial.println(" progresspoint");
-		  //Serial.print(inst->brick);
-		  //Serial.println(" brick");
-		  //Serial.print(inst->positions[0]);
-		  //Serial.println(" x");
-		  //Serial.print(inst->positions[1]);
-		  //Serial.println(" z");
-		  //Serial.print(inst->level);
-		  //Serial.println(" y");
-		  //Serial.print("RAMFREE: ");
-		  //Serial.println(freeRam());
-		  //Serial.println("");
+    Instruction tempInstruction;
+	  
+	  bool notDone = true;
+	  
+	  while(notDone){
+      tempInstruction = GetInstruction(bp, &BPProgress, &skipCaseChecker);
+
+      if(tempInstruction.brick != none){
+        push(&queue, &tempInstruction);
+      }
+      else{
+        notDone = false;
+      }
 	  }
+
+   NextInstruction();
+   progress = 3;
   }
-  //if(queue.size < MAX_QUEUE_SIZE)
-    //push(&queue, &GetInstrction());
-  //put your main code here, to run repeatedly:
-  //Serial.println(queue.size);
-  //Serial.println(isPosReached);
-  
-  if(isPosReached && !IsCurrentMotorMoving()){
+  else if(progress == 3){
+    if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
-    //Serial.println(CheckPositionMargen()); 
-    //Serial.println(myController.runningMotor->pos);
-    //Serial.println(currentInstruction->positions[currentInstruction->count]); 
-   /*if(!CheckPositionMargen()){
-      Serial.println("test");
-      //Start motor to get closer to target if we have moved to far;
-      MoveTo(currentInstruction->positions[currentInstruction->count], &myController);
-    }
-    else{
-     */    
-      //Serial.println(currentInstruction->count);
-      //Serial.println(currentInstruction->type);
+    
       switch(currentInstruction->count){
         case 0:   
           if(currentInstruction->type == normalInst){
@@ -195,6 +164,14 @@ void loop() {
       }
     //}
   }
+  }
+  //if(queue.size < MAX_QUEUE_SIZE)
+    //push(&queue, &GetInstrction());
+  //put your main code here, to run repeatedly:
+  //Serial.println(queue.size);
+  //Serial.println(isPosReached);
+  
+  
     
  //Serial.println(myController.runningMotor->pos);
  //delay(10);
