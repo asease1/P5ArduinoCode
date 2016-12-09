@@ -2,7 +2,8 @@
 #define MaxX 15 
 #define MaxY 3 
 #define MaxZ 15 
-#define OFFSET 0
+#define OFFSETX 0
+#define OFFSETZ 65
 #define InstErr -1
 #define ArrMin 0
 
@@ -47,17 +48,13 @@ struct Instruction{
 
 
 int ConvertToGearDegrees(float BrickCord){
-  return ((int)((45.0/0.32)*0.8*BrickCord) + OFFSET);
+  return ((int)((45.0/0.32)*0.8*BrickCord));
 }
 
-Instruction CreateInstruction(int x, int z,int y, BrickType brick){
+Instruction CreateInstruction(float x, float z,int y, BrickType brick){
   Instruction newInstruction;
-  Serial.print(x);
-  Serial.print(", ");
-  Serial.print(z);
-  Serial.println(" BCOR");
-  newInstruction.positions[0] = ConvertToGearDegrees(x);
-  newInstruction.positions[1] = ConvertToGearDegrees(z);
+  newInstruction.positions[0] = ConvertToGearDegrees(x)+OFFSETX;
+  newInstruction.positions[1] = ConvertToGearDegrees(z)+OFFSETZ;
   newInstruction.level = y;
   newInstruction.brick = brick;
   newInstruction.count = 0;

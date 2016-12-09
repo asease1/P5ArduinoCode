@@ -2,9 +2,9 @@
 //Have function that contains the controller or motor in them
 //Have struct for position/3DVector and a brickData struckt
 //Margins
-#define ERROR_MARGIN1 6
-#define ERROR_MARGIN2 120
-#define ERROR_MARGIN3 600
+#define ERROR_MARGIN1 2
+#define ERROR_MARGIN2 40
+#define ERROR_MARGIN3 300
 
 #define SMALL_BRICK_DEPO_X 0
 #define SMALL_BRICK_DEPO_Z 0
@@ -84,7 +84,7 @@ Motor CreateMotor(int maxPos, float pin1, float pin2){
 
 //Take a motor and set the pins to the diraction you want it to move and chance the state
 //Have to watch out for that you can run a motor that the channel is not on if this is don't you cannot update its position.
-void ChangeMotorState(MotorStates state, volatile Motor* motor){
+void ChangeMotorState(MotorStates state, Motor* motor){
   switch(state){
     case forward:
       motor->state = state;
@@ -119,7 +119,7 @@ void ChangeMotorState(MotorStates state, volatile Motor* motor){
 }
 
 //Update the controller targetpos to the new position and start the runningMotor in the dircation of target
-bool MoveTo(int pos, volatile Controller *control){
+bool MoveTo(int pos, Controller *control){
   if(pos > control->runningMotor->maxPos)
     return false;
 
@@ -142,7 +142,7 @@ bool MoveTo(int pos, volatile Controller *control){
 
 
 //Swi'tch the runningMotor on the Controller to a new Motor
-void ChangeMotor(volatile Controller *myControl, Chanels newMotor){
+void ChangeMotor(Controller *myControl, Chanels newMotor){
   switch(newMotor){
     case motorX:
       digitalWrite(chanelPin1, HIGH);
@@ -186,6 +186,7 @@ Instruction* PickUpBrick(BrickType brick){
   }
 
   tempInstruction.type = pickUp; 
+
   memcpy(pickUpInstruction, &tempInstruction, sizeof(Instruction));
   return pickUpInstruction;
 }
@@ -205,10 +206,9 @@ void GrabBrick(Controller *myController){
   ChangeMotorState(forward, &myController->motorY);
   delay(2000);
   analogWrite(gearPin, 180);
-  isResat = false;
-  Serial.println(isResat);
+/*  isResat = false;
   ChangeMotor(myController, motorZ);
-  for(int i = 0; i < 1; i++){
+  for(int i = 0; i < 0; i++){
     ChangeMotorState(forward, myController->runningMotor);
     delay(200);
     ChangeMotorState(backward, myController->runningMotor);
@@ -221,20 +221,23 @@ void GrabBrick(Controller *myController){
   }
   
   ChangeMotor(myController, motorX);
-  isResat = true;
+  isResat = true;*/
 
   ChangeMotorState(backward, &myController->motorY);
   delay(2000);
+  //while(!IsCurrentMotorMoving()){}
   ChangeMotorState(hold, &myController->motorY);
+  ChangeMotor(myController, motorX);
 }
 
-void PlaceBrick(volatile Controller *myController){
+void PlaceBrick(Controller *myController){
 
   ChangeMotorState(forward, &myController->motorY);
   delay(2000);
   analogWrite(gearPin, 180);
+  delay(10);
   isResat = false;
-  Serial.println(isResat);
+  delay(1000);
   ChangeMotor(myController, motorX);
   for(int i = 0; i < 1; i++){
     ChangeMotorState(forward, &myController->motorX);
@@ -253,6 +256,7 @@ void PlaceBrick(volatile Controller *myController){
   analogWrite(gearPin, 255);
   ChangeMotorState(backward, &myController->motorY);
   delay(2000);
+  //while(!IsCurrentMotorMoving()){}
   ChangeMotorState(hold, &myController->motorY);
 }
 
