@@ -2,7 +2,8 @@
 #define MaxX 26 
 #define MaxY 3 
 #define MaxZ 15 
-#define OFFSET 0
+#define OFFSETX 0
+#define OFFSETZ 65
 
 enum wallSpecs {
   StartX,
@@ -39,13 +40,13 @@ struct Instruction{
 
 
 int ConvertToGearDegrees(float BrickCord){
-  return ((int)((45.0/0.32)*0.8*BrickCord) + OFFSET);
+  return ((int)((45.0/0.32)*0.8*BrickCord));
 }
 
-Instruction CreateInstruction(int x, int z,int y, BrickType brick){
+Instruction CreateInstruction(float x, float z,int y, BrickType brick){
   Instruction newInstruction;
-  newInstruction.positions[0] = ConvertToGearDegrees(x);
-  newInstruction.positions[1] = ConvertToGearDegrees(z);
+  newInstruction.positions[0] = ConvertToGearDegrees(x)+OFFSETX;
+  newInstruction.positions[1] = ConvertToGearDegrees(z)+OFFSETZ;
   newInstruction.brick = brick;
   newInstruction.count = 0;
   newInstruction.type = normal;

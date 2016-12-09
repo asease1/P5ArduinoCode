@@ -2,9 +2,9 @@
 //Have function that contains the controller or motor in them
 //Have struct for position/3DVector and a brickData struckt
 //Margins
-#define ERROR_MARGIN1 6
-#define ERROR_MARGIN2 120
-#define ERROR_MARGIN3 600
+#define ERROR_MARGIN1 2
+#define ERROR_MARGIN2 40
+#define ERROR_MARGIN3 300
 
 #define SMALL_BRICK_DEPO_X 0
 #define SMALL_BRICK_DEPO_Z 0
@@ -206,8 +206,7 @@ void GrabBrick(Controller *myController){
   ChangeMotorState(forward, &myController->motorY);
   delay(2000);
   analogWrite(gearPin, 180);
-  isResat = false;
-  Serial.println(isResat);
+/*  isResat = false;
   ChangeMotor(myController, motorZ);
   for(int i = 0; i < 0; i++){
     ChangeMotorState(forward, myController->runningMotor);
@@ -222,11 +221,13 @@ void GrabBrick(Controller *myController){
   }
   
   ChangeMotor(myController, motorX);
-  isResat = true;
+  isResat = true;*/
 
   ChangeMotorState(backward, &myController->motorY);
   delay(2000);
+  //while(!IsCurrentMotorMoving()){}
   ChangeMotorState(hold, &myController->motorY);
+  ChangeMotor(myController, motorX);
 }
 
 void PlaceBrick(Controller *myController){
@@ -234,8 +235,9 @@ void PlaceBrick(Controller *myController){
   ChangeMotorState(forward, &myController->motorY);
   delay(2000);
   analogWrite(gearPin, 180);
+  delay(10);
   isResat = false;
-  Serial.println(isResat);
+  delay(1000);
   ChangeMotor(myController, motorX);
   for(int i = 0; i < 1; i++){
     ChangeMotorState(forward, &myController->motorX);
@@ -254,6 +256,7 @@ void PlaceBrick(Controller *myController){
   analogWrite(gearPin, 255);
   ChangeMotorState(backward, &myController->motorY);
   delay(2000);
+  //while(!IsCurrentMotorMoving()){}
   ChangeMotorState(hold, &myController->motorY);
 }
 

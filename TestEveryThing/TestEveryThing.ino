@@ -94,7 +94,7 @@ void loop() {
   if(progress == 1){
     Blueprint* MyBlueprint = convertToBlueprint(&wallQueue);
     Serial.print("Coord(1,1,1): ");
-    Serial.println(MyBlueprint->pos[1][1][1]);
+    //Serial.println(MyBlueprint->pos[1][1][1]);
     progress = 2;
   }
   
@@ -106,9 +106,9 @@ void loop() {
   
   if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
-    Serial.println(CheckPositionMargen()); 
-    Serial.println(myController.runningMotor->pos);
-    Serial.println(currentInstruction->positions[currentInstruction->count]); 
+    //Serial.println(CheckPositionMargen()); 
+    //Serial.println(myController.runningMotor->pos);
+    //Serial.println(currentInstruction->positions[currentInstruction->count]); 
    /*if(!CheckPositionMargen()){
       Serial.println("test");
       //Start motor to get closer to target if we have moved to far;
