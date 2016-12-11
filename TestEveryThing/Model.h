@@ -101,10 +101,6 @@ Blueprint* createBlueprint(){
 struct Wall{
   byte value[5];
 };
-enum notAllowedEnum
-{
-	allowed, right, left, down, up
-};
 
 Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCaseChecker) {
 	Instruction inst;
