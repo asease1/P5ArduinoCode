@@ -84,13 +84,13 @@ void setup() {
   push(&queue, &CreateInstruction(5,11,0, smallBrick));
   */
   
-  NextInstruction();
+  //NextInstruction();
   
   
   ResetSystem();
   //analogWrite(gearPin, 120);
   //StartMotor();
-  isPosReached = true;
+  //isPosReached = true;
 }
 
 void loop() {
@@ -109,7 +109,39 @@ void loop() {
 	  bool notDone = true;
 	  
 	  while(notDone){
+		  for (int i = 0; i < MaxY; i++)
+		  {
+		  Serial.println("");
+		  for (int j = 0; j < MaxZ; j++)
+		  {
+		  Serial.println("");
+		  for (int k = 0; k < MaxX; k++)
+		  {
+		  Serial.print(bp->pos[k][i][j]);
+		  }
+		  }
+		  }
+		  Serial.println("");
+		  Serial.println("Before GetInstruction");
+		  
       tempInstruction = GetInstruction(bp, &BPProgress, &skipCaseChecker);
+	  Serial.print(BPProgress.x);
+	  Serial.print(", ");
+	  Serial.print(BPProgress.z);
+	  Serial.print(", ");
+	  Serial.print(BPProgress.y);
+	  Serial.println(" progresspoint");
+	  Serial.print(tempInstruction.brick);
+	  Serial.println(" brick");
+	  Serial.print(tempInstruction.positions[0]);
+	  Serial.println(" x");
+	  Serial.print(tempInstruction.positions[1]);
+	  Serial.println(" z");
+	  Serial.print(tempInstruction.level);
+	  Serial.println(" y");
+	  Serial.print("RAMFREE: ");
+	  Serial.println(freeRam());
+	  Serial.println("");
 
       if(tempInstruction.brick != none){
         push(&queue, &tempInstruction);
@@ -120,6 +152,7 @@ void loop() {
 	  }
 
    NextInstruction();
+   isPosReached = true;
    progress = 3;
   }
   else if(progress == 3){
@@ -131,7 +164,7 @@ void loop() {
           if(currentInstruction->type == normalInst){
             
             savedInstruction = currentInstruction;
-            currentInstruction = PickUpBrick(smallBrick);
+            currentInstruction = PickUpBrick(currentInstruction->brick);
             newInstruction = true;
             //Serial.println(111111);  
             break;

@@ -7,11 +7,11 @@
 #define ERROR_MARGIN3 600
 
 #define SMALL_BRICK_DEPO_X 0
-#define SMALL_BRICK_DEPO_Z 0
+#define SMALL_BRICK_DEPO_Z 7
 #define LARGE_BRICK_0_DEPO_X 0
-#define LARGE_BRICK_0_DEPO_Z 1
+#define LARGE_BRICK_0_DEPO_Z 0
 #define LARGE_BRICK_90_DEPO_X 0
-#define LARGE_BRICK_90_DEPO_Z 1
+#define LARGE_BRICK_90_DEPO_Z 14
 
 //Gear Pin
 //Pin to the PVM pins(3,5,6,9,10,11)
@@ -172,7 +172,8 @@ void ChangeMotor(volatile Controller *myControl, Chanels newMotor){
 Instruction* PickUpBrick(BrickType brick){
   Instruction* pickUpInstruction = malloc(sizeof(Instruction));
   Instruction tempInstruction;
-
+  Serial.print("okey so brick is: ");
+  Serial.println(brick);
   switch(brick){
     case smallBrick:
       tempInstruction = CreateInstruction(SMALL_BRICK_DEPO_X,SMALL_BRICK_DEPO_Z,0, none);
@@ -208,7 +209,7 @@ void GrabBrick(Controller *myController){
   isResat = false;
   Serial.println(isResat);
   ChangeMotor(myController, motorZ);
-  for(int i = 0; i < 1; i++){
+  for(int i = 0; i < 0; i++){
     ChangeMotorState(forward, myController->runningMotor);
     delay(200);
     ChangeMotorState(backward, myController->runningMotor);
