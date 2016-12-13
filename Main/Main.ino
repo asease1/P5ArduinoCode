@@ -27,7 +27,7 @@
 #define MAX_QUEUE_SIZE 25
 
 #include "Wire.h"
-#include "Controller.h"
+#include "Interface.h"
 
 Blueprint* bp;
 Position BPProgress;
