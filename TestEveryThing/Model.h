@@ -333,5 +333,4 @@ Blueprint* convertToBlueprint(Queue* WallQueuePointer){
 void* GetNextInstruction(){
   return pop(&queue);
 }
-}
 

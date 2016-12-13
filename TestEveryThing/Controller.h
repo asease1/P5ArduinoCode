@@ -269,7 +269,7 @@ void NextInstruction(){
     queueIsEmpty = true;
   else
     queueIsEmpty = false;
-  currentInstruction = (Instruction*)pop(&queue);
+  currentInstruction = (Instruction*)GetNextInstruction();
 }
 
 void StartMotor(){
