@@ -7,18 +7,14 @@
 #define InstErr -1
 #define ArrMin 0
 
-enum wallSpecs {
-  StartX,
-  StartZ,
-  EndX,
-  EndZ,
-  Height
-} wallSpecs;
 
+#include "InputHandler.h"
 enum brickState
 {
 	empty, notPlaced, placed
 };
+
+struct Queue queue;
 
 /*Contains a single position in 3d space*/ 
 typedef struct Position{ 
@@ -95,9 +91,6 @@ Blueprint* createBlueprint(){
   return temp; 
 }
 
-struct Wall{
-  byte value[5];
-};
 enum notAllowedEnum
 {
 	allowed, right, left, down, up
@@ -266,13 +259,79 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCas
 	Serial.println("No instruction created.");
 	return CreateInstruction(inst.positions[0], inst.positions[1], inst.level, inst.brick);//this should never happen
 }
-/*creates a new instance of the wall struct*/
-Wall* createWall(){
-  struct Wall* tempWall = malloc(sizeof(Wall));
-  tempWall->value[StartX] = 0; // Wall starting x
-  tempWall->value[StartZ] = 0; // Wall starting z
-  tempWall->value[EndX] = 0; // Wall stopping x
-  tempWall->value[EndZ] = 0; // Wall stopping z
-  tempWall->value[Height] = 0; // Wall height
-  return tempWall;
+
+//Insert values according to the Wall it has been given
+void makeBlueprint(Blueprint* BP, Wall* W, int D){
+  int startval, endval;
+  if(D){
+    if(W->value[StartX] < W->value[EndX]){
+      startval = W->value[StartX];
+      endval = W->value[EndX];
+    }
+    else{
+      startval = W->value[EndX];
+      endval = W->value[StartX];
+    }
+    int endH = W->value[Height];
+    int zval = W->value[StartZ];
+    for(startval; startval <= endval; startval++){
+      for(int startH = 0; startH < endH; startH++)
+        BP->pos[startval][startH][zval] = 1;
+    }
+  }
+  
+  else{
+    if(W->value[StartZ] < W->value[EndZ]){
+      startval = W->value[StartZ];
+      endval = W->value[EndZ];
+    }
+    else{
+      startval = W->value[EndZ];
+      endval = W->value[StartZ];
+    }
+    int endH = W->value[Height];
+    int xval = W->value[StartX];
+    for(startval; startval <= endval; startval++){
+      for(int startH = 0; startH < endH; startH++)
+      BP->pos[xval][startH][startval] = 1;
+    }
+  }
 }
+/*Takes a pointer to queue containing Wall structs, converts these into a Blueprint struct and returns a pointer to said Blueprint struct*/
+Blueprint* convertToBlueprint(Queue* WallQueuePointer){
+  Wall* tempWall;
+
+  struct Blueprint* tempBlueprint = createBlueprint();
+
+  while(WallQueuePointer->size != 0){
+
+    tempWall = (Wall*)pop(WallQueuePointer);
+    if(tempWall->value[Height] > 0 && tempWall->value[Height] <= MaxY //Checks wall height for 0 < h <= max height
+      && tempWall->value[StartX] >= 0 && tempWall->value[StartX] < MaxX // Check if value is within model bounds
+      && tempWall->value[StartZ] >= 0 && tempWall->value[StartZ] < MaxZ // Same
+      && tempWall->value[EndX] >= 0 && tempWall->value[EndX] < MaxX //You get the idea
+      && tempWall->value[EndZ] >= 0 && tempWall->value[EndZ] < MaxZ){ //not even gonna try
+      if(tempWall->value[StartX] == tempWall->value[EndX]   // Checks if start X == end X (prevents diagonal walls)
+      && tempWall->value[StartZ] != tempWall->value[EndZ]){ // Checks if wall is not 0 long
+        makeBlueprint(tempBlueprint, tempWall, 0);
+      }
+      else if(tempWall->value[StartZ] == tempWall->value[EndZ]   // Checks if start Z == end Z (prevents diagonal walls)
+      && tempWall->value[StartX] != tempWall->value[EndX]){ // Checks if wall is not 0 long
+        makeBlueprint(tempBlueprint, tempWall, 1);
+      }
+      else{
+        ErrorCode(ERR_WALL);
+      }
+    }
+    else{
+      ErrorCode(ERR_WALL);
+    }
+  }
+  return tempBlueprint;
+}
+
+void* GetNextInstruction(){
+  return pop(&queue);
+}
+}
+

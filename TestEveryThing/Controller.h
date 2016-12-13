@@ -24,8 +24,15 @@ enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
 
 unsigned long int TimeSinceLastInterrupt = 0;
 
-
+bool isPosReached = false;
 bool isResat = false;
+bool newInstruction = false;
+bool queueIsEmpty = true;
+
+struct Instruction* currentInstruction;
+struct Instruction* savedInstruction;
+
+
 
 //All data struct
 struct Motor{
@@ -39,8 +46,6 @@ struct Motor{
     volatile int sig2;
 };
 
-
-
 struct Controller{
   int targetPos;
   Motor motorX;
@@ -49,8 +54,7 @@ struct Controller{
   volatile Motor *runningMotor;
 };
 
-
-
+struct Controller myController;
 
 //Counstructers for all the struct
 Controller CreateController(Motor motorX, Motor motorY, Motor motorZ){
@@ -256,4 +260,91 @@ void PlaceBrick(volatile Controller *myController){
   delay(2000);
   ChangeMotorState(hold, &myController->motorY);
 }
+
+void NextInstruction(){
+  ChangeMotor(&myController, motorX);
+  free(currentInstruction);
+
+  if(queue.size == 0)
+    queueIsEmpty = true;
+  else
+    queueIsEmpty = false;
+  currentInstruction = (Instruction*)pop(&queue);
+}
+
+void StartMotor(){
+  //Serial.println(currentInstruction->positions[currentInstruction->count]);
+  
+  while(!MoveTo(currentInstruction->positions[currentInstruction->count],&myController)){
+
+      if(newInstruction){
+        newInstruction = false;
+        isPosReached = true;
+        return;
+      }
+      else if(++currentInstruction->count == 2){        
+           currentInstruction->count = 1;
+           isPosReached = true;
+           return;
+        //}
+      }
+      else{
+        switch(currentInstruction->count){
+          case 0:
+            ChangeMotor(&myController, motorX);
+            break;
+          case 1:
+            ChangeMotor(&myController, motorZ);
+            break;
+        }
+      }
+    }
+}
+
+void InterfaceLoop(){
+  if(progress == InstructionsCreated){
+    if(isPosReached && !IsCurrentMotorMoving()){
+    isPosReached = false;
+    
+      switch(currentInstruction->count){
+        case 0:   
+          if(currentInstruction->type == normalInst){
+            
+            savedInstruction = currentInstruction;
+            currentInstruction = PickUpBrick(currentInstruction->brick);
+            newInstruction = true;
+            //Serial.println(111111);  
+            break;
+          }
+          //Serial.println(111112);
+          currentInstruction->count = 1;
+          ChangeMotor(&myController, motorZ);
+          
+          break;
+        case 1:
+          if(currentInstruction->type == pickUp){
+            GrabBrick(&myController);
+            free(currentInstruction);
+            currentInstruction = savedInstruction;
+            currentInstruction->type = place;
+            ChangeMotor(&myController, motorX);
+            //Serial.println(222221);
+            break;
+          }
+            digitalWrite(gearPin, HIGH);
+          //Serial.println(222222);
+          PlaceBrick(&myController);
+          //ResetSystem();
+          NextInstruction();
+          
+          break;
+      }
+      if(!queueIsEmpty){
+        StartMotor();
+      }
+    }
+  }
+}
+
+
 

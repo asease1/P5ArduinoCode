@@ -28,19 +28,11 @@
 
 #include "Wire.h"
 #include "Controller.h"
-#include "InputHandler.h"
 
-struct Instruction* currentInstruction;
-struct Instruction* savedInstruction;
-struct Queue queue;
 Blueprint* bp;
 Position BPProgress;
-struct Controller myController;
 
 
-bool queueIsEmpty = true;
-bool isPosReached = false;
-bool newInstruction = false;
 bool skipCaseChecker = false;
 
 void setup() {
@@ -98,11 +90,11 @@ void loop() {
   if(progress == 0){ // run input handler
     beginInputHandler();
   }
-  else if(progress == 1){
+  else if(progress == InputRecieved){
     bp = convertToBlueprint(&wallQueue);
-    progress = 2;
+    progress = BlueprintCreated;
   }
-  else if (progress == 2)
+  else if (progress == BlueprintCreated)
   {
     Instruction tempInstruction;
 	  
@@ -153,51 +145,9 @@ void loop() {
 
    NextInstruction();
    isPosReached = true;
-   progress = 3;
+   progress = InstructionsCreated;
   }
-  else if(progress == 3){
-    if(isPosReached && !IsCurrentMotorMoving()){
-    isPosReached = false;
-    
-      switch(currentInstruction->count){
-        case 0:   
-          if(currentInstruction->type == normalInst){
-            
-            savedInstruction = currentInstruction;
-            currentInstruction = PickUpBrick(currentInstruction->brick);
-            newInstruction = true;
-            //Serial.println(111111);  
-            break;
-          }
-          //Serial.println(111112);
-          currentInstruction->count = 1;
-          ChangeMotor(&myController, motorZ);
-          
-          break;
-        case 1:
-          if(currentInstruction->type == pickUp){
-            GrabBrick(&myController);
-            free(currentInstruction);
-            currentInstruction = savedInstruction;
-            currentInstruction->type = place;
-            ChangeMotor(&myController, motorX);
-            //Serial.println(222221);
-            break;
-          }
-            digitalWrite(gearPin, HIGH);
-          //Serial.println(222222);
-          PlaceBrick(&myController);
-          //ResetSystem();
-          NextInstruction();
-          
-          break;
-      }
-      if(!queueIsEmpty){
-        StartMotor();
-      }
-    //}
-  }
-  }
+  InterfaceLoop();
   //if(queue.size < MAX_QUEUE_SIZE)
     //push(&queue, &GetInstrction());
   //put your main code here, to run repeatedly:
@@ -342,45 +292,7 @@ void OnInterrupt(){
   }
 }
 
-void StartMotor(){
-  //Serial.println(currentInstruction->positions[currentInstruction->count]);
-  
-  while(!MoveTo(currentInstruction->positions[currentInstruction->count],&myController)){
 
-      if(newInstruction){
-        newInstruction = false;
-        isPosReached = true;
-        return;
-      }
-      else if(++currentInstruction->count == 2){        
-           currentInstruction->count = 1;
-           isPosReached = true;
-           return;
-        //}
-      }
-      else{
-        switch(currentInstruction->count){
-          case 0:
-            ChangeMotor(&myController, motorX);
-            break;
-          case 1:
-            ChangeMotor(&myController, motorZ);
-            break;
-        }
-      }
-    }
-}
-
-void NextInstruction(){
-  ChangeMotor(&myController, motorX);
-  free(currentInstruction);
-
-  if(queue.size == 0)
-    queueIsEmpty = true;
-  else
-    queueIsEmpty = false;
-  currentInstruction = (Instruction*)pop(&queue);
-}
 
 void ResetSystem(){
   isResat = false;
