@@ -334,3 +334,58 @@ void* GetNextInstruction(){
   return pop(&queue);
 }
 
+void ModelLoop(){
+  if (progress == BlueprintCreated)
+  {
+    Instruction tempInstruction;
+	  
+	  bool notDone = true;
+	  
+	  while(notDone){
+		  for (int i = 0; i < MaxY; i++)
+		  {
+		  Serial.println("");
+		  for (int j = 0; j < MaxZ; j++)
+		  {
+		  Serial.println("");
+		  for (int k = 0; k < MaxX; k++)
+		  {
+		  Serial.print(bp->pos[k][i][j]);
+		  }
+		  }
+		  }
+		  Serial.println("");
+		  Serial.println("Before GetInstruction");
+		  
+      tempInstruction = GetInstruction(bp, &BPProgress, &skipCaseChecker);
+	  Serial.print(BPProgress.x);
+	  Serial.print(", ");
+	  Serial.print(BPProgress.z);
+	  Serial.print(", ");
+	  Serial.print(BPProgress.y);
+	  Serial.println(" progresspoint");
+	  Serial.print(tempInstruction.brick);
+	  Serial.println(" brick");
+	  Serial.print(tempInstruction.positions[0]);
+	  Serial.println(" x");
+	  Serial.print(tempInstruction.positions[1]);
+	  Serial.println(" z");
+	  Serial.print(tempInstruction.level);
+	  Serial.println(" y");
+	  Serial.print("RAMFREE: ");
+	  Serial.println(freeRam());
+	  Serial.println("");
+
+      if(tempInstruction.brick != none){
+        push(&queue, &tempInstruction);
+      }
+      else{
+        notDone = false;
+      }
+	  }
+
+   NextInstruction();
+   isPosReached = true;
+   progress = InstructionsCreated;
+  }
+}

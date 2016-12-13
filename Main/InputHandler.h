@@ -69,3 +69,14 @@ beginInputHandler(){
     progress = InputRecieved;
   }
 }
+
+
+void InputHandlerLoop(){
+  if(progress == 0){ // run input handler
+    beginInputHandler();
+  }
+  else if(progress == InputRecieved){
+    bp = convertToBlueprint(&wallQueue);
+    progress = BlueprintCreated;
+  }
+}
