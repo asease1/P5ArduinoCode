@@ -302,7 +302,12 @@ void StartMotor(){
 }
 
 void InterfaceLoop(){
-  if(progress == InstructionsCreated){
+if(progress == InstructionsCreated){
+    NextInstruction();
+    isPosReached = true;
+    progress = ReadyToRun;
+  }
+  else if(progress == ReadyToRun){
     if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
     

@@ -1,7 +1,7 @@
 #include "Error.h"
 #include "queue.h"
 
-enum LoopState{Inital, InputRecieved, BlueprintCreated, InstructionsCreated};
+enum LoopState{Inital, InputRecieved, BlueprintCreated, InstructionsCreated, ReadyToRun};
 enum wallSpecs {
   StartX,
   StartZ,
@@ -74,9 +74,5 @@ beginInputHandler(){
 void InputHandlerLoop(){
   if(progress == 0){ // run input handler
     beginInputHandler();
-  }
-  else if(progress == InputRecieved){
-    bp = convertToBlueprint(&wallQueue);
-    progress = BlueprintCreated;
   }
 }

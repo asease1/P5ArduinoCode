@@ -29,11 +29,7 @@
 #include "Wire.h"
 #include "Interface.h"
 
-Blueprint* bp;
-Position BPProgress;
 
-
-bool skipCaseChecker = false;
 
 void setup() {
  
@@ -87,9 +83,11 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  
   InputHandlerLoop();
   ModelLoop(); 
   InterfaceLoop();
+
   //if(queue.size < MAX_QUEUE_SIZE)
     //push(&queue, &GetInstrction());
   //put your main code here, to run repeatedly:

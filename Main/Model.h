@@ -9,6 +9,11 @@
 
 
 #include "InputHandler.h"
+
+
+
+bool skipCaseChecker = false;
+
 enum brickState
 {
 	empty, notPlaced, placed
@@ -22,6 +27,8 @@ typedef struct Position{
   int16_t y; 
   int16_t z; 
 }; 
+
+Position BPProgress;
  
 Position CreatePosition(int16_t x, int16_t y, int16_t z){ 
   Position newPosition; 
@@ -334,8 +341,14 @@ void* GetNextInstruction(){
   return pop(&queue);
 }
 
+Blueprint* bp;
+
 void ModelLoop(){
-  if (progress == BlueprintCreated)
+  if(progress == InputRecieved){
+    bp = convertToBlueprint(&wallQueue);
+    progress = BlueprintCreated;
+  }
+  else if (progress == BlueprintCreated)
   {
     Instruction tempInstruction;
 	  
@@ -384,8 +397,6 @@ void ModelLoop(){
       }
 	  }
 
-   NextInstruction();
-   isPosReached = true;
    progress = InstructionsCreated;
   }
 }
