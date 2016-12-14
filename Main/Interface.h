@@ -92,10 +92,6 @@ void ChangeMotorState(MotorStates state, volatile Motor* motor){
   switch(state){
     case forward:
       motor->state = state;
-      
-      //Serial.println(motor->pin1);
-      //Serial.println(motor->pin2);
-      
       digitalWrite(motor->pin1, HIGH);
       digitalWrite(motor->pin2, LOW);
       break;
@@ -104,14 +100,7 @@ void ChangeMotorState(MotorStates state, volatile Motor* motor){
       digitalWrite(motor->pin1, LOW);
       digitalWrite(motor->pin2, HIGH);
       break;
-    case hold:
-      /*if(motor->state == forward)
-        ChangeMotorState(backward, motor);
-      else if(motor->state == backward)  
-        ChangeMotorState(forward, motor);
-      //we should find a other way, maybe use PVM and gears so we slow down.
-      delay(Hold_Delay);*/
-    
+    case hold: 
       digitalWrite(motor->pin1, LOW);
       digitalWrite(motor->pin2, LOW);
       motor->state = hold;
