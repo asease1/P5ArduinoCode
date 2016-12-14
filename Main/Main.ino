@@ -253,7 +253,7 @@ bool CheckPositionMargen(){
 }
 
 void ResetMotor(Chanels motor){
-  ChangeMotor(&myController, motor);
+  SelectMotor(&myController, motor);
   ChangeMotorState(backward, myController.runningMotor);
   TimeSinceLastInterrupt = millis();
   while(IsCurrentMotorMoving()){

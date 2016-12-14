@@ -146,7 +146,7 @@ bool MoveTo(int pos, volatile Controller *control){
 
 
 //Swi'tch the runningMotor on the Controller to a new Motor
-void ChangeMotor(volatile Controller *myControl, Chanels newMotor){
+void SelectMotor(volatile Controller *myControl, Chanels newMotor){
   switch(newMotor){
     case motorX:
       digitalWrite(chanelPin1, HIGH);
@@ -212,7 +212,7 @@ void GrabBrick(Controller *myController){
   analogWrite(gearPin, 180);
   isResat = false;
   Serial.println(isResat);
-  ChangeMotor(myController, motorZ);
+  SelectMotor(myController, motorZ);
   for(int i = 0; i < 0; i++){
     ChangeMotorState(forward, myController->runningMotor);
     delay(200);
@@ -225,7 +225,7 @@ void GrabBrick(Controller *myController){
     delay(700);  
   }
   
-  ChangeMotor(myController, motorX);
+  SelectMotor(myController, motorX);
   isResat = true;
 
   ChangeMotorState(backward, &myController->motorY);
@@ -240,7 +240,7 @@ void PlaceBrick(volatile Controller *myController){
   analogWrite(gearPin, 180);
   isResat = false;
   Serial.println(isResat);
-  ChangeMotor(myController, motorX);
+  SelectMotor(myController, motorX);
   for(int i = 0; i < 1; i++){
     ChangeMotorState(forward, &myController->motorX);
     delay(400);
@@ -253,7 +253,7 @@ void PlaceBrick(volatile Controller *myController){
     delay(700);  
   }
   
-  ChangeMotor(myController, motorZ);
+  SelectMotor(myController, motorZ);
   isResat = true;
   analogWrite(gearPin, 255);
   ChangeMotorState(backward, &myController->motorY);
@@ -261,8 +261,8 @@ void PlaceBrick(volatile Controller *myController){
   ChangeMotorState(hold, &myController->motorY);
 }
 
-void NextInstruction(){
-  ChangeMotor(&myController, motorX);
+void ExecuteInstruction(){
+  SelectMotor(&myController, motorX);
   free(currentInstruction);
 
   if(queue.size == 0)
@@ -291,10 +291,10 @@ void StartMotor(){
       else{
         switch(currentInstruction->count){
           case 0:
-            ChangeMotor(&myController, motorX);
+            SelectMotor(&myController, motorX);
             break;
           case 1:
-            ChangeMotor(&myController, motorZ);
+            SelectMotor(&myController, motorZ);
             break;
         }
       }
@@ -303,7 +303,7 @@ void StartMotor(){
 
 void InterfaceLoop(){
 if(progress == InstructionsCreated){
-    NextInstruction();
+    ExecuteInstruction();
     isPosReached = true;
     progress = ReadyToRun;
   }
@@ -323,7 +323,7 @@ if(progress == InstructionsCreated){
           }
           //Serial.println(111112);
           currentInstruction->count = 1;
-          ChangeMotor(&myController, motorZ);
+          SelectMotor(&myController, motorZ);
           
           break;
         case 1:
@@ -332,7 +332,7 @@ if(progress == InstructionsCreated){
             free(currentInstruction);
             currentInstruction = savedInstruction;
             currentInstruction->type = place;
-            ChangeMotor(&myController, motorX);
+            SelectMotor(&myController, motorX);
             //Serial.println(222221);
             break;
           }
@@ -340,7 +340,7 @@ if(progress == InstructionsCreated){
           //Serial.println(222222);
           PlaceBrick(&myController);
           //ResetSystem();
-          NextInstruction();
+          ExecuteInstruction();
           
           break;
       }

@@ -49,7 +49,7 @@ void readInput(int wallInt[], Queue* Walls){
   push(Walls, wallTemp);
 }
 
-beginInputHandler(){
+DecodeInput(){
   if(Serial.available()){
     if((char)Serial.peek() != 'k'){
       tempNumber = tempNumber + (char)Serial.read();
@@ -73,6 +73,6 @@ beginInputHandler(){
 
 void InputHandlerLoop(){
   if(progress == 0){ // run input handler
-    beginInputHandler();
+    DecodeInput();
   }
 }
