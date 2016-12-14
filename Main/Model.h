@@ -70,7 +70,7 @@ int freeRam() {
 	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 }
  
-/*Contains a three-dimensional array of chars and te position of the brick pickup site*/ 
+/*Contains a three-dimensional array of chars and the position of the brick pickup site*/ 
 typedef struct Blueprint{
   byte pos[MaxX][MaxY][MaxZ]; 
   Position pickup; 
@@ -98,11 +98,6 @@ Blueprint* createBlueprint(){
   return temp; 
 }
 
-enum notAllowedEnum
-{
-	allowed, right, left, down, up
-};
-
 Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCaseChecker) {
 	Instruction inst;
 	inst.brick = none;
@@ -115,7 +110,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCas
 	//Serial.print("GetInstruction:");
 	//Serial.println(freeRam());
 	bool skipCase = false;
-	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++) // lol det skal v�re en int_8t her, ellers g�r den amok
+	for (int8_t yAxis = bpProgress->y; yAxis < MaxY; yAxis++) // It has to be int_8t here, otherwise it does not work.
 	{
 		if (yAxis % 2 == 1 && !(*skipCaseChecker))
 		{
@@ -150,7 +145,7 @@ Instruction GetInstruction(Blueprint * bp, Position * bpProgress, bool * skipCas
 							bp->pos[xAxis + 2][yAxis][zAxis + 1] = placed;
 							bp->pos[xAxis + 3][yAxis][zAxis + 1] = placed;
 							//Serial.println("LB90");
-							return CreateInstruction(xAxis + 1, zAxis, yAxis, largeBrick90);       //enum BrickType {smallBrick, largeBrick0, largeBrick90, none};																								   
+							return CreateInstruction(xAxis + 1, zAxis, yAxis, largeBrick90);																							   
 							//Place big brick
 							break;
 						}
@@ -313,11 +308,11 @@ Blueprint* convertToBlueprint(Queue* WallQueuePointer){
   while(WallQueuePointer->size != 0){
 
     tempWall = (Wall*)pop(WallQueuePointer);
-    if(tempWall->value[Height] > 0 && tempWall->value[Height] <= MaxY //Checks wall height for 0 < h <= max height
-      && tempWall->value[StartX] >= 0 && tempWall->value[StartX] < MaxX // Check if value is within model bounds
-      && tempWall->value[StartZ] >= 0 && tempWall->value[StartZ] < MaxZ // Same
-      && tempWall->value[EndX] >= 0 && tempWall->value[EndX] < MaxX //You get the idea
-      && tempWall->value[EndZ] >= 0 && tempWall->value[EndZ] < MaxZ){ //not even gonna try
+    if(tempWall->value[Height] > 0 && tempWall->value[Height] <= MaxY
+      && tempWall->value[StartX] >= 0 && tempWall->value[StartX] < MaxX
+      && tempWall->value[StartZ] >= 0 && tempWall->value[StartZ] < MaxZ
+      && tempWall->value[EndX] >= 0 && tempWall->value[EndX] < MaxX 
+      && tempWall->value[EndZ] >= 0 && tempWall->value[EndZ] < MaxZ){ 
       if(tempWall->value[StartX] == tempWall->value[EndX]   // Checks if start X == end X (prevents diagonal walls)
       && tempWall->value[StartZ] != tempWall->value[EndZ]){ // Checks if wall is not 0 long
         makeBlueprint(tempBlueprint, tempWall, 0);
