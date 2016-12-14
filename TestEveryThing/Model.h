@@ -70,7 +70,7 @@ int freeRam() {
 	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 }
  
-/*Contains a three-dimensional array of chars and te position of the brick pickup site*/ 
+/*Contains a three-dimensional array of chars and the position of the brick pickup site*/ 
 typedef struct Blueprint{
   byte pos[MaxX][MaxY][MaxZ]; 
   Position pickup; 
