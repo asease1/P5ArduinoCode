@@ -1,8 +1,14 @@
 #include "Error.h"
 #include "queue.h"
 
-enum LoopState{Inital, InputRecieved, BlueprintCreated, InstructionsCreated, ReadyToRun};
-enum wallSpecs {
+enum LoopState{ //Used to keep track of what state the program is in
+	Inital, 
+	InputRecieved, 
+	BlueprintCreated, 
+	InstructionsCreated, 
+	ReadyToRun
+};
+enum wallSpecs { //Used in the generation of walls
   StartX,
   StartZ,
   EndX,
@@ -15,18 +21,18 @@ int wallCount = 0;
 
 LoopState progress = Inital;
 
-Queue wallQueue;
+Queue wallQueue; //As the walls are generated, they are kept in this queue
 
 String tempNumber = "";
 
 
 
 
-struct Wall{
+struct Wall{ 
   byte value[5];
 };
 
-/*creates a new instance of the wall struct*/
+/*Creates a new instance of the wall struct*/
 Wall* createWall(){
   struct Wall* tempWall = malloc(sizeof(Wall));
   tempWall->value[StartX] = 0; // Wall starting x
@@ -36,20 +42,19 @@ Wall* createWall(){
   tempWall->value[Height] = 0; // Wall height
   return tempWall;
 }
-/*Reads an input stream from the USB port. Divides the input into wall structs, enqueues these structs and returns a pointer to the queue*/
+/*Reads an input stream from the serial port, usually USB. Divides the input into wall structs, enqueues these structs and returns a pointer to the queue*/
 void readInput(int wallInt[], Queue* Walls){
-  /*loop runs while there is input waiting to be processed*/
   Wall* wallTemp = createWall();
   wallTemp->value[StartX] = wallInt[StartX];
   wallTemp->value[StartZ] = wallInt[StartZ];
   wallTemp->value[EndX] = wallInt[EndX];
   wallTemp->value[EndZ] = wallInt[EndZ];
   wallTemp->value[Height] = wallInt[Height];
-  //Serial.println(wallTemp->value[??]);
   push(Walls, wallTemp);
 }
 
-DecodeInput(){
+
+DecodeInput(){ //A kind of parser for the input
   if(Serial.available()){
     if((char)Serial.peek() != 'k'){
       tempNumber = tempNumber + (char)Serial.read();
@@ -72,7 +77,7 @@ DecodeInput(){
 
 
 void InputHandlerLoop(){
-  if(progress == 0){ // run input handler
+  if(progress == 0){ // Run input handler until we have recieved some meaningfull input
     DecodeInput();
   }
 }

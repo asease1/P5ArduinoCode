@@ -10,10 +10,10 @@
 //Diraction pins z axis
 #define zPin1 13
 #define zPin2 8
-//Chanel Pins
-#define chanelPin3 10
-#define chanelPin2 11
-#define chanelPin1 12
+//Channel Pins
+#define ChannelPin3 10
+#define ChannelPin2 11
+#define ChannelPin1 12
 
 
 //gear are the amount of speed the motor should move at from 0-255
@@ -33,10 +33,10 @@
 
 void setup() {
  
-  // define pin mode for chanels
-  pinMode(chanelPin3, OUTPUT);
-  pinMode(chanelPin2, OUTPUT);
-  pinMode(chanelPin1, OUTPUT);
+  // define pin mode for Channels
+  pinMode(ChannelPin3, OUTPUT);
+  pinMode(ChannelPin2, OUTPUT);
+  pinMode(ChannelPin1, OUTPUT);
   pinMode(xPin1, OUTPUT);
   pinMode(xPin2, OUTPUT);
   pinMode(yPin1, OUTPUT);
@@ -145,7 +145,7 @@ void OnInterupts2(){
   int pinSignal = digitalRead(interupt2);
 
   //Check if the signal is the same as before
-  //if it is then we have changed chanel and should not run the interupt
+  //if it is then we have changed Channel and should not run the interupt
   if(myController.runningMotor->sig2 == pinSignal)
      return;
       
@@ -252,7 +252,7 @@ bool CheckPositionMargen(){
   return false; 
 }
 
-void ResetMotor(Chanels motor){
+void ResetMotor(Channels motor){
   SelectMotor(&myController, motor);
   ChangeMotorState(backward, myController.runningMotor);
   TimeSinceLastInterrupt = millis();

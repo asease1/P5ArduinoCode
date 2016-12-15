@@ -1,11 +1,12 @@
-//Control that defines motor and a controler that contains the motors
-//Have function that contains the controller or motor in them
-//Have struct for position/3DVector and a brickData struckt
-//Margins
+//The functions in Interface.h are the ones that control the motors, and in general they act as an interface for the program to interact with the real world
+//It defines motors and a controller that contains the motors, that the other parts of the program can access
+//Has a struct for position/3DVector and a brickData struckt
+//Margins, used for correcting motor movement
 #define ERROR_MARGIN1 6
 #define ERROR_MARGIN2 120
 #define ERROR_MARGIN3 600
 
+//Coordinates for where the robot has to pick up bricks
 #define SMALL_BRICK_DEPO_X 0
 #define SMALL_BRICK_DEPO_Z 7
 #define LARGE_BRICK_0_DEPO_X 0
@@ -13,13 +14,14 @@
 #define LARGE_BRICK_90_DEPO_X 0
 #define LARGE_BRICK_90_DEPO_Z 14
 
-//Gear Pin
+//Gearing pin
 //Pin to the PVM pins(3,5,6,9,10,11)
 #define gearPin 9
-//Chanel is the current motor input Interupts
-enum Chanels {motorY, motorX, motorZ, motorRotation};
-enum MotorStates {forward, backward, hold};
-enum BrickType {smallBrick, largeBrick0, largeBrick90, none};
+
+enum Channels {motorY, motorX, motorZ, motorRotation}; //Channel is used to change what motor is currently in use
+enum MotorStates {forward, backward, hold}; //States of a motor
+enum BrickType {smallBrick, largeBrick0, largeBrick90, none}; //The different types of brick we }
+enum InstructionProgress {XCoord, ZCoord, NextInstruction}; // Tells at what stage an instruction is: Is it executing the X-coordinate, the z-coordinate, or if it should move on to the next instruction.
 #include "Model.h"
 
 unsigned long int TimeSinceLastInterrupt = 0;
@@ -34,7 +36,6 @@ struct Instruction* savedInstruction;
 
 
 
-//All data struct
 struct Motor{
     volatile int pos;
     int maxPos;
@@ -56,7 +57,6 @@ struct Controller{
 
 struct Controller myController;
 
-//Counstructers for all the struct
 Controller CreateController(Motor motorX, Motor motorY, Motor motorZ){
   Controller newController;
   newController.targetPos = 0;
@@ -69,7 +69,7 @@ Controller CreateController(Motor motorX, Motor motorY, Motor motorZ){
 
 
 
-//Function that create the motor with the values that a dynamic at the start
+//Function that initializes a new motor
 Motor CreateMotor(int maxPos, float pin1, float pin2){
   //maybe move pin setyp in to this function.
   Motor newMotor;
@@ -79,15 +79,14 @@ Motor CreateMotor(int maxPos, float pin1, float pin2){
   newMotor.pin1 = pin1;
   newMotor.pin2 = pin2;
   newMotor.state = hold;
-  //Can check the sig pins in here if you chance chanel to get a more precise position.
+  //Can check the sig pins in here, if you change channel to get a more precise position.
   newMotor.sig1 = 0;
   newMotor.sig2 = 0;
 
   return newMotor;
 }
 
-//Take a motor and set the pins to the diraction you want it to move and chance the state
-//Have to watch out for that you can run a motor that the channel is not on if this is don't you cannot update its position.
+//Takes a motor and sets the pins to the direction specified and changes the state accordingly.
 void ChangeMotorState(MotorStates state, volatile Motor* motor){
   switch(state){
     case forward:
@@ -104,14 +103,11 @@ void ChangeMotorState(MotorStates state, volatile Motor* motor){
       digitalWrite(motor->pin1, LOW);
       digitalWrite(motor->pin2, LOW);
       motor->state = hold;
-
-      //Debug
-      //MoveTo(motor->pos * -1, runningMotor);
       break;
   }
 }
 
-//Update the controller targetpos to the new position and start the runningMotor in the dircation of target
+//Update the controllers target position to a new position, and start the specified motor in that direction
 bool MoveTo(int pos, volatile Controller *control){
   if(pos > control->runningMotor->maxPos)
     return false;
@@ -119,49 +115,45 @@ bool MoveTo(int pos, volatile Controller *control){
   
   if(control->runningMotor->pos > (pos + ERROR_MARGIN1)){
       ChangeMotorState(backward, control->runningMotor);
-      //Serial.println("Back");
   }
   else if(control->runningMotor->pos < (pos - ERROR_MARGIN1)){
     ChangeMotorState(forward, control->runningMotor);
-    //Serial.println("Forward");
   }
   else
     return false;
-
   control->targetPos = pos;
   return true;
 }
 
 
 
-//Swi'tch the runningMotor on the Controller to a new Motor
-void SelectMotor(volatile Controller *myControl, Chanels newMotor){
+//Switch the runningMotor contained in the controller to a new motor
+void SelectMotor(volatile Controller *myControl, Channels newMotor){
   switch(newMotor){
     case motorX:
-      digitalWrite(chanelPin1, HIGH);
-      digitalWrite(chanelPin2, LOW);
-      digitalWrite(chanelPin3, LOW);
+      digitalWrite(ChannelPin1, HIGH);
+      digitalWrite(ChannelPin2, LOW);
+      digitalWrite(ChannelPin3, LOW);
       myControl->runningMotor = &myControl->motorX;
       break;
     case motorY:
-      digitalWrite(chanelPin1, LOW);
-      digitalWrite(chanelPin2, HIGH);
-      digitalWrite(chanelPin3, LOW);
+      digitalWrite(ChannelPin1, LOW);
+      digitalWrite(ChannelPin2, HIGH);
+      digitalWrite(ChannelPin3, LOW);
       myControl->runningMotor = &myControl->motorY;
       break;
     case motorZ:
-      digitalWrite(chanelPin1, LOW);
-      digitalWrite(chanelPin2, LOW);
-      digitalWrite(chanelPin3, LOW);
+      digitalWrite(ChannelPin1, LOW);
+      digitalWrite(ChannelPin2, LOW);
+      digitalWrite(ChannelPin3, LOW);
       myControl->runningMotor = &myControl->motorZ;
       break;
-    case motorRotation:
-      //place code for rotationMotor.
-      break;
+	default:
+		break;
   }
 }
 
-
+//Creates an instruction for where to pick up a brick. This instruction is passed on and executed somewhere else.
 Instruction* PickUpBrick(BrickType brick){
   Instruction* pickUpInstruction = malloc(sizeof(Instruction));
   Instruction tempInstruction;
@@ -184,17 +176,18 @@ Instruction* PickUpBrick(BrickType brick){
   return pickUpInstruction;
 }
 
+
 bool IsCurrentMotorMoving(){
-  //Serial.println(TimeSinceLastInterrupt);
   if(millis() > TimeSinceLastInterrupt + DELAY_FOR_MOTOR_MOVEMENT){
     return false;
   }
   else{
-    //Serial.println(myController.runningMotor->pos);
     return true;
   }
 }
 
+
+//Executes the grabbing of a brick. Seperate from other kinds of motor movement. 
 void GrabBrick(Controller *myController){
   ChangeMotorState(forward, &myController->motorY);
   delay(2000);
@@ -222,6 +215,7 @@ void GrabBrick(Controller *myController){
   ChangeMotorState(hold, &myController->motorY);
 }
 
+//Executes the grabbing of a brick. Seperate from other kinds of motor movement. 
 void PlaceBrick(volatile Controller *myController){
 
   ChangeMotorState(forward, &myController->motorY);
@@ -262,7 +256,6 @@ void ExecuteInstruction(){
 }
 
 void StartMotor(){
-  //Serial.println(currentInstruction->positions[currentInstruction->count]);
   
   while(!MoveTo(currentInstruction->positions[currentInstruction->count],&myController)){
 
@@ -271,18 +264,17 @@ void StartMotor(){
         isPosReached = true;
         return;
       }
-      else if(++currentInstruction->count == 2){        
-           currentInstruction->count = 1;
+      else if((currentInstruction->count+1) == NextInstruction){        
+           currentInstruction->count = ZCoord;
            isPosReached = true;
            return;
-        //}
       }
       else{
         switch(currentInstruction->count){
-          case 0:
+          case XCoord:
             SelectMotor(&myController, motorX);
             break;
-          case 1:
+          case ZCoord:
             SelectMotor(&myController, motorZ);
             break;
         }
@@ -290,6 +282,7 @@ void StartMotor(){
     }
 }
 
+//The loop responsible for running the right parts of an instruction when it is supposed to run, eg. the x coordinate first, then the z coordinate
 void InterfaceLoop(){
 if(progress == InstructionsCreated){
     ExecuteInstruction();
@@ -301,34 +294,29 @@ if(progress == InstructionsCreated){
     isPosReached = false;
     
       switch(currentInstruction->count){
-        case 0:   
+        case XCoord:   
           if(currentInstruction->type == normalInst){
             
             savedInstruction = currentInstruction;
             currentInstruction = PickUpBrick(currentInstruction->brick);
             newInstruction = true;
-            //Serial.println(111111);  
             break;
           }
-          //Serial.println(111112);
-          currentInstruction->count = 1;
+          currentInstruction->count = ZCoord;
           SelectMotor(&myController, motorZ);
           
           break;
-        case 1:
+        case ZCoord:
           if(currentInstruction->type == pickUp){
             GrabBrick(&myController);
             free(currentInstruction);
             currentInstruction = savedInstruction;
             currentInstruction->type = place;
             SelectMotor(&myController, motorX);
-            //Serial.println(222221);
             break;
           }
             digitalWrite(gearPin, HIGH);
-          //Serial.println(222222);
           PlaceBrick(&myController);
-          //ResetSystem();
           ExecuteInstruction();
           
           break;
