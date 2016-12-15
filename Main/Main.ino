@@ -69,21 +69,21 @@ void setup() {
   
   ResetSystem();
 
-  Serial.println("Input: 5 ");
+  Serial.print("Input: 5 ");
   Serial.print("Output: ");
-  Serial.print(ConvertToGearDegrees(5));
-  Serial.println("Input: -5 ");
+  Serial.println(ConvertToGearDegrees(5));
+  Serial.print("Input: -5 ");
   Serial.print("Output: ");
-  Serial.print(ConvertToGearDegrees(-5));
-  Serial.println("Input: 100000 ");
+  Serial.println(ConvertToGearDegrees(-5));
+  Serial.print("Input: 100000 ");
   Serial.print("Output: ");
-  Serial.print(ConvertToGearDegrees(100000));
-  Serial.println("Input: 0 ");
+  Serial.println(ConvertToGearDegrees(100000));
+  Serial.print("Input: 0 ");
   Serial.print("Output: ");
-  Serial.print(ConvertToGearDegrees(0));
-  Serial.println("Input: 35 ");
+  Serial.println(ConvertToGearDegrees(0));
+  Serial.print("Input: 35 ");
   Serial.print("Output: ");
-  Serial.print(ConvertToGearDegrees(35));
+  Serial.println(ConvertToGearDegrees(35));
 
 }
 
