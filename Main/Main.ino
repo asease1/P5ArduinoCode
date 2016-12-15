@@ -64,41 +64,31 @@ void setup() {
   
   myController = CreateController(CreateMotor(3000, xPin1, xPin2),CreateMotor(3050, yPin1, yPin2),CreateMotor(3050, zPin1, zPin2));
 
-  /*
-  push(&queue, &CreateInstruction(5,5,0, smallBrick));
-  push(&queue, &CreateInstruction(5,9,0, smallBrick));
-  push(&queue, &CreateInstruction(5,13,0, smallBrick));
-  push(&queue, &CreateInstruction(5,7,0, smallBrick));
-  push(&queue, &CreateInstruction(5,11,0, smallBrick));
-  */
-  
-  //NextInstruction();
+
   
   
   ResetSystem();
-  //analogWrite(gearPin, 120);
-  //StartMotor();
-  //isPosReached = true;
+
+  Serial.println("Input: 5 ");
+  Serial.print("Output: ");
+  Serial.print(ConvertToGearDegrees(5));
+  Serial.println("Input: -5 ");
+  Serial.print("Output: ");
+  Serial.print(ConvertToGearDegrees(-5));
+  Serial.println("Input: 100000 ");
+  Serial.print("Output: ");
+  Serial.print(ConvertToGearDegrees(100000));
+  Serial.println("Input: 0 ");
+  Serial.print("Output: ");
+  Serial.print(ConvertToGearDegrees(0));
+  Serial.println("Input: 35 ");
+  Serial.print("Output: ");
+  Serial.print(ConvertToGearDegrees(35));
+
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  
-  InputHandlerLoop();
-  ModelLoop(); 
-  InterfaceLoop();
 
-  //if(queue.size < MAX_QUEUE_SIZE)
-    //push(&queue, &GetInstrction());
-  //put your main code here, to run repeatedly:
-  //Serial.println(queue.size);
-  //Serial.println(isPosReached);
-  
-  
-    
- //Serial.println(myController.runningMotor->pos);
- //delay(10);
- //Serial.println(myController.runningMotor->pos);
 }
 
 //DebugCode
