@@ -12,3 +12,16 @@ void ErrorCode(int error_Code) {
 	Serial.println(error_Code);
 	Wire.endTransmission();
 }
+
+void InitializeErrorComms() {
+	Wire.begin();           // Wake up I2C bus
+							// Set I/O pins to outputs
+	Wire.beginTransmission(0x20);
+	Wire.write(0x00);       // IODIRA register
+	Wire.write(0x00);       // Set all of port A to outputs
+	Wire.endTransmission();
+	Wire.beginTransmission(0x20);
+	Wire.write(0x01);       // IODIRB register
+	Wire.write(0x00);       // Set all of port B to outputs
+	Wire.endTransmission();
+}
