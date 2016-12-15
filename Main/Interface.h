@@ -297,9 +297,17 @@ if(progress == InstructionsCreated){
     progress = ReadyToRun;
   }
   else if(progress == ReadyToRun){
+    
     if(isPosReached && !IsCurrentMotorMoving()){
     isPosReached = false;
-    
+    Serial.println(currentInstruction->positions[0]);
+    Serial.println(currentInstruction->positions[1]);
+    Serial.print("X: ");
+  Serial.println(myController.motorX.pos);
+  Serial.print("Y: ");
+  Serial.println(myController.motorY.pos);
+  Serial.print("Z: ");
+  Serial.println(myController.motorZ.pos);
       switch(currentInstruction->count){
         case 0:   
           if(currentInstruction->type == normalInst){
