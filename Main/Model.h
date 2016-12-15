@@ -340,7 +340,6 @@ void ModelLoop(){
 	  bool notDone = true;
 	  
 	  while(notDone){
-y
       tempInstruction = GetInstruction(bp, &BPProgress, &skipCaseChecker);
 
       if(tempInstruction.brick != none){

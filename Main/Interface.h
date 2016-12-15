@@ -169,6 +169,9 @@ Instruction* PickUpBrick(BrickType brick){
     case largeBrick90:
       tempInstruction = CreateInstruction(LARGE_BRICK_90_DEPO_X, LARGE_BRICK_90_DEPO_Z,0, none);
       break;
+	default:
+		break;
+
   }
 
   tempInstruction.type = pickUp; 
@@ -277,6 +280,8 @@ void StartMotor(){
           case ZCoord:
             SelectMotor(&myController, motorZ);
             break;
+		  default:
+			break;
         }
       }
     }
@@ -318,8 +323,9 @@ if(progress == InstructionsCreated){
             digitalWrite(gearPin, HIGH);
           PlaceBrick(&myController);
           ExecuteInstruction();
-          
           break;
+		default:
+			break;
       }
       if(!queueIsEmpty){
         StartMotor();
