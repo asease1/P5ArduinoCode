@@ -63,42 +63,15 @@ void setup() {
   wallQueue = CreateQueue(sizeof(Wall));
   
   myController = CreateController(CreateMotor(3000, xPin1, xPin2),CreateMotor(3050, yPin1, yPin2),CreateMotor(3050, zPin1, zPin2));
-
-  /*
-  push(&queue, &CreateInstruction(5,5,0, smallBrick));
-  push(&queue, &CreateInstruction(5,9,0, smallBrick));
-  push(&queue, &CreateInstruction(5,13,0, smallBrick));
-  push(&queue, &CreateInstruction(5,7,0, smallBrick));
-  push(&queue, &CreateInstruction(5,11,0, smallBrick));
-  */
-  
-  //NextInstruction();
   
   
   ResetSystem();
-  //analogWrite(gearPin, 120);
-  //StartMotor();
-  //isPosReached = true;
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  
   InputHandlerLoop();
   ModelLoop(); 
   InterfaceLoop();
-
-  //if(queue.size < MAX_QUEUE_SIZE)
-    //push(&queue, &GetInstrction());
-  //put your main code here, to run repeatedly:
-  //Serial.println(queue.size);
-  //Serial.println(isPosReached);
-  
-  
-    
- //Serial.println(myController.runningMotor->pos);
- //delay(10);
- //Serial.println(myController.runningMotor->pos);
 }
 
 //DebugCode
@@ -106,7 +79,6 @@ void loop() {
 
 
 void OnInterupts1(){
-  //Serial.println(11);
   //NXT lego motor encoder
   //A1100
   //B0110 Code for the clockwise rotation
@@ -134,7 +106,6 @@ void OnInterupts1(){
       break;
   }  
   OnInterrupt();
-  //Serial.println(21);
 }
 
 void OnInterupts2(){
@@ -171,7 +142,6 @@ void OnInterupts2(){
   }
 
    OnInterrupt();
-   //Serial.println(22);
 }
 
 bool InterruptMotorPositionCheck(){
@@ -220,7 +190,6 @@ bool InterruptMotorPositionCheck(){
         break;
     }
     
-      //Serial.println(halted);
     return halted;
 }
 
@@ -257,7 +226,6 @@ void ResetMotor(Channels motor){
   ChangeMotorState(backward, myController.runningMotor);
   TimeSinceLastInterrupt = millis();
   while(IsCurrentMotorMoving()){
-    //Serial.println(myController.runningMotor->pos);
   }
   ChangeMotorState(hold, myController.runningMotor);
   myController.runningMotor->pos = 0;
